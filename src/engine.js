@@ -279,7 +279,7 @@ function cardLevel(run, id) {
 }
 function cardNums(run, id) { return CARDS[id].lv[cardLevel(run, id) - 1]; }
 function cardText(id, lv) { return CARDS[id].fx(lv || 1); }
-function nrgMax(run) { return 3 + (run && cs(run, 'est') >= 3.5 ? 1 : 0); }
+function nrgMax(run) { return Math.max(1, 3 + (run && cs(run, 'est') >= 3.5 ? 1 : 0) - ((run && run.nrgPenalty) || 0)); }
 function comboHints(run, id) {
   return COMBOS.filter(c => c.cards.indexOf(id) >= 0 && (
     (c.relic && run.relics && run.relics.indexOf(c.relic) >= 0) ||
@@ -498,6 +498,7 @@ function teamLines(run, stage) {
   };
 }
 function oppLines(run, stage) {
+  if (run.careerOpp) return run.careerOpp.lines;
   if (stage === 6 && run.cupRole != null && run.opponents[6]) {
     const o = run.opponents[6];
     return { atk: o.baseStr + o.jit.atk, mid: o.baseStr + o.jit.mid, def: o.baseStr + o.jit.def, gk: o.baseStr + o.jit.gk };
@@ -510,6 +511,7 @@ function oppLines(run, stage) {
 }
 function opponentInfo(run, stage) {
   stage = stage == null ? run.stage : stage;
+  if (run.careerOpp) return run.careerOpp;
   if (stage === 6 && run.cupRole != null && run.opponents[6]) {
     const o = run.opponents[6];
     return { nome: o.nome, flag: o.flag, boss: false, scorers: o.scorers, scorerW: o.scorerW, gk: o.gk, lines: oppLines(run, 6) };
