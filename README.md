@@ -35,4 +35,6 @@ https://patricksouzapaiva-crypto.github.io/fominha-fc/
 
 Cada push na `main` dispara `.github/workflows/pages.yml`: instala as dependências, roda `node build.js`, publica a pasta `_site/` com `index.html` via GitHub Actions (`actions/configure-pages` com `enablement: true`, `actions/upload-pages-artifact` e `actions/deploy-pages`).
 
+O token do Actions não consegue ligar o Pages sozinho. Na primeira vez, em **Settings → Pages → Source**, escolha **GitHub Actions** e rode de novo o workflow.
+
 O `index.html` commitado na raiz também cobre o modo **Deploy from a branch** (branch `main`, pasta `/`). O arquivo `.nojekyll` evita que o Jekyll reescreva o HTML.
