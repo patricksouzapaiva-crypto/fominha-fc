@@ -1,12 +1,31 @@
-/* Fominha FC · amostras livres, com fallback procedural se o arquivo não carregar. */
+/* Fominha FC · só gravações. Sem oscilador e sem ruído gerado. */
 (function (root) {
   const KEY = 'ffsom';
-  let AC = null, master = null, noiseBuf = null, crowd = null, crowdGain = null, unlocked = false;
+  let AC = null, master = null, musicGain = null, crowdGain = null, unlocked = false;
   let settings = { on: true, vol: 0.25 };
   try {
     const s = JSON.parse((typeof localStorage !== 'undefined' && localStorage.getItem(KEY)) || 'null');
     if (s && typeof s.vol === 'number') settings = { on: s.on !== false, vol: Math.max(0, Math.min(1, s.vol)) };
   } catch (e) { /* segue o padrão */ }
+
+  const FILES = {
+    music: 'music.ogg',
+    crowd: 'crowd.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg', chant: 'chant.ogg',
+    whistle: 'whistle.ogg', 'whistle-long': 'whistle-long.ogg',
+    kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
+    click: 'click.ogg', back: 'back.ogg', confirm: 'confirm.ogg', pack: 'pack.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg'
+  };
+  const UI = ['click', 'back', 'confirm', 'pack', 'card', 'fanfare'];
+  const MATCH = ['crowd', 'roar', 'groan', 'boo', 'chant', 'whistle', 'whistle-long', 'kick', 'net', 'post'];
+  const MIX = {
+    music: 0.16, musicDuck: 0.03,
+    crowd: 0.42, crowdDuck: 0.2,
+    click: 0.1, back: 0.08, confirm: 0.12, pack: 0.14, card: 0.11, fanfare: 0.22,
+    whistle: 0.72, kick: 0.64, net: 0.7, post: 0.55, roar: 0.88, groan: 0.5, boo: 0.42, chant: 0.3
+  };
+  const bufs = {};
+  const inflight = {};
+  const loops = {};
 
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (e) { /* modo privado */ }
@@ -19,61 +38,21 @@
     master = AC.createGain();
     master.gain.value = settings.on ? settings.vol : 0;
     master.connect(AC.destination);
-    const len = AC.sampleRate * 2;
-    noiseBuf = AC.createBuffer(1, len, AC.sampleRate);
-    const d = noiseBuf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    musicGain = AC.createGain();
+    musicGain.gain.value = MIX.music;
+    musicGain.connect(master);
+    crowdGain = AC.createGain();
+    crowdGain.gain.value = MIX.crowd;
+    crowdGain.connect(master);
     return AC;
   }
   function live() {
-    if (!settings.on || settings.vol <= 0.001) return null;
+    if (!unlocked || !settings.on || settings.vol <= 0.001) return null;
     const c = ctx();
     if (!c) return null;
     if (c.state === 'suspended') c.resume();
     return c;
   }
-  function envGain(t, a, peak, d) {
-    const g = AC.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + a);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
-    g.connect(master);
-    return g;
-  }
-  function tone(freq, dur, type, peak, delay) {
-    const c = live(); if (!c) return;
-    const t = c.currentTime + (delay || 0);
-    const o = c.createOscillator();
-    o.type = type || 'sine';
-    o.frequency.setValueAtTime(freq, t);
-    o.connect(envGain(t, 0.012, peak == null ? 0.2 : peak, dur));
-    o.start(t); o.stop(t + dur + 0.05);
-  }
-  function noise(dur, peak, bp, delay) {
-    const c = live(); if (!c) return;
-    const t = c.currentTime + (delay || 0);
-    const s = c.createBufferSource();
-    s.buffer = noiseBuf;
-    s.loop = true;
-    let node = s;
-    if (bp) {
-      const f = c.createBiquadFilter();
-      f.type = 'bandpass'; f.frequency.value = bp.f; f.Q.value = bp.q || 0.7;
-      s.connect(f); node = f;
-    }
-    node.connect(envGain(t, 0.01, peak == null ? 0.15 : peak, dur));
-    s.start(t); s.stop(t + dur + 0.02);
-  }
-  function chord(freqs, dur, peak) {
-    freqs.forEach((f, i) => tone(f, dur, 'triangle', (peak || 0.12) * (1 - i * 0.15), i * 0.045));
-  }
-  const FILES = {
-    click: 'click.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg', whistle: 'whistle.ogg',
-    'whistle-long': 'whistle-long.ogg', kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
-    crowd: 'crowd.ogg', chant: 'chant.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg'
-  };
-  const bufs = {};
-  let loading = false;
   function sampleBase() {
     try {
       if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
@@ -81,117 +60,173 @@
       return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/snd/';
     } catch (e) { return ''; }
   }
-  function loadSamples() {
+  function loadOne(name) {
+    if (bufs[name]) return Promise.resolve(bufs[name]);
+    if (inflight[name]) return inflight[name];
     const base = sampleBase();
-    if (!base || !AC || loading || typeof fetch !== 'function') return;
-    loading = true;
-    Object.keys(FILES).forEach(name => {
-      fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
-        if (!ab) return null;
-        return AC.decodeAudioData(ab);
-      }).then(buf => { if (buf) bufs[name] = buf; }).catch(() => {});
-    });
+    const c = ctx();
+    if (!base || !c || !FILES[name] || typeof fetch !== 'function') return Promise.resolve(null);
+    inflight[name] = fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
+      if (!ab) return null;
+      return c.decodeAudioData(ab);
+    }).then(buf => {
+      if (buf) bufs[name] = buf;
+      delete inflight[name];
+      return buf || null;
+    }).catch(() => { delete inflight[name]; return null; });
+    return inflight[name];
   }
-  function playBuf(name, gain, loop) {
+  function playBuf(name, gain) {
     const buf = bufs[name];
     const c = live();
-    if (!c || !buf) return null;
+    if (!c) return null;
+    if (!buf) { loadOne(name).then(b => { if (b && settings.on) playBuf(name, gain); }); return null; }
     const s = c.createBufferSource();
     s.buffer = buf;
-    s.loop = !!loop;
     const g = c.createGain();
-    g.gain.value = gain == null ? 0.8 : gain;
+    g.gain.value = gain == null ? 0.5 : gain;
     s.connect(g); g.connect(master);
     s.start();
-    return { src: s, gain: g };
+    return s;
   }
-  function duckCrowd(to, back, sec) {
-    if (!crowdGain || !AC) return;
+  function placeLoop(st, buf, dest, when, fade) {
+    const dur = buf.duration;
+    const xf = Math.min(fade, dur * 0.35);
+    const s = AC.createBufferSource();
+    s.buffer = buf;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.linearRampToValueAtTime(1, when + xf);
+    g.gain.setValueAtTime(1, Math.max(when + xf + 0.01, when + dur - xf));
+    g.gain.linearRampToValueAtTime(0.0001, when + dur);
+    s.connect(g); g.connect(dest);
+    s.start(when);
+    s.stop(when + dur + 0.03);
+    st.srcs.push(s);
+    s.onended = () => { const i = st.srcs.indexOf(s); if (i >= 0) st.srcs.splice(i, 1); };
+    return dur - xf;
+  }
+  function armLoop(key, buf, dest, fade) {
+    if (!buf || !AC || loops[key]) return;
+    const st = { alive: true, srcs: [], timer: 0 };
+    loops[key] = st;
+    const kick = when => {
+      if (!st.alive) return;
+      const hop = placeLoop(st, buf, dest, when, fade);
+      const wait = (when + hop - AC.currentTime) * 1000;
+      st.timer = setTimeout(() => kick(when + hop), Math.max(40, wait));
+    };
+    kick(AC.currentTime + 0.04);
+  }
+  function disarm(key) {
+    const st = loops[key];
+    if (!st) return;
+    st.alive = false;
+    clearTimeout(st.timer);
+    st.srcs.forEach(s => { try { s.stop(); } catch (e) { /* já parou */ } });
+    delete loops[key];
+  }
+  function duck(node, floor, back, sec) {
+    if (!node || !AC) return;
     const t = AC.currentTime;
-    const now = crowdGain.gain.value;
-    crowdGain.gain.cancelScheduledValues(t);
-    crowdGain.gain.setValueAtTime(now, t);
-    crowdGain.gain.linearRampToValueAtTime(to, t + 0.06);
-    crowdGain.gain.linearRampToValueAtTime(back, t + sec);
+    const now = node.gain.value;
+    node.gain.cancelScheduledValues(t);
+    node.gain.setValueAtTime(now, t);
+    node.gain.linearRampToValueAtTime(floor, t + 0.07);
+    node.gain.linearRampToValueAtTime(back, t + sec);
   }
 
   const FFAudio = {
     settings() { return { on: settings.on, vol: settings.vol }; },
-    setOn(v) { settings.on = !!v; if (master) master.gain.value = settings.on ? settings.vol : 0; if (!settings.on) FFAudio.crowdStop(); save(); },
-    setVol(v) { settings.vol = Math.max(0, Math.min(1, +v || 0)); if (master) master.gain.value = settings.on ? settings.vol : 0; save(); },
+    setOn(v) {
+      settings.on = !!v;
+      const c = ctx();
+      if (master && c) {
+        const t = c.currentTime;
+        master.gain.cancelScheduledValues(t);
+        master.gain.setValueAtTime(master.gain.value, t);
+        master.gain.linearRampToValueAtTime(settings.on ? settings.vol : 0, t + 0.05);
+      }
+      if (!settings.on) { disarm('music'); disarm('crowd'); }
+      save();
+    },
+    setVol(v) {
+      settings.vol = Math.max(0, Math.min(1, +v || 0));
+      if (master && settings.on) master.gain.value = settings.vol;
+      save();
+    },
     unlock() {
       const c = ctx(); if (!c) return;
       if (c.state === 'suspended') c.resume();
       unlocked = true;
-      loadSamples();
+      UI.forEach(loadOne);
+      if (settings.on) loadOne('music').then(buf => { if (buf && settings.on && unlocked) FFAudio.musicStart(); });
     },
-    click() { if (!playBuf('click', 0.55)) tone(640, 0.04, 'sine', 0.045); },
-    flip() { noise(0.07, 0.12, { f: 1800, q: 0.6 }); tone(420, 0.05, 'square', 0.04); },
-    pack() { noise(0.25, 0.14, { f: 900, q: 0.5 }); tone(520, 0.12, 'sawtooth', 0.05); tone(780, 0.16, 'triangle', 0.07, 0.08); },
-    playCard() { if (!playBuf('card', 0.6)) { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); } },
-    energy() { tone(880, 0.04, 'sine', 0.06); },
-    counter() { tone(196, 0.12, 'sawtooth', 0.1); tone(392, 0.14, 'square', 0.05, 0.04); },
-    combo() { chord([523, 659, 784], 0.16, 0.1); },
-    level() { chord([523, 659, 784, 1046], 0.22, 0.11); },
-    record() { chord([392, 494, 587, 784], 0.38, 0.12); },
+    musicStart() {
+      const c = live(); if (!c || loops.music) return;
+      loadOne('music').then(buf => {
+        if (!buf || !settings.on || loops.music) return;
+        musicGain.gain.cancelScheduledValues(c.currentTime);
+        musicGain.gain.setValueAtTime(MIX.music, c.currentTime);
+        armLoop('music', buf, musicGain, 0.22);
+      });
+    },
+    musicStop() { disarm('music'); },
+    ready(name) { return !!bufs[name]; },
+    click() { playBuf('click', MIX.click); },
+    back() { playBuf('back', MIX.back); },
+    confirm() { playBuf('confirm', MIX.confirm); },
+    flip() { playBuf('card', MIX.card); },
+    pack() { playBuf('pack', MIX.pack); },
+    playCard() { playBuf('card', MIX.card); },
+    energy() { playBuf('click', MIX.click * 0.7); },
+    counter() { playBuf('confirm', MIX.confirm); },
+    combo() { playBuf('fanfare', MIX.fanfare * 0.7); },
+    level() { playBuf('fanfare', MIX.fanfare); },
+    record() { playBuf('fanfare', MIX.fanfare); },
+    stinger() { playBuf('confirm', MIX.confirm); },
+    fanfare() { playBuf('fanfare', MIX.fanfare); },
     whistle(kind) {
-      const file = kind === 'full' ? 'whistle-long' : 'whistle';
-      if (playBuf(file, 0.7)) return;
-      const hi = kind === 'full' ? 2100 : kind === 'card' ? 1700 : 1900;
-      tone(hi, kind === 'full' ? 0.28 : 0.16, 'sine', 0.09);
-      tone(hi * 1.01, kind === 'full' ? 0.28 : 0.12, 'triangle', 0.04, 0.02);
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.7);
+      playBuf(kind === 'full' ? 'whistle-long' : 'whistle', MIX.whistle);
     },
-    net() { if (!playBuf('net', 0.75)) noise(0.12, 0.16, { f: 600, q: 0.8 }); },
+    kick() {
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.45);
+      playBuf('kick', MIX.kick);
+    },
+    net() { playBuf('net', MIX.net); },
     post() {
-      if (playBuf('post', 0.7)) { FFAudio.uuh(); return; }
-      tone(240, 0.18, 'square', 0.08);
-      tone(180, 0.22, 'sawtooth', 0.06, 0.02);
-      noise(0.15, 0.1, { f: 1400, q: 2 });
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.8);
+      playBuf('post', MIX.post);
       FFAudio.uuh();
     },
-    uuh() { if (!playBuf('groan', 0.55)) noise(0.45, 0.1, { f: 500, q: 0.6 }); },
+    uuh() { playBuf('groan', MIX.groan); },
     goal() {
-      duckCrowd(0.05, 0.12, 1.6);
-      if (playBuf('roar', 0.85)) { playBuf('net', 0.7); return; }
-      FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 });
+      duck(musicGain, MIX.musicDuck, MIX.music, 2.3);
+      duck(crowdGain, MIX.crowdDuck, MIX.crowd, 1.7);
+      playBuf('roar', MIX.roar);
+      playBuf('net', MIX.net);
     },
     concede() {
-      if (playBuf('boo', 0.7)) return;
-      FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05);
+      duck(musicGain, MIX.musicDuck, MIX.music, 1.6);
+      playBuf('boo', MIX.boo);
     },
-    stinger() { chord([349, 440, 523], 0.28, 0.1); },
-    fanfare() { if (!playBuf('fanfare', 0.65)) chord([523, 659, 784, 1046], 0.42, 0.12); },
     crowdStart() {
-      const c = live(); if (!c || crowd) return;
-      if (bufs.crowd) {
-        const played = playBuf('crowd', 0.22, true);
-        if (played) { crowd = played.src; crowdGain = played.gain; return; }
-      }
-      const s = c.createBufferSource();
-      s.buffer = noiseBuf; s.loop = true;
-      const bp = c.createBiquadFilter();
-      bp.type = 'bandpass'; bp.frequency.value = 480; bp.Q.value = 0.55;
-      crowdGain = c.createGain();
-      crowdGain.gain.value = 0.022;
-      s.connect(bp); bp.connect(crowdGain); crowdGain.connect(master);
-      s.start();
-      crowd = s;
+      const c = live(); if (!c || loops.crowd) return;
+      MATCH.forEach(loadOne);
+      loadOne('crowd').then(buf => {
+        if (!buf || !settings.on || loops.crowd) return;
+        crowdGain.gain.cancelScheduledValues(AC.currentTime);
+        crowdGain.gain.setValueAtTime(MIX.crowd, AC.currentTime);
+        armLoop('crowd', buf, crowdGain, 1.05);
+      });
     },
     crowdSwell(level) {
-      if (!crowdGain || !AC) { FFAudio.crowdStart(); }
-      if (!crowdGain || !AC) return;
-      const t = AC.currentTime;
-      const peak = Math.max(0.04, Math.min(0.2, level || 0.1));
-      crowdGain.gain.cancelScheduledValues(t);
-      crowdGain.gain.setValueAtTime(Math.max(0.02, crowdGain.gain.value), t);
-      crowdGain.gain.linearRampToValueAtTime(peak, t + 0.12);
-      crowdGain.gain.linearRampToValueAtTime(bufs.crowd ? 0.22 : 0.022, t + 1.1);
-      if (bufs.chant && peak > 0.12) playBuf('chant', 0.35);
+      if (!loops.crowd) FFAudio.crowdStart();
+      duck(crowdGain, Math.min(0.7, MIX.crowd + (level || 0.08)), MIX.crowd, 1.15);
+      if ((level || 0) > 0.05) playBuf('chant', MIX.chant);
     },
-    crowdStop() {
-      if (crowd) { try { crowd.stop(); } catch (e) { /* já parou */ } }
-      crowd = null; crowdGain = null;
-    },
+    crowdStop() { disarm('crowd'); },
     unlocked: () => unlocked
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = FFAudio;
