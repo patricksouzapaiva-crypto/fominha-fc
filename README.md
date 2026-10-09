@@ -25,7 +25,17 @@ Os testes de unidade rodam no Node, sem navegador:
 npm test
 ```
 
-Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js`, `test/meta.test.js`, `test/bracket.test.js`, `test/live.test.js` e `test/cards.test.js`.
+Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js`, `test/meta.test.js`, `test/bracket.test.js`, `test/live.test.js`, `test/cards.test.js` e `test/career.test.js`.
+
+## Modo Carreira
+
+No início, **Modo Carreira** abre uma carreira de até 20 temporadas, ao lado da Copa Relâmpago. O técnico começa na Série D, com 18 pontos para distribuir. A temporada anda em simulação rápida; os clássicos, as rodadas decisivas e as semifinais e finais de copa entram no mesmo motor de cartas da Copa.
+
+A pirâmide tem 20 clubes por série. Os quatro primeiros sobem, os quatro últimos caem. Proposta de clube grande não entrega o elenco inteiro: o time herdado fica perto do que você já tinha. Mentor sai a cada cinco temporadas e acelera um atributo. Demissão existe quando a confiança chega no chão, e dá para assinar em outro banco.
+
+O som é gerado no navegador (apito, torcida, gol, interface). O botão **Som** liga, desliga e muda o volume. A preferência fica no aparelho. Nada de arquivo de áudio.
+
+`node test/career.test.js` imprime a tabela de equilíbrio: subida Série D→A, taças, demissões e o quanto o mentor adianta o atributo.
 
 `node test/realtime.test.js` abre dois clientes no Supabase (chave publishable) e confere o broadcast da final ao vivo. `node test/duel-screens.js` grava as telas do duelo em `docs/screens/duel/`.
 

@@ -77,7 +77,10 @@ function toast(msg) {
   setTimeout(() => t.remove(), 2000);
 }
 function rc(rar) { return E.RARITIES[rar] ? `var(--r-${rar})` : 'var(--r-comum)'; }
-function selOf(run) { return E.SELECOES[run.selecao]; }
+function selOf(run) {
+  if (run && run.clubKit) return { flag: run.clubFlag || '🏳️', curto: run.clubShort || 'Clube', nome: run.clubName || 'Clube', kit: run.clubKit, id: 'clube', cor: run.clubKit[0], perk: { nome: 'Comissão', desc: '' } };
+  return E.SELECOES[run.selecao];
+}
 function oppShort(op) { return op.boss ? op.apelido : op.nome.replace(/ \d{4}$/, ''); }
 
 // ---------- desafio do dia ----------
@@ -210,8 +213,11 @@ function coachCardHtml(nome, slots, opts) {
 // ---------- telas ----------
 function render() {
   clearTimeout(G.timer); clearInterval(G.decT); clearInterval(G.spinT);
-  document.querySelectorAll('.tip,.sheet,.modal,.epicfx').forEach(x => x.remove()); SIM.epic = null;
+  document.querySelectorAll('.tip,.sheet,.modal,.epicfx,.walkout').forEach(x => x.remove()); SIM.epic = null;
+  if (G.screen !== 'match' && window.FFAudio) FFAudio.crowdStop();
   window.scrollTo(0, 0);
+  app.classList.toggle('career', String(G.screen || '').indexOf('car') === 0);
+  if (window.FFCareer && FFCareer.view && String(G.screen || '').indexOf('car') === 0) { renderCareer(); syncTabbar(); saveStore(); app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter'); return; }
   ({ home: renderHome, daily: renderDaily, selecao: renderSelecao, coach: renderCoach, hub: renderHub, match: renderMatch, result: renderResult, reward: renderReward, shop: renderShop, verdict: renderVerdict, desafios: renderDesafios, album: renderAlbum, tecnicos: renderTecnicos, perfil: renderPerfil, duelo: renderDuelo, chave: renderChave, espera: renderEspera, caiu: renderCaiu })[G.screen]();
   syncTabbar(); saveStore();
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
@@ -278,9 +284,10 @@ function renderHome() {
     <input class="seed" id="seedIn" maxlength="12" placeholder="SEMENTE (OPCIONAL)" value="${esc(G.pendingSeed)}" autocomplete="off" autocapitalize="characters" aria-label="Semente para desafiar amigo">
     <p class="xs mut" style="margin:6px 0 12px">Vazio = Copa aleatória. Cole a semente de um amigo pra jogar a mesma Copa e comparar a pontuação.</p>
     <button class="btn shine" data-act="start">${ic('play')} Começar a Copa</button>
-    <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button></div>
+    <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button>
+    <button class="btn sec" style="margin-top:8px" data-act="carOpen">Modo Carreira <small>20 temporadas, da Série D à elite</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
-  <button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button>`;
+  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button><button class="btn ghost" data-act="som">Som</button></div>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
   if (!ligaAnimModal()) showTip('nav');
 }
@@ -492,7 +499,7 @@ function renderMatch() {
       <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
     </div>
     <div class="prog"><i id="prog" style="width:${Math.min(100, m.minute / 90 * 100)}%"></i></div>
-    <div class="stagelbl"><span>${esc(E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
+    <div class="stagelbl"><span>${esc(run.careerLabel || E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
   </div>
   <div class="momentum"><div class="mh"><span style="color:var(--lime)">▲ ${esc(sel.curto)}</span><span>Momentum</span><span style="color:#ff9a9d">${esc(oppShort(op))} ▼</span></div>
     <svg id="mom" viewBox="0 0 300 46" preserveAspectRatio="none" role="img" aria-label="Gráfico de pressão por minuto"></svg>
@@ -505,6 +512,8 @@ function renderMatch() {
   G.mom = Array.from({ length: 30 }, () => [0, 0]); G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
   initSim();
   updateFx(); drawMomentum(); drawStats();
+  if (window.FFAudio) FFAudio.crowdStart();
+  if (!RM() && G.speed === 1 && (run.careerMatch || run.stage === 0 || (m.stage >= 5 && m.minute === 0))) showWalkout();
   if (m.pvp && G.holdKick && Date.now() < G.holdKick) G.timer = setTimeout(tick, Math.max(200, G.holdKick - Date.now()));
   else G.timer = setTimeout(tick, 700);
 }
@@ -726,9 +735,17 @@ function tick() {
   } else if (it.t === 'build') {
     setPoss(it.side, true); G.mst.poss[it.side] += 1.5; addMom(it.side, it.min, 0.7);
     pushFeed({ min: it.min, kind: 'build', text: narr('build' + it.side, it.side, it.who) }); wait = PACE.build;
+    if (window.FFAudio && it.side === 0) FFAudio.crowdSwell(0.06);
   } else {
     const e = it.e;
-    if (e.kind === 'counter' || e.kind === 'combo') flashBanner(e);
+    if (e.kind === 'counter' || e.kind === 'combo') { flashBanner(e); if (window.FFAudio) { if (e.kind === 'combo') FFAudio.combo(); else FFAudio.counter(); } }
+    if (window.FFAudio) {
+      if (e.kind === 'goal') { if (e.side === 0) FFAudio.goal(); else FFAudio.concede(); }
+      else if (e.kind === 'lance' && /TRAVE|travessão/.test(e.text || '')) FFAudio.post();
+      else if (e.kind === 'card') FFAudio.playCard();
+      else if (e.kind === 'half') FFAudio.whistle('half');
+      else if (e.kind === 'end') FFAudio.whistle('full');
+    }
     pushFeed(e);
     if (e.epic) {
       if (e.kind === 'goal') { G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2.5); G.mst.shots[e.side]++; }
@@ -822,9 +839,25 @@ function flashBanner(e) {
   document.body.appendChild(d);
   setTimeout(() => d.remove(), 1700);
 }
+function showWalkout() {
+  const run = G.run, m = G.match; if (!run || !m || RM()) return;
+  const d = document.createElement('div'); d.className = 'walkout';
+  d.innerHTML = `<div class="wk"><div class="eyebrow">Entrada em campo</div><b>${esc(selOf(run).curto)}</b><i>x</i><b>${esc(oppShort(m.opp))}</b><small>${esc(run.careerLabel || (E.STAGES[m.stage] && E.STAGES[m.stage].nome) || '')}</small></div>`;
+  document.body.appendChild(d);
+  if (window.FFAudio) FFAudio.whistle('kick');
+  setTimeout(() => d.remove(), 1200);
+}
 function endMatch() {
   SIM.on = false;
+  if (window.FFAudio) FFAudio.crowdStop();
   if (G.match && G.match.pvp) return endPvp();
+  if (G.run && G.run.careerMatch) {
+    const m = G.match, gf = m.score[0], ga = m.score[1];
+    const outcome = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
+    G.careerPending = { gf, ga };
+    G.result = { outcome, gf, ga, pens: null, fichas: [], ganho: 0, why: [`Placar do jogo decisivo: ${gf} a ${ga}.`], groupMsg: '', reward: false, shop: false, status: 'playing', stage: m.stage, mGoals: (m.goals || []).slice(), epics: (m.epics || []).slice(), weather: m.weather, used: (m.used || []).slice(), career: true };
+    return go('result');
+  }
   G.result = E.finishMatch(G.run, G.match);
   if (G.run && G.run.cupRole != null && G.run.status === 'eliminated' && G.run.stage < 6) { finalizeRun(); return go('caiu'); }
   if (G.run.status !== 'playing') finalizeRun();
@@ -846,9 +879,9 @@ function renderResult() {
      <div class="pens"><span style="font-size:22px">${selOf(run).flag}</span><div>${kicks.filter(k => k.side === role).map(k => pk(k, true)).join('')}</div><span style="font-size:22px">${oppFlag}</span><div>${kicks.filter(k => k.side !== role).map(k => pk(k)).join('')}</div></div>
      ${kicks.some(k => k.coach) ? `<div class="xs mut" style="margin-top:6px">Contorno azul = cobrança salva pela Mentalidade do técnico.</div>` : ''}</div>` : '';
   const goals = (r.mGoals || []).map(g => `<div class="gl"><span class="m">${g.min}'</span><span>${ballSvg('ico')}</span><span><b style="color:${g.side === role ? '#fff' : '#ff9a9d'}">${esc(g.scorer)}</b> ${g.type === 'mao' ? '<span class="mut">(mão!)</span>' : g.value > 1 ? `<span style="color:var(--gold)">(vale ${g.value})</span>` : ''}</span></div>`).join('');
-  const next = r.status === 'playing' ? (r.reward ? [ic('gift') + ' Abrir pacote', ''] : r.shop ? [ic('hanger') + ' Ir pro Vestiário', ''] : [ic('play') + ' Continuar', '']) : [ic('trophy') + ' Ver o veredito', 'gold'];
+  const next = r.career ? ['Voltar à temporada', 'gold'] : r.status === 'playing' ? (r.reward ? [ic('gift') + ' Abrir pacote', ''] : r.shop ? [ic('hanger') + ' Ir pro Vestiário', ''] : [ic('play') + ' Continuar', '']) : [ic('trophy') + ' Ver o veredito', 'gold'];
   app.innerHTML = `${topbar(run)}
-    <div class="reshero"><div class="eyebrow">${esc(E.STAGES[r.stage].nome)}</div><div class="big ${r.outcome}">${title}</div></div>
+    <div class="reshero"><div class="eyebrow">${esc((run && run.careerLabel) || E.STAGES[r.stage].nome)}</div><div class="big ${r.outcome}">${title}</div></div>
     <div class="resscore"><span class="f">${selOf(run).flag}</span><span class="s">${r.gf} <span class="mut" style="font-size:34px">x</span> ${r.ga}</span><span class="f">${oppFlag}</span></div>
     ${r.groupMsg ? `<p style="text-align:center;font-weight:800;margin:4px 0 10px">${esc(r.groupMsg)}</p>` : ''}
     ${pens}
@@ -857,14 +890,20 @@ function renderResult() {
       ${r.epics.length > 1 ? `<div class="pages">${r.epics.map((e, i) => `<button class="${i === (G.epicIdx || 0) ? 'on' : ''}" data-act="epicSel" data-i="${i}">${e.icon} ${esc(e.nome)}</button>`).join('')}</div>` : ''}
       ${epicCanvasHtml(Math.min(G.epicIdx || 0, r.epics.length - 1))}<button class="btn gold" style="margin-top:10px" data-act="epicPng" data-i="${Math.min(G.epicIdx || 0, r.epics.length - 1)}">${ic('share')} Baixar card do lance (PNG)</button></div>` : ''}
     ${goals ? `<div class="panel"><div class="ph">${ballSvg('ico')} Gols</div>${goals}</div>` : ''}
-    <div class="panel"><div class="ph">${ic('coin')} Fichas ganhas</div>${r.fichas.map(f => `<div class="fline"><span>${esc(f.label)}</span><b>+${f.v}</b></div>`).join('') || '<div class="small mut">Nenhuma desta vez.</div>'}
-      <div class="fline t"><span>Total</span><b style="font-size:18px">+${r.ganho} ${ic('coin')}</b></div></div>
+    ${r.career ? '' : `<div class="panel"><div class="ph">${ic('coin')} Fichas ganhas</div>${r.fichas.map(f => `<div class="fline"><span>${esc(f.label)}</span><b>+${f.v}</b></div>`).join('') || '<div class="small mut">Nenhuma desta vez.</div>'}<div class="fline t"><span>Total</span><b style="font-size:18px">+${r.ganho} ${ic('coin')}</b></div></div>`}
     <div class="mctrl"><button class="btn ${next[1]} shine" data-act="afterResult">${next[0]}</button></div>`;
   const f = $('#fichas'); if (f && r.ganho > 0) { f.classList.add('bump'); }
   if (r.epics && r.epics.length) startEpicCanvases(r.epics.map(e => ({ ...e, seed: run.seed })));
 }
 function afterResult() {
   const r = G.result; G.epicIdx = 0;
+  if (r && r.career && G.career && G.careerPending) {
+    const back = FFCareer.applyLive(G.career, G.careerPending.gf, G.careerPending.ga);
+    FFCareer.persist(G.career);
+    G.careerPending = null;
+    if (back.msg) toast(back.msg);
+    return go(back.screen || 'carHub');
+  }
   if (G.run.status !== 'playing') return go('verdict');
   if (r.reward) { G.offers = E.genRewards(G.run); G.packOpen = false; return go('reward'); }
   if (r.shop) { G.shop = E.genShop(G.run); return go('shop'); }
@@ -2002,9 +2041,81 @@ function newRunFromPending(selId) {
 // ---------- ações ----------
 document.addEventListener('click', onClick);
 document.addEventListener('keydown', ev => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches && ev.target.matches('[role=button][data-act]')) { ev.preventDefault(); ev.target.click(); } });
+function renderCareer() {
+  const C = window.FFCareer; if (!C) return;
+  const extra = G.screen === 'carCriar' ? G.carDraft : G.screen === 'carMuseu' ? (G.carExtra || C.loadStore()) : G.screen === 'carHome' ? C.loadStore() : G.carExtra;
+  app.innerHTML = C.view(G.screen, G.career, extra);
+  app.classList.toggle('hasdock', !!app.querySelector('.mctrl'));
+  if (G.screen === 'carFim' && G.career && G.career.summary && G.career.summary.fire && !RM()) {
+    setTimeout(() => confettiBurst(['#ffc83d', '#c6ff3d', '#fff', '#ff5a5f'], 42), 180);
+    if (window.FFAudio && !G.firePlayed) { G.firePlayed = G.career.year; FFAudio.fanfare(); }
+  }
+  if (G.screen !== 'carFim') G.firePlayed = 0;
+  if (G.screen === 'carMentor') {
+    const win = app.querySelector('.rcard.win');
+    const strip = app.querySelector('.roulette .strip');
+    if (win && strip) {
+      const box = strip.parentElement.clientWidth || 320;
+      const x = -Math.max(0, win.offsetLeft - (box - win.offsetWidth) / 2);
+      strip.style.transition = 'none';
+      strip.style.transform = 'translateX(' + (x - 70) + 'px)';
+      void strip.offsetWidth;
+      if (!RM()) strip.style.transition = '';
+      strip.style.transform = 'translateX(' + x + 'px)';
+    }
+    if (window.FFAudio && G.mentorPlayed !== (G.career && G.career.seasons)) {
+      G.mentorPlayed = G.career.seasons; FFAudio.pack(); setTimeout(() => FFAudio.fanfare(), RM() ? 0 : 700);
+    }
+  }
+}
+function somSheet() {
+  const A = window.FFAudio; if (!A) return;
+  document.querySelectorAll('.modal.somm').forEach(x => x.remove());
+  const s = A.settings();
+  const m = document.createElement('div'); m.className = 'modal somm';
+  m.innerHTML = `<div class="box sombox"><div class="eyebrow g">Som do estádio</div><h3 class="ttl" style="margin-top:4px">Arquibancada</h3>
+    <p class="sub">Apito, torcida e fogos saem do próprio navegador. Nenhum arquivo de áudio.</p>
+    <button class="btn ${s.on ? '' : 'sec'}" data-act="somOn">${s.on ? 'Som ligado' : 'Som desligado'}</button>
+    <label class="somlab">Volume<input id="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></label>
+    <button class="btn sec" data-x="1">Fechar</button></div>`;
+  m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
+  const range = m.querySelector('#somVol');
+  range.addEventListener('input', ev => { A.unlock(); A.setVol(ev.target.value / 100); A.click(); });
+  document.body.appendChild(m);
+}
+function syncCarName() {
+  const el = document.getElementById('carName');
+  if (el && G.carDraft) G.carDraft.nome = el.value.slice(0, 24);
+}
+function carGo(res) {
+  if (!res) return;
+  if (res.msg) toast(res.msg);
+  FFCareer.persist(G.career);
+  go(res.screen || FFCareer.screenFor(G.career));
+}
+function startCareerLive() {
+  const run = FFCareer.liveRun(G.career);
+  if (!run) return toast('Esse jogo já passou.');
+  G.run = run;
+  G.match = E.createMatch(run);
+  if (run.careerHome) {
+    const b = G.match.base[0];
+    G.match.base[0] = { atk: b.atk + 1.4, mid: b.mid + 1.2, def: b.def + 1.1, gk: b.gk };
+  }
+  if (run.careerKo) G.match.ko = true;
+  applyDebug(G.match);
+  G.speed = 1;
+  go('match');
+}
 function onClick(ev) {
   const el = ev.target.closest('[data-act]'); if (!el || el.disabled) return;
   const a = el.dataset.act;
+  if (window.FFAudio) {
+    FFAudio.unlock();
+    const ownSound = { speed: 1, somVol: 1, carStart: 1, carMentorOk: 1, somOn: 1 };
+    if (a === 'usecard' || a === 'carOpt' || a === 'carLive') FFAudio.playCard();
+    else if (!ownSound[a]) FFAudio.click();
+  }
   if (navigator.vibrate && !RM()) try { navigator.vibrate(8); } catch (er) { /* sem vibração */ }
   switch (a) {
     case 'level': {
@@ -2068,6 +2179,37 @@ function onClick(ev) {
     case 'info': showInfo(el.dataset.k, el.dataset.id); break;
     case 'tipok': G.store.tips[el.dataset.k] = 1; saveStore(); el.closest('.tip').remove(); break;
     case 'tipskip': G.store.tipsOff = true; saveStore(); document.querySelectorAll('.tip').forEach(x => x.remove()); break;
+    case 'som': somSheet(); break;
+    case 'somOn': { const A = window.FFAudio; if (!A) break; A.setOn(!A.settings().on); if (A.settings().on) { A.unlock(); A.whistle('kick'); } somSheet(); break; }
+    case 'carOpen': G.screen = 'carHome'; render(); break;
+    case 'carNew': G.carSlot = +el.dataset.i || 0; G.carDraft = FFCareer.draftNew(G.pendingSeed || 'FOMINHA'); go('carCriar'); break;
+    case 'carCont': { const st = FFCareer.loadStore(); G.career = st.slots[+el.dataset.i]; if (G.career) { G.career.slot = +el.dataset.i; go(FFCareer.screenFor(G.career)); } break; }
+    case 'carMuseu': G.carExtra = FFCareer.loadStore(); go('carMuseu'); break;
+    case 'carPlus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.left > 0 && d.nums[attr] < 78) { d.nums[attr]++; d.left--; render(); } break; }
+    case 'carMinus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.nums[attr] > 60) { d.nums[attr]--; d.left++; render(); } break; }
+    case 'carClub': if (G.carDraft) { G.carDraft.clubId = el.dataset.id; render(); } break;
+    case 'carStart': {
+      syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
+      G.career = FFCareer.create({ seed: d.seed, nome: d.nome || 'Professor', nums: d.nums, clubId: d.clubId, slot: G.carSlot || 0, policy: 'play' });
+      FFCareer.persist(G.career); if (window.FFAudio) FFAudio.whistle('kick'); go('carHub'); break;
+    }
+    case 'carJump': carGo(FFCareer.pump(G.career, 'jump')); break;
+    case 'carOne': carGo(FFCareer.pump(G.career, 'one')); break;
+    case 'carLive': startCareerLive(); break;
+    case 'carSkip': carGo(FFCareer.skipLive(G.career)); break;
+    case 'carTabela': go('carTabela'); break;
+    case 'carInboxBtn': go('carInbox'); break;
+    case 'carBackHub': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
+    case 'carHome': go('carHome'); break;
+    case 'carOpt': FFCareer.chooseDecision(G.career, +el.dataset.i); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
+    case 'carAccept': FFCareer.acceptOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
+    case 'carReject': FFCareer.rejectOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
+    case 'carNeg': FFCareer.negotiate(G.career, el.dataset.id); render(); break;
+    case 'carInboxOk': if (FFCareer.closeInbox(G.career)) { FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); } else toast('Escolha um clube ou encerre a carreira.'); break;
+    case 'carMentorOk': FFCareer.lockMentor(G.career); FFCareer.persist(G.career); if (window.FFAudio) FFAudio.level(); go(FFCareer.screenFor(G.career)); break;
+    case 'carAck': FFCareer.ackSummary(G.career); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
+    case 'carRetire': FFCareer.retire(G.career, 'pedido'); go('carDoc'); break;
+    case 'carShare': { const d = G.career && (G.career.doc || G.career); copyText(FFCareer.shareText(d)).then(ok => toast(ok ? 'Retrospectiva copiada!' : 'Não deu pra copiar')); break; }
   }
 }
 // expõe para testes/screenshot
@@ -2123,7 +2265,27 @@ function previewCards(which) {
     openMatch(['pressao', 'craque', 'casinha', 'grito'], ['pressao']);
   }
 }
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards };
+function previewCareer(which) {
+  window.__noTips = true;
+  if (which === 'som') { G.screen = 'home'; render(); somSheet(); return; }
+  const d = FFCareer.demo(which === 'acesso' ? 'fogos' : which);
+  G.career = d.career || null;
+  G.carDraft = which === 'criar' ? d.extra : G.carDraft;
+  G.carExtra = d.extra;
+  if (which === 'jogo' && d.career) {
+    G.career = d.career;
+    let guard = 0;
+    while (G.career.phase === 'season' && !FFCareer.isKey(G.career) && guard++ < 40) FFCareer.pump(G.career, 'one');
+    startCareerLive();
+    if (G.match) { G.match.minute = 28; G.match.score = [1, 0]; G.match.awaiting = true; G.shownScore = [1, 0]; }
+    render();
+    clearTimeout(G.timer); SIM.on = false;
+    showDecision();
+    return;
+  }
+  G.screen = d.screen; render();
+}
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet };
 document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);
