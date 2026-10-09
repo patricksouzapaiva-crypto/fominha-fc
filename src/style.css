@@ -666,7 +666,7 @@ body:has(.tabbar) #app{padding-bottom:96px}
 .wxline{display:flex;gap:10px;align-items:center;margin-top:10px;padding:8px 10px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid var(--line)}
 .wxline .wi{font-size:26px}.wxline b{display:block;font-size:13px}.wxline small{font-size:11.5px;color:#c9dccf}
 .wxline.wx-chuva{border-color:rgba(120,170,255,.5)}.wxline.wx-calor{border-color:rgba(255,150,60,.55)}.wxline.wx-neblina{border-color:rgba(220,230,230,.45)}.wxline.wx-altitude{border-color:rgba(160,200,255,.5)}
-@media (prefers-reduced-motion:reduce){.pz{transition:none}.pz.ez{transform:none}.epicfx .lb{animation:none}}
+@media (prefers-reduced-motion:reduce){.pz{transition:none}.pz.ez{transform:none}.epicfx .lb{animation:none}.eart,.estreaks,.eparts,.epicfx .ereveal{animation:none}.eart{transform:none;left:0;top:0;width:100%;height:100%}}
 /* chave do duelo ao vivo */
 .cupnote{border-radius:16px;padding:12px 14px;margin:8px 0;background:rgba(198,255,61,.08);border:1px solid rgba(198,255,61,.35)}
 .cupnote.off{background:rgba(255,90,95,.08);border-color:rgba(255,90,95,.4)}
@@ -836,6 +836,29 @@ body:has(.tabbar) #app{padding-bottom:96px}
 .tapgo{appearance:none;border:0;border-radius:999px;padding:10px 16px;font-weight:900;background:var(--gold);color:#2a1300;box-shadow:0 6px 0 #8a5a00}
 .goalfx .tapgo{position:absolute;bottom:18%;left:50%;transform:translateX(-50%)}
 .epicfx .tapgo{position:absolute;z-index:6;left:50%;bottom:18px;transform:translateX(-50%)}
+.escene.art{top:10vh;height:min(300px,38vh);overflow:hidden;background:#05080c}
+.escene.art .eart{position:absolute;left:-6%;top:-6%;width:112%;height:112%;object-fit:cover;object-position:var(--fx,50%) var(--fy,42%);transform-origin:var(--fx,50%) var(--fy,42%);animation:kenburns 8s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1.03)}to{transform:scale(1.12)}}
+.epicfx.rm .eart{animation:none;transform:none;left:0;top:0;width:100%;height:100%}
+.evignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at var(--fx,50%) var(--fy,42%),transparent 28%,rgba(0,0,0,.62) 82%),linear-gradient(180deg,rgba(0,0,0,.4),transparent 22%,transparent 68%,rgba(0,0,0,.55))}
+.estreaks{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(112deg,transparent 0 22px,rgba(255,255,255,.16) 22px 23px,transparent 23px 46px);mix-blend-mode:screen;opacity:.5;animation:streaks 1.6s ease-out both}
+@keyframes streaks{from{transform:translateX(-8%);opacity:0}to{transform:none;opacity:.5}}
+.eparts{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 18% 30%,rgba(255,230,160,.95) 0 1.4px,transparent 2.2px),radial-gradient(circle at 72% 24%,rgba(255,255,255,.9) 0 1.2px,transparent 2px),radial-gradient(circle at 40% 62%,rgba(255,210,120,.8) 0 1.3px,transparent 2px),radial-gradient(circle at 84% 48%,rgba(255,255,255,.75) 0 1px,transparent 1.8px);animation:parts 2.4s ease-out both}
+@keyframes parts{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.epicfx .ereveal{position:absolute;inset:0;z-index:7;pointer-events:none;background:radial-gradient(circle,rgba(255,248,220,.95),rgba(255,210,80,.35) 42%,transparent 70%);animation:eflash .55s ease-out forwards}
+.epicfx .lb{z-index:4}
+.epicfx .rec,.epicfx .ebox{z-index:6}
+.epicfx:has(.escene.art) .ei{display:none}
+.epicfx:has(.escene.art) .en{font-size:38px}
+.epicfx:has(.escene.art) .ebox{top:calc(10vh + min(300px, 38vh) + 14px);bottom:auto}
+.escene.art{box-shadow:inset 0 0 0 1px rgba(255,200,61,.4)}
+.epicexport{min-height:100%;display:flex;align-items:center;padding:18px 0 28px}
+.epicexport .ecard{width:100%}
+.ephigh{margin:8px 0 0;border-radius:14px;overflow:hidden;background:#071018;border:1px solid rgba(255,255,255,.08)}
+.ephigh img{display:block;width:100%;height:168px;object-fit:cover}
+.ephigh figcaption{padding:8px 10px 10px}
+.ephigh b{display:block}
+.ephigh small{color:var(--mut);font-weight:700}
 .banner .tapgo{margin-top:10px}
 .tapnote{margin-left:auto;font-size:11px;font-weight:900;color:var(--gold);letter-spacing:.2px}
 .eventcard{border-radius:18px;overflow:hidden;margin:8px 0 12px;background:linear-gradient(180deg,#163044,#102018);border:1px solid var(--line);box-shadow:0 10px 24px rgba(0,0,0,.28)}

@@ -988,6 +988,7 @@ function renderResult() {
 function afterResult() {
   const r = G.result; G.epicIdx = 0;
   if (r && r.career && G.career && G.careerPending) {
+    if (r.epics && r.epics.length && FFCareer.noteEpics) FFCareer.noteEpics(G.career, r.epics);
     const back = FFCareer.applyLive(G.career, G.careerPending.gf, G.careerPending.ga);
     FFCareer.persist(G.career);
     G.careerPending = null;
@@ -1201,9 +1202,52 @@ function wrapText(ctx, text, x, y, maxW, lh) {
   return y + lh;
 }
 function rrect(x, X, Y, W, H, R) { x.beginPath(); x.moveTo(X + R, Y); x.arcTo(X + W, Y, X + W, Y + H, R); x.arcTo(X + W, Y + H, X, Y + H, R); x.arcTo(X, Y + H, X, Y, R); x.arcTo(X, Y, X + W, Y, R); x.closePath(); }
-function drawCard(v) {
+function paintShareEpic(x, W, H, v, epicArt) {
+  const ep = epicArt.epic, img = epicArt.img;
+  const F = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const champ = v.chegou === 'CAMPEÃO';
+  x.fillStyle = '#04100a'; x.fillRect(0, 0, W, H);
+  const f = epicFocusOf(ep.id);
+  const fx = parseFloat(f.x) / 100, fy = parseFloat(f.y) / 100;
+  const bandY = 150, bandH = 620;
+  x.save();
+  rrect(x, 48, bandY, W - 96, bandH, 28); x.clip();
+  coverDraw(x, img, 48, bandY, W - 96, bandH, fx, fy, RM() ? 1 : 1.04);
+  const vg = x.createLinearGradient(0, bandY + bandH * 0.42, 0, bandY + bandH);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.8)');
+  x.fillStyle = vg; x.fillRect(48, bandY, W - 96, bandH);
+  x.restore();
+  x.strokeStyle = moldStroke(x, W, H, champ ? '#ffc83d' : '#6f9c84');
+  x.lineWidth = 14; rrect(x, 30, 30, W - 60, H - 60, 44); x.stroke();
+  x.textAlign = 'center';
+  x.fillStyle = '#c6ff3d'; x.font = `900 36px ${F}`;
+  x.fillText('FOMINHA FC · COPA RELÂMPAGO', W / 2, 110);
+  x.fillStyle = '#ffc83d'; x.font = `italic 900 52px ${F}`;
+  x.fillText((ep.nome || 'Lance épico').toUpperCase(), W / 2, bandY + bandH - 78, W - 160);
+  x.fillStyle = '#fff'; x.font = `800 32px ${F}`;
+  const bits = [ep.scorer || '', ep.min != null && ep.min !== '' ? ep.min + "'" : '', ep.score ? ep.score[0] + ' x ' + ep.score[1] : ''].filter(Boolean);
+  x.fillText(bits.join(' · '), W / 2, bandY + bandH - 30, W - 140);
+  let y = bandY + bandH + 78;
+  x.font = `italic 900 72px ${F}`;
+  x.fillStyle = champ ? '#ffc83d' : '#fff';
+  y = wrapText(x, champ ? 'CAMPEÃO!' : String(v.chegou || '').toUpperCase(), W / 2, y, W - 140, 80);
+  x.fillStyle = '#ffc83d'; x.font = `900 40px ${F}`;
+  x.fillText('“' + (v.titulo || '') + '”', W / 2, y + 8);
+  x.fillStyle = '#e6f6ea'; x.font = `italic 500 34px ${F}`;
+  wrapText(x, v.frase || '', W / 2, y + 62, W - 180, 46);
+  x.fillStyle = 'rgba(0,0,0,.42)';
+  rrect(x, 80, H - 250, 450, 160, 28); x.fill();
+  rrect(x, 550, H - 250, 450, 160, 28); x.fill();
+  x.fillStyle = '#9db5a6'; x.font = `900 24px ${F}`;
+  x.fillText('SEMENTE', 305, H - 190); x.fillText('PONTOS', 775, H - 190);
+  x.fillStyle = '#c6ff3d'; x.font = `900 64px ${F}`;
+  x.fillText(String(v.seed), 305, H - 120);
+  x.fillStyle = '#ffc83d'; x.fillText(fmtN(v.points || 0), 775, H - 120);
+}
+function drawCard(v, epicArt) {
   const W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H;
   const x = c.getContext('2d');
+  if (epicArt && epicArt.img) { paintShareEpic(x, W, H, v, epicArt); return c; }
   const champ = v.chegou === 'CAMPEÃO';
   const F = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', FE = F + ', "Noto Color Emoji", "Apple Color Emoji"';
   const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, v.selecao.cor); g.addColorStop(.32, '#0f4a26'); g.addColorStop(1, '#04100a');
@@ -1246,7 +1290,10 @@ function drawCard(v) {
 }
 async function shareCard() {
   const v = G.verdict, text = shareText(v);
-  const canvas = drawCard(v);
+  const epics = (G.run && G.run.epics) || [];
+  const hero = epics.length ? epics[epics.length - 1] : null;
+  const img = hero ? await loadEpicArt(hero.id) : null;
+  const canvas = drawCard(v, img && hero ? { img, epic: hero } : null);
   const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
   const file = blob && typeof File !== 'undefined' ? new File([blob], `fominha-fc-${v.seed}.png`, { type: 'image/png' }) : null;
   try {
@@ -1486,13 +1533,57 @@ function epicScene(id) {
   };
   return `<div class="escene" aria-hidden="true"><svg viewBox="0 0 390 280">${sky}${figs[id] || figs.golaco}<g stroke="#ffd76a" stroke-width="2" fill="none" opacity=".8"><path d="M40 40 l18 6 M60 28 l8 16 M330 36 l-16 10"/></g></svg></div>`;
 }
+function assetBase() {
+  try {
+    if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
+    const u = location.href.split('#')[0].split('?')[0];
+    return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/';
+  } catch (e) { return ''; }
+}
+function epicFileOf(id) { return window.FFCareer && FFCareer.epicFile ? FFCareer.epicFile(id) : ''; }
+function epicFocusOf(id) {
+  const f = window.FFCareer && FFCareer.epicFocus ? FFCareer.epicFocus(id) : null;
+  return f && f.x ? f : { x: '50%', y: '42%' };
+}
+const epicArtCache = {};
+function epicArtUrl(id) {
+  const file = epicFileOf(id);
+  const base = assetBase();
+  if (!file || !base) return '';
+  return base + 'epic/' + file;
+}
+function loadEpicArt(id) {
+  const url = epicArtUrl(id);
+  if (!url) return Promise.resolve(null);
+  const hit = epicArtCache[id];
+  if (hit && hit.ok) return Promise.resolve(hit.img);
+  if (hit && hit.bad) return Promise.resolve(null);
+  if (hit && hit.p) return hit.p;
+  const img = new Image();
+  const p = new Promise(resolve => {
+    img.onload = () => { epicArtCache[id] = { ok: true, img }; resolve(img); };
+    img.onerror = () => { epicArtCache[id] = { bad: true }; resolve(null); };
+  });
+  epicArtCache[id] = { p };
+  img.src = url;
+  return p;
+}
+function epicVisual(id) {
+  const url = epicArtUrl(id);
+  if (!url) return epicScene(id);
+  const f = epicFocusOf(id);
+  return `<div class="escene art" style="--fx:${f.x};--fy:${f.y}"><img class="eart" alt="" src="${url}" style="object-position:${f.x} ${f.y}"><div class="evignette"></div><div class="estreaks"></div><div class="eparts"></div></div>`;
+}
 function epicFx(e, sp) {
   const ep = e.epic, P = EPIC_PATHS[ep.id] || EPIC_PATHS.hattrick, rm = RM(), mine = e.side === 0 || P.save;
   const slow = 1 / Math.min(sp, 1.5), DUR = 1700 * slow, END = P.segs[P.segs.length - 1][2];
   const pz = $('#pz');
   const box = document.createElement('div'); box.className = 'epicfx' + (rm ? ' rm' : ''); box.setAttribute('role', 'status');
-  box.innerHTML = `${epicScene(ep.id)}<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="eflash"></div>
+  box.innerHTML = `${epicVisual(ep.id)}<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="ereveal"></div><div class="eflash"></div>
     <div class="ebox"><div class="ek">⚡ LANCE ÉPICO</div><div class="ei">${ep.icon}</div><div class="en">${esc(ep.nome.toUpperCase())}!</div><div class="es">${esc(ep.scorer || '')} · ${ep.min}' · ${ep.score ? ep.score[0] + ' x ' + ep.score[1] : ''}</div><div class="ef">📻 “${esc(ep.frase)}”</div></div>`;
+  const art = box.querySelector('.eart');
+  if (art) art.addEventListener('error', () => { const sc = box.querySelector('.escene'); if (sc) sc.outerHTML = epicScene(ep.id); });
+  loadEpicArt(ep.id);
   document.body.appendChild(box);
   if (pz && !rm) { pz.style.transformOrigin = `${END[0]}% ${END[1]}%`; pz.classList.add('ez'); }
   SIM.trailEls.forEach(t => t.classList.add('hot')); if (SIM.ballEl) SIM.ballEl.classList.add('hot');
@@ -1531,7 +1622,61 @@ function moldStroke(x, W, H, fallback) {
   if (c.cor === 'fogo') { const g = x.createLinearGradient(0, H, 0, 0); g.addColorStop(0, '#ff3d00'); g.addColorStop(.5, '#ff9a1f'); g.addColorStop(1, '#ffe14d'); return g; }
   return c.cor || fallback;
 }
-function drawEpic(x, W, H, ep, k, ghosts) {
+function coverDraw(x, img, dx, dy, dw, dh, fx, fy, zoom) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  if (!iw || !ih) return;
+  const ir = iw / ih, cr = dw / dh;
+  zoom = zoom || 1;
+  let sw, sh;
+  if (ir > cr) { sh = dh * zoom; sw = sh * ir; }
+  else { sw = dw * zoom; sh = sw / ir; }
+  x.drawImage(img, dx + (dw - sw) * fx, dy + (dh - sh) * fy, sw, sh);
+}
+function paintEpicStill(x, W, H, ep, img, k) {
+  const F = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const f = epicFocusOf(ep.id);
+  const fx = parseFloat(f.x) / 100, fy = parseFloat(f.y) / 100;
+  const zoom = RM() ? 1.04 : 1.04 + 0.1 * (k || 1);
+  x.fillStyle = '#05080c';
+  x.fillRect(0, 0, W, H);
+  const bandY = Math.round(H * 0.055), bandH = Math.round(H * 0.58);
+  x.save();
+  x.beginPath(); x.rect(0, bandY, W, bandH); x.clip();
+  coverDraw(x, img, 0, bandY, W, bandH, fx, fy, zoom);
+  const vg = x.createRadialGradient(W * fx, bandY + bandH * fy, W * 0.12, W * 0.5, bandY + bandH * 0.48, W * 0.78);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.66)');
+  x.fillStyle = vg; x.fillRect(0, bandY, W, bandH);
+  const bot = x.createLinearGradient(0, bandY + bandH * 0.55, 0, bandY + bandH);
+  bot.addColorStop(0, 'rgba(0,0,0,0)'); bot.addColorStop(1, 'rgba(0,0,0,.5)');
+  x.fillStyle = bot; x.fillRect(0, bandY, W, bandH);
+  x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = 2;
+  for (let i = 0; i < 5; i++) { const y = bandY + bandH * (0.2 + i * 0.13); x.beginPath(); x.moveTo(0, y); x.lineTo(W * 0.38, y - 18); x.stroke(); }
+  x.restore();
+  x.fillStyle = '#000';
+  x.fillRect(0, 0, W, bandY);
+  x.fillRect(0, bandY + bandH, W, H - bandY - bandH);
+  x.strokeStyle = moldStroke(x, W, H, '#ffc83d'); x.lineWidth = 14;
+  rrect(x, 22, 22, W - 44, H - 44, 36); x.stroke();
+  x.textAlign = 'center';
+  x.fillStyle = '#ff5a5f'; x.font = `900 22px ${F}`;
+  x.fillText('● REPLAY', W / 2, Math.max(36, bandY - 18));
+  const ty = bandY + bandH + Math.round(H * 0.06);
+  x.fillStyle = '#c6ff3d'; x.font = `900 26px ${F}`;
+  x.fillText('FOMINHA FC · LANCE ÉPICO', W / 2, ty);
+  x.fillStyle = '#ffc83d';
+  const title = ((ep.nome || 'Lance') + '!').toUpperCase();
+  x.font = `italic 900 ${title.length > 20 ? 58 : 76}px ${F}`;
+  x.fillText(title, W / 2, ty + 78, W - 100);
+  x.fillStyle = '#fff'; x.font = `800 34px ${F}`;
+  const bits = [ep.scorer || '', ep.min != null && ep.min !== '' ? ep.min + "'" : '', ep.score ? ep.score[0] + ' x ' + ep.score[1] : ''].filter(Boolean);
+  x.fillText(bits.join(' · '), W / 2, ty + 132, W - 90);
+  x.fillStyle = '#e6f6ea'; x.font = `italic 600 32px ${F}`;
+  if (ep.frase) wrapText(x, '📻 “' + ep.frase + '”', W / 2, ty + 188, W - 130, 42);
+  x.fillStyle = '#9db5a6'; x.font = `800 24px ${F}`;
+  x.fillText('Copa Relâmpago · semente ' + (ep.seed || (G.run && G.run.seed) || ''), W / 2, H - 46);
+}
+function drawEpic(x, W, H, ep, k, ghosts, img) {
+  if (img) { paintEpicStill(x, W, H, ep, img, k); return; }
   const F = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', FE = F + ', "Noto Color Emoji", "Apple Color Emoji"';
   const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#1a3d10'); g.addColorStop(.5, '#0b2416'); g.addColorStop(1, '#04100a');
   x.fillStyle = g; x.fillRect(0, 0, W, H);
@@ -1592,15 +1737,40 @@ function startEpicCanvases(list) {
   document.querySelectorAll('canvas.ecv').forEach(cv => {
     const ep = list[+cv.dataset.i]; if (!ep) return;
     const x = cv.getContext('2d'); x.setTransform(.5, 0, 0, .5, 0, 0);
-    if (RM()) { drawEpic(x, 1080, 1350, ep, 1, [.2, .4, .6, .8]); return; }
-    const t0 = performance.now();
-    const f = now => { if (!document.body.contains(cv)) return; const c = ((now - t0) / 1000) % 3.6, k = Math.min(1, c / 2.2), e = 1 - Math.pow(1 - k, 2); drawEpic(x, 1080, 1350, ep, e, []); requestAnimationFrame(f); };
-    requestAnimationFrame(f);
+    const play = img => {
+      if (!document.body.contains(cv)) return;
+      cv.dataset.ready = img ? 'art' : 'svg';
+      if (!img) {
+        if (RM()) { drawEpic(x, 1080, 1350, ep, 1, [.2, .4, .6, .8]); return; }
+        const t0 = performance.now();
+        const f = now => { if (!document.body.contains(cv)) return; const c = ((now - t0) / 1000) % 3.6, k = Math.min(1, c / 2.2), e = 1 - Math.pow(1 - k, 2); drawEpic(x, 1080, 1350, ep, e, []); requestAnimationFrame(f); };
+        requestAnimationFrame(f);
+        return;
+      }
+      if (RM()) { drawEpic(x, 1080, 1350, ep, 1, [], img); return; }
+      const t0 = performance.now();
+      const f = now => { if (!document.body.contains(cv)) return; const cyc = ((now - t0) / 1000) % 4.2, kk = Math.min(1, cyc / 3.2); drawEpic(x, 1080, 1350, ep, kk, [], img); requestAnimationFrame(f); };
+      requestAnimationFrame(f);
+    };
+    loadEpicArt(ep.id).then(play);
   });
 }
-function epicPNG(ep) { const c = document.createElement('canvas'); c.width = 1080; c.height = 1350; drawEpic(c.getContext('2d'), 1080, 1350, ep, 1, [.2, .4, .6, .8]); return c; }
+function epicPNG(ep) {
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+  const cached = epicArtCache[ep.id] && epicArtCache[ep.id].ok ? epicArtCache[ep.id].img : null;
+  drawEpic(c.getContext('2d'), 1080, 1350, ep, 1, [.2, .4, .6, .8], cached);
+  return c;
+}
 async function downloadEpic(ep) {
-  const c = epicPNG(ep), blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  const img = await loadEpicArt(ep.id);
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1350;
+  drawEpic(c.getContext('2d'), 1080, 1350, ep, 1, [.2, .4, .6, .8], img);
+  let blob = null;
+  try { blob = await new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error('png')), 'image/png')); }
+  catch (e) {
+    drawEpic(c.getContext('2d'), 1080, 1350, ep, 1, [.2, .4, .6, .8], null);
+    blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  }
   const name = `fominha-lance-${ep.id}-${ep.seed || ''}.png`, text = `${ep.icon} ${ep.nome}! ${ep.scorer || ''} aos ${ep.min}' · Fominha FC · Copa Relâmpago (semente ${ep.seed || ''})`;
   const file = blob && typeof File !== 'undefined' ? new File([blob], name, { type: 'image/png' }) : null;
   try { if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text, title: 'Lance épico' }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
@@ -2452,13 +2622,25 @@ function previewCareer(which) {
     });
     return;
   }
-  if (which === 'overlay' || which === 'epic2') {
+  if (which === 'overlay' || which === 'epic2' || which === 'epico-bicicleta' || which === 'epico-olimpico' || which === 'epico-virada') {
     const run = E.newRun('EPIC3', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
     G.run = run; G.match = E.createMatch(run); G.speed = 3; G.screen = 'match'; G.shownScore = [1, 0];
     render(); clearTimeout(G.timer); SIM.on = false; G.held = true;
-    const id = which === 'epic2' ? 'cobertura' : 'bicicleta';
-    const nome = id === 'cobertura' ? 'Gol de Cobertura' : 'Gol de Bicicleta';
-    epicFx({ epic: { id, nome, icon: id === 'cobertura' ? '🌈' : '🚲', scorer: 'Rafael Silva', min: 41, frase: nome.toUpperCase() + '! PODE PARAR O JOGO!', score: [1, 0] }, side: 0, kind: 'goal', min: 41 }, 3);
+    const ids = { overlay: 'bicicleta', epic2: 'cobertura', 'epico-bicicleta': 'bicicleta', 'epico-olimpico': 'olimpico', 'epico-virada': 'virada' };
+    const nomes = { bicicleta: 'Gol de Bicicleta', cobertura: 'Gol de Cobertura', olimpico: 'Gol Olímpico', virada: 'Virada no Fim' };
+    const icons = { bicicleta: '🚲', cobertura: '🌈', olimpico: '🌀', virada: '⏱️' };
+    const id = ids[which];
+    const nome = nomes[id];
+    const minuto = id === 'virada' ? 92 : 41;
+    epicFx({ epic: { id, nome, icon: icons[id], scorer: 'Rafael Silva', min: minuto, frase: nome.toUpperCase() + '! PODE PARAR O JOGO!', score: id === 'virada' ? [2, 1] : [1, 0] }, side: 0, kind: 'goal', min: minuto }, 3);
+    return;
+  }
+  if (which === 'epiccard') {
+    const run = E.newRun('EPIC3', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run = run; G.screen = 'home'; render();
+    const ep = { id: 'bicicleta', nome: 'Gol de Bicicleta', icon: '🚲', scorer: 'Rafael Silva', min: 41, frase: 'DE BICICLETA! QUE COISA LINDA! PODE PARAR O CAMPEONATO!', score: [2, 1], seed: run.seed };
+    app.innerHTML = `<div class="epicexport">${epicCanvasHtml(0)}</div>`;
+    startEpicCanvases([ep]);
     return;
   }
   if (which === 'lesao' || which === 'protesto' || which === 'joia') {

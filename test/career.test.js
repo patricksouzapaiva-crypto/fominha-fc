@@ -122,6 +122,10 @@ function nums(over) {
   C.skipLive(c);
   assert(c.report && Array.isArray(c.report.goals) && c.report.goals.length === c.report.gf + c.report.ga);
   assert.strictEqual(JSON.stringify(c.titles), before);
+  assert.strictEqual(C.epicFile('penalti'), 'penalti.webp');
+  assert.strictEqual(C.epicFile('placa'), 'goleada.webp');
+  assert.strictEqual(C.epicFile('nenhum'), '');
+  assert.strictEqual(C.epicFocus('bicicleta').x, '42%');
 }
 
 // equilíbrio: boa sobe em ~4-8, ruim é demitida, mentor acelera de verdade
