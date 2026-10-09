@@ -675,12 +675,54 @@ body:has(.tabbar) #app{padding-bottom:96px}
 .wxline .wi{font-size:26px}.wxline b{display:block;font-size:13px}.wxline small{font-size:11.5px;color:#c9dccf}
 .wxline.wx-chuva{border-color:rgba(120,170,255,.5)}.wxline.wx-calor{border-color:rgba(255,150,60,.55)}.wxline.wx-neblina{border-color:rgba(220,230,230,.45)}.wxline.wx-altitude{border-color:rgba(160,200,255,.5)}
 @media (prefers-reduced-motion:reduce){.pz{transition:none}.pz.ez{transform:none}.epicfx .lb{animation:none}}
+/* chave do duelo ao vivo */
+.cupnote{border-radius:16px;padding:12px 14px;margin:8px 0;background:rgba(198,255,61,.08);border:1px solid rgba(198,255,61,.35)}
+.cupnote.off{background:rgba(255,90,95,.08);border-color:rgba(255,90,95,.4)}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gcard{border-radius:14px;padding:8px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.gcard.me{border-color:var(--lime);box-shadow:0 0 0 1px var(--lime) inset}
+.gcard.them{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.gcard .gh{font-size:11px;font-weight:900;letter-spacing:.4px;color:var(--mut);margin-bottom:4px}
+.grow{display:grid;grid-template-columns:1fr auto;gap:4px;align-items:center;font-size:11px;padding:3px 0;border-top:1px dashed rgba(255,255,255,.06)}
+.grow b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grow .pts{font-family:var(--disp);font-weight:900;color:var(--gold)}
+.grow.you b{color:var(--lime)}
+.grow.pal b{color:var(--gold)}
+.paths{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch;margin-top:8px}
+.pathcol{display:flex;flex-direction:column;gap:6px}
+.pnode{border-radius:12px;padding:8px;background:rgba(0,0,0,.25);border:1px solid var(--line);font-size:11px}
+.pnode b{display:block;font-size:12px}
+.pnode.on{border-color:var(--lime);background:rgba(198,255,61,.1)}
+.pnode.pal{border-color:var(--gold);background:rgba(255,200,61,.1)}
+.pnode.now{outline:2px solid var(--gold)}
+.pnode.done{opacity:.75}
+.pnode.out{opacity:.7}
+.pathlbl{font-size:12px;font-weight:900;margin-bottom:2px}
+.pathlbl small{display:block;font-weight:700;color:var(--mut);font-size:10px}
+.pathlbl.you{color:var(--lime)}
+.pathlbl.pal{color:var(--gold)}
+.finalmeet{align-self:center;text-align:center;font-family:var(--disp);font-weight:900;font-style:italic;color:var(--gold);font-size:18px;line-height:1.05}
+.waitbig,.caiubig{text-align:center;padding:22px 14px;border-radius:22px;margin:8px 0;border:1px solid rgba(255,200,61,.45);background:radial-gradient(circle at 50% 0,rgba(255,200,61,.22),transparent 68%),linear-gradient(180deg,#1c2a12,#0b1a10)}
+.caiubig{border-color:rgba(255,90,95,.45);background:radial-gradient(circle at 50% 0,rgba(255,90,95,.2),transparent 68%),linear-gradient(180deg,#2a1214,#14080c)}
+.friendprog{font-size:13px;font-weight:800;margin-top:8px}
+.btn.huge{min-height:64px;font-size:18px}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>const BALL_IMG = 'data:image/webp;base64,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';
 const BALL_ICON = 'data:image/webp;base64,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';
+</script>
+<script>/* Config pública do Supabase. A chave é publishable (sb_publishable_...), feita pra ir no navegador. */
+(function (root) {
+  'use strict';
+  const C = {
+    SUPABASE_URL: 'https://oyhdmsxvhiqortaocetr.supabase.co',
+    SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_Ecg325kYYW-MwWJwxW3gkA_kXA0trsk'
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = C;
+  else root.FFConfig = C;
+})(typeof window !== 'undefined' ? window : this);
 </script>
 <script>/* Fominha FC · Copa Relâmpago · motor de simulação (puro, sem DOM) */
 (function (root) {
@@ -1113,6 +1155,10 @@ function teamLines(run, stage) {
   };
 }
 function oppLines(run, stage) {
+  if (stage === 6 && run.cupRole != null && run.opponents[6]) {
+    const o = run.opponents[6];
+    return { atk: o.baseStr + o.jit.atk, mid: o.baseStr + o.jit.mid, def: o.baseStr + o.jit.def, gk: o.baseStr + o.jit.gk };
+  }
   if (stage === 6) return { ...(run.legend ? LEGENDS[run.legend].lines : BOSS.lines) };
   const o = run.opponents[stage];
   const lvl = run.level >= 2 && stage <= 2 ? 4 : 0;
@@ -1121,6 +1167,10 @@ function oppLines(run, stage) {
 }
 function opponentInfo(run, stage) {
   stage = stage == null ? run.stage : stage;
+  if (stage === 6 && run.cupRole != null && run.opponents[6]) {
+    const o = run.opponents[6];
+    return { nome: o.nome, flag: o.flag, boss: false, scorers: o.scorers, scorerW: o.scorerW, gk: o.gk, lines: oppLines(run, 6) };
+  }
   if (stage === 6 && run.legend) { const L = LEGENDS[run.legend]; return { nome: L.nome, flag: L.flag, kit: L.kit, boss: true, legend: L.id, rule: L.rule, tecnico: L.tecnico, apelido: L.apelido, regra: L.regra, scorers: L.scorers, scorerW: L.scorerW, gk: L.gk, lines: oppLines(run, 6) }; }
   if (stage === 6) return { nome: BOSS.nome, flag: BOSS.flag, boss: true, rule: 'mao', apelido: BOSS.apelido, regra: BOSS.regra, scorers: BOSS.scorers, scorerW: BOSS.scorerW, gk: BOSS.gk, lines: oppLines(run, 6) };
   const o = run.opponents[stage];
@@ -1156,12 +1206,53 @@ function createMatch(run) {
   return m;
 }
 
+// Final ao vivo: os dois lados são campanhas de verdade. O placar é canônico
+// (casa = jogador do grupo A, visitante = jogador do grupo E) pros dois celulares.
+function blankFx() { return { pressaoUntil: -1, casinhaUntil: -1, chuvaUntil: -1, longeUntil: -1, craque: false, peixinho: false, paredao: false, sub: 0, fatigue: 0, paredaoMult: 1 }; }
+function createPvpMatch(home, away, seed) {
+  seed = normalizeSeed(seed) || 'FINAL';
+  const stage = 6;
+  const r = rngFor(seed, 'final-ao-vivo');
+  const out = run => run.players.filter(p => p.pos !== 'GOL').slice().sort((a, b) => b.rating - a.rating).slice(0, 4);
+  const aw = out(away);
+  const opp = {
+    nome: SELECOES[away.selecao].nome, flag: SELECOES[away.selecao].flag, kit: SELECOES[away.selecao].kit,
+    boss: false, scorers: aw.map(p => p.nome), scorerW: aw.map(p => Math.max(1, p.rating - 55)),
+    gk: (away.players.find(p => p.pos === 'GOL') || { nome: 'Goleiro' }).nome, lines: teamLines(away, stage)
+  };
+  const m = {
+    stage, ko: true, opp, base: [teamLines(home, stage), opp.lines],
+    rng: r, minute: 0, score: [0, 0], done: false, awaiting: false, awaitingSides: [false, false],
+    pauses: [r.int(17, 25), r.int(47, 56), r.int(68, 78), r.int(82, 86)].sort((a, b) => a - b),
+    fx: blankFx(), fxAway: blankFx(), used: [], usedAway: [], peCoelhoUsed: false, peCoelhoAway: false,
+    juizMin: has(home, 'juiz_ladrao') ? r.int(20, 70) : -1,
+    juizMinAway: has(away, 'juiz_ladrao') ? r.int(20, 70) : -1,
+    maoMin: -1, maoDone: false,
+    goals: [], stats: { lances: [0, 0], shots: [0, 0], bigSaves: [0, 0], cardGoals: [], relicExtra: {}, posts: [0, 0], coach: { atk: 0, def: 0, mei: 0, bol: 0, mot: 0, est: 0 }, coachAway: { atk: 0, def: 0, mei: 0, bol: 0, mot: 0, est: 0 } },
+    lastPauseMin: -1, motShown: false, motShownAway: false, pvp: true,
+    weather: rngFor(seed, 'final-clima').weighted(Object.keys(WEATHER_W), k => WEATHER_W[k]),
+    erng: rngFor(seed, 'final-epico'), epics: [], trailed: false, myGoalsBy: {}, awayGoalsBy: {}, placaDone: false
+  };
+  if (cs(home, 'est') < 3.5 && cs(away, 'est') < 3.5) m.pauses.pop();
+  Object.defineProperty(m, 'run', { value: home, enumerable: false, writable: true });
+  Object.defineProperty(m, 'away', { value: away, enumerable: false, writable: true });
+  return m;
+}
+function awayPlayable(m) { return (m.away && m.away.cards ? m.away.cards : []).filter(c => m.usedAway.indexOf(c) < 0); }
+function pvpCards(m, side) { return side === 0 ? playableCards(m) : awayPlayable(m); }
+
 function lines(m, side) {
   const b = m.base[side];
   const hot = m.weather === 'calor' && m.minute > 60 ? 2 : 0;
   if (side === 1) {
-    const vb = m.opp.rule === 'virada' && m.score[1] < m.score[0] ? 6 : 0;
-    return (hot || vb) ? { atk: b.atk + vb, mid: b.mid + vb - hot, def: b.def + vb, gk: b.gk + vb } : b;
+    const vb = !m.pvp && m.opp.rule === 'virada' && m.score[1] < m.score[0] ? 6 : 0;
+    if (!m.pvp) return (hot || vb) ? { atk: b.atk + vb, mid: b.mid + vb - hot, def: b.def + vb, gk: b.gk + vb } : b;
+    const fa = m.fxAway, away = m.away;
+    let add = fa.sub;
+    if (away.selecao === 'cam90' && m.score[1] < m.score[0]) add += 6;
+    const mot = cs(away, 'mot');
+    if (mot) { if (m.score[1] < m.score[0]) add += CK.motLose * mot; add += CK.motKO * mot; }
+    return { atk: b.atk * fa.paredaoMult + add, mid: b.mid * fa.paredaoMult + add - fa.fatigue - hot, def: b.def * fa.paredaoMult + add, gk: b.gk * fa.paredaoMult + add };
   }
   const run = m.run, f = m.fx;
   let add = f.sub - 0; let mult = f.paredaoMult;
@@ -1231,9 +1322,11 @@ function tpl(s, o) { return s.replace(/\{(\w)\}/g, (_, k) => o[k] != null ? o[k]
 
 function ballFor(side, kind) {
   // posição da bola em % (x, y) no campinho; time 0 ataca para a direita
+  // na final ao vivo o RNG da partida entra no lugar de Math.random, pra os dois celulares baterem
+  const rnd = ballFor.rng || Math.random;
   const gx = side === 0 ? 90 : 10;
-  const y = kind === 'goal' ? 50 : 30 + Math.random() * 40;
-  return [kind === 'goal' ? (side === 0 ? 99 : 1) : gx + (side === 0 ? -1 : 1) * Math.random() * 8, y];
+  const y = kind === 'goal' ? 50 : 30 + rnd() * 40;
+  return [kind === 'goal' ? (side === 0 ? 99 : 1) : gx + (side === 0 ? -1 : 1) * rnd() * 8, y];
 }
 
 function stepMatch(m) {
@@ -1249,9 +1342,21 @@ function stepMatch(m) {
     else ev.push({ min, kind: 'info', text: 'Futebol Total: a Pressão alta acaba, mas ninguém cansou.' });
   }
   if (f.casinhaUntil === min) ev.push({ min, kind: 'info', text: 'O time destranca a casinha e volta a jogar.' });
+  if (m.pvp) {
+    const fa = m.fxAway, away = m.away;
+    if (fa.pressaoUntil === min) {
+      if (away.selecao !== 'hol74') { fa.fatigue = m.weather === 'calor' ? 6 : 4; ev.push({ min, kind: 'info', text: `Acabou o gás da Pressão alta de ${SELECOES[away.selecao].curto}: o time cansou.` }); }
+      else ev.push({ min, kind: 'info', text: `${SELECOES[away.selecao].curto}: a Pressão alta acaba, mas ninguém cansou.` });
+    }
+    if (fa.casinhaUntil === min) ev.push({ min, kind: 'info', text: `${SELECOES[away.selecao].curto} destranca a casinha.` });
+  }
 
   // eventos roteirizados
-  if (min === m.juizMin) {
+  if (m.pvp && min === m.juizMinAway && min !== m.juizMin) {
+    const mine = r.chance(0.4);
+    ev.push({ min, kind: 'info', side: mine ? 1 : 0, text: `🃏 Juiz Ladrão de ${SELECOES[m.away.selecao].curto}! Pênalti do nada${mine ? ' a favor deles!' : ' contra eles!'}` });
+    resolveLance(m, mine ? 1 : 0, 'penalti', ev, { juiz: true });
+  } else if (min === m.juizMin) {
     const mine = r.chance(0.6);
     ev.push({ min, kind: 'info', side: mine ? 0 : 1, text: `🃏 Juiz Ladrão! O árbitro aponta a marca do pênalti do nada${mine ? ', pra você!' : '... pro rival!'}` });
     resolveLance(m, mine ? 0 : 1, 'penalti', ev, { juiz: true });
@@ -1280,6 +1385,11 @@ function stepMatch(m) {
         if (m.opp.rule === 'pressao' && min <= 20) p -= 0.12;
         const p0 = clamp(p, 0.2, 0.82);
         p = clamp(p + CK.mei * cs(run, 'mei'), 0.2, 0.86);
+        if (m.pvp) {
+          if (min <= m.fxAway.pressaoUntil) p -= 0.14;
+          if (min <= m.fxAway.casinhaUntil) p += 0.1;
+          p = clamp(p - CK.mei * cs(m.away, 'mei'), 0.14, 0.86);
+        }
         const xs = r.next();
         side = xs < p ? 0 : 1;
         if (side === 0 && xs >= p0) posse = true;
@@ -1292,9 +1402,21 @@ function stepMatch(m) {
     m.motShown = true; m.stats.coach.mot++;
     ev.push({ min, kind: 'coach', attr: 'mot', text: `🔥 ${run.coach.nome} (garra de ${csrc(run, 'mot')}) incendeia o banco: +${n1(CK.motLose * cs(run, 'mot'))} de força enquanto estiver perdendo!` });
   }
-  if (m.pauses.indexOf(min) >= 0 && min < 90 && playableCards(m).length > 0) {
-    m.awaiting = true; m.lastPauseMin = min;
-    ev.push({ min, kind: 'decision', text: 'Momento decisivo! Use uma carta ou guarde.' });
+  if (m.pvp && !m.motShownAway && cs(m.away, 'mot') > 0 && m.score[1] < m.score[0] && min < 90) {
+    m.motShownAway = true; m.stats.coachAway.mot++;
+    ev.push({ min, kind: 'coach', attr: 'mot', text: `🔥 ${m.away.coach.nome} incendeia o banco de ${SELECOES[m.away.selecao].curto} enquanto estiver perdendo!` });
+  }
+  if (m.pauses.indexOf(min) >= 0 && min < 90) {
+    if (m.pvp) {
+      const a = playableCards(m).length > 0, b = awayPlayable(m).length > 0;
+      if (a || b) {
+        m.awaiting = true; m.awaitingSides = [a, b]; m.lastPauseMin = min;
+        ev.push({ min, kind: 'decision', sides: [a, b], text: 'Momento decisivo! Os dois técnicos podem usar uma carta.' });
+      }
+    } else if (playableCards(m).length > 0) {
+      m.awaiting = true; m.lastPauseMin = min;
+      ev.push({ min, kind: 'decision', text: 'Momento decisivo! Use uma carta ou guarde.' });
+    }
   }
   if (min >= 90) {
     m.done = true;
@@ -1323,6 +1445,7 @@ function chooseType(m, side) {
 }
 
 function resolveLance(m, side, forcedType, ev, opts) {
+  ballFor.rng = m.pvp ? () => m.rng.next() : null;
   const r = m.rng, run = m.run, f = m.fx, min = m.minute, st = m.stage;
   const type = forcedType || chooseType(m, side);
   const A = lines(m, side), D = lines(m, 1 - side);
@@ -1387,13 +1510,28 @@ function resolveLance(m, side, forcedType, ev, opts) {
       atkB = CK.atk * cs(run, 'atk');
       bolB = (type === 'escanteio' || type === 'falta' || type === 'cruz') ? CK.bol * cs(run, 'bol') : 0;
       q = clamp(q + atkB + bolB, 0.03, 0.8);
-    } else q = clamp(q * (1 - CK.def * cs(run, 'def')), 0.03, 0.8);
+      if (m.pvp) q = clamp(q * (1 - CK.def * cs(m.away, 'def')), 0.03, 0.8);
+      if (m.pvp && min <= m.fxAway.casinhaUntil) q *= 0.55;
+    } else {
+      q = clamp(q * (1 - CK.def * cs(run, 'def')), 0.03, 0.8);
+      if (m.pvp) {
+        const ar = m.away;
+        q = clamp(q + CK.atk * cs(ar, 'atk') + ((type === 'escanteio' || type === 'falta' || type === 'cruz') ? CK.bol * cs(ar, 'bol') : 0), 0.03, 0.8);
+        if (m.fxAway.craque && (type === 'jogada' || forcedType === 'jogada')) { q = clamp(q + 0.32 + CK.estQ * cs(ar, 'est'), 0.03, 0.85); m.fxAway.craque = false; }
+      }
+    }
   } else {
     q = clamp(q + (scorerRating - D.gk) * 0.004, 0.55, 0.93);
   }
   m.stats.shots[side]++;
 
-  // Paredão (carta)
+  // Paredão (carta). Na final ao vivo cada lado fecha o próprio gol.
+  if (m.pvp && side === 0 && m.fxAway.paredao) {
+    m.fxAway.paredao = false;
+    m.stats.bigSaves[1]++;
+    ev.push({ min, kind: 'lance', side, scorer: scorerName, text: text + ' 🛡️ PAREDÃO de ' + SELECOES[m.away.selecao].curto + '! ' + m.opp.gk + ' fecha o gol!', ball: ballFor(side), hl: true });
+    return;
+  }
   if (side === 1 && f.paredao) {
     f.paredao = false;
     m.stats.bigSaves[0]++;
@@ -1502,9 +1640,14 @@ function playCard(m, cardId) {
   const ev = [];
   if (!m.awaiting) return ev;
   m.awaiting = false;
-  if (!cardId) { ev.push({ min, kind: 'info', text: 'Você guardou as cartas. Segue o jogo.' }); return ev; }
+  if (!cardId) {
+    const who = m.pvp ? SELECOES[run.selecao].curto : 'Você';
+    ev.push({ min, kind: 'info', text: m.pvp ? `${who} guardou as cartas.` : 'Você guardou as cartas. Segue o jogo.' });
+    return ev;
+  }
   if (playableCards(m).indexOf(cardId) < 0) return ev;
   m.used.push(cardId);
+  run.cardLog = run.cardLog || {};
   run.cardLog[cardId] = (run.cardLog[cardId] || 0) + 1;
   const c = CARDS[cardId];
   let t = '';
@@ -1530,8 +1673,49 @@ function playCard(m, cardId) {
     const bonus = { pressao: `+${ex} min`, casinha: `+${ex} min`, chuveirinho: `+${ex} min`, longe: `+${ex} min`, craque: `+${pp(CK.estQ * es)} p.p. de chance`, peixinho: `+${pp(CK.estQ * es)} p.p. de chance`, submagica: `+${n1(CK.estSub * es)} de força extra` }[cardId];
     t += ` 📋 Prancheta de ${csrc(run, 'est')}: ${bonus}.`;
   }
-  ev.push({ min, kind: 'card', card: cardId, text: `${c.icon} ${t}` });
+  ev.push({ min, kind: 'card', card: cardId, side: 0, text: `${m.pvp ? SELECOES[run.selecao].curto + ': ' : ''}${c.icon} ${t}` });
   return ev;
+}
+function applyAwayCard(m, cardId) {
+  const away = m.away, f = m.fxAway, min = m.minute, ev = [];
+  const nome = SELECOES[away.selecao].curto;
+  if (!cardId) { ev.push({ min, kind: 'info', side: 1, text: `${nome} guardou as cartas.` }); return ev; }
+  if (awayPlayable(m).indexOf(cardId) < 0) return ev;
+  m.usedAway.push(cardId);
+  away.cardLog = away.cardLog || {};
+  away.cardLog[cardId] = (away.cardLog[cardId] || 0) + 1;
+  const c = CARDS[cardId];
+  let t = '';
+  const ex = Math.round(CK.estMin * cs(away, 'est'));
+  switch (cardId) {
+    case 'pressao': f.pressaoUntil = min + (away.selecao === 'hol74' ? 30 : 15) + ex; t = 'Pressão alta!'; break;
+    case 'casinha': f.casinhaUntil = min + 25 + ex; t = 'Fechar a casinha!'; break;
+    case 'craque': f.craque = true; t = 'Craque decide!'; break;
+    case 'submagica': f.sub += 6 + CK.estSub * cs(away, 'est'); t = 'Substituição mágica! +6 em tudo.'; break;
+    case 'chuveirinho': f.chuvaUntil = min + 15 + ex; t = 'Chuveirinho!'; break;
+    case 'longe': f.longeUntil = min + 15 + ex; t = 'Chute de longe!'; break;
+    case 'paredao': f.paredao = true; t = 'Paredão no gol!'; break;
+    case 'peixinho': f.peixinho = true; t = 'Peixinho ensaiado!'; break;
+  }
+  if (cs(away, 'est') > 0 && cardId !== 'paredao') m.stats.coachAway.est++;
+  ev.push({ min, kind: 'card', card: cardId, side: 1, text: `${nome}: ${c.icon} ${t}` });
+  return ev;
+}
+function applyPvpCards(m, c0, c1) {
+  if (!m.pvp || !m.awaiting) return [];
+  const sides = m.awaitingSides || [false, false];
+  const ev = [];
+  if (sides[0]) ev.push(...playCard(m, c0 || null));
+  else m.awaiting = false;
+  if (sides[1]) ev.push(...applyAwayCard(m, c1 || null));
+  m.awaiting = false;
+  return ev;
+}
+function pvpResult(m) {
+  let winner = m.score[0] > m.score[1] ? 0 : m.score[1] > m.score[0] ? 1 : -1;
+  let pens = null;
+  if (winner < 0) { pens = shootout(m); winner = pens.win ? 0 : 1; }
+  return { score: m.score.slice(), winner, pens, epics: m.epics.map(e => ({ id: e.id, min: e.min, scorer: e.scorer, nome: e.nome })) };
 }
 
 function simulateRest(m, chooser) {
@@ -1821,6 +2005,7 @@ const E = {
   MAX_RELICS, MAX_CARDS, GROUP_PTS_NEEDED, RELIC_PRICE,
   selecaoChoices, newRun, teamLines, oppLines, opponentInfo, promessaIndex, effRating, maxInterest, interestFor,
   createMatch, stepMatch, playCard, playableCards, simulateRest, finishMatch, lines,
+  createPvpMatch, applyPvpCards, pvpCards, pvpResult, awayPlayable,
   genRewards, rerollRewards, rerollRewardsCost, genShop, rerollShop, rerollShopCost, needsTarget, applyItem, buyItem, sellRelic, itemPrice,
   verdict, stageReachedLabel, runScore, isKO, has,
   EPICS, EPIC_IDS, EPIC_RATE, WEATHER, WEATHER_W, weatherFor, LEGENDS, LEGEND_IDS,
@@ -1828,6 +2013,269 @@ const E = {
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = E;
 else root.FFEngine = E;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>/* Chave compartilhada do duelo. Os dois humanos ficam em metades opostas e só podem se cruzar na final. */
+(function (root) {
+  'use strict';
+  const E = typeof module !== 'undefined' && module.exports ? require('./engine.js') : root.FFEngine;
+  const LETTERS = 'ABCDEFGH';
+  const TIER_STR = { A: 52, B: 57, C: 62, D: 66 };
+  const EXTRA = [
+    { nome: 'México 1986', flag: '🇲🇽', scorers: ['Hugo Sánchez', 'Negrete', 'Boy'], gk: 'Larios', tier: 'B' },
+    { nome: 'Bélgica 1986', flag: '🇧🇪', scorers: ['Ceulemans', 'Scifo', 'Claesen'], gk: 'Pfaff', tier: 'C' },
+    { nome: 'Colômbia 1994', flag: '🇨🇴', scorers: ['Valderrama', 'Asprilla', 'Rincón'], gk: 'Córdoba', tier: 'B' },
+    { nome: 'Irlanda 1990', flag: '🇮🇪', scorers: ['Aldridge', 'Houghton', 'McGrath'], gk: 'Bonner', tier: 'A' },
+    { nome: 'Rússia 2018', flag: '🇷🇺', scorers: ['Dzyuba', 'Cheryshev', 'Golovin'], gk: 'Akinfeev', tier: 'B' },
+    { nome: 'Marrocos 2022', flag: '🇲🇦', scorers: ['En-Nesyri', 'Ziyech', 'Hakimi'], gk: 'Bounou', tier: 'C' },
+    { nome: 'Japão 2022', flag: '🇯🇵', scorers: ['Mitoma', 'Maeda', 'Doan'], gk: 'Gonda', tier: 'B' }
+  ];
+  // Oitavas: metade esquerda (grupos A–D) e metade direita (E–H) não se cruzam antes da final.
+  const R16 = [
+    [{ g: 0, rank: 1 }, { g: 1, rank: 2 }],
+    [{ g: 2, rank: 1 }, { g: 3, rank: 2 }],
+    [{ g: 1, rank: 1 }, { g: 0, rank: 2 }],
+    [{ g: 3, rank: 1 }, { g: 2, rank: 2 }],
+    [{ g: 4, rank: 1 }, { g: 5, rank: 2 }],
+    [{ g: 6, rank: 1 }, { g: 7, rank: 2 }],
+    [{ g: 5, rank: 1 }, { g: 4, rank: 2 }],
+    [{ g: 7, rank: 1 }, { g: 6, rank: 2 }]
+  ];
+  const QF = [[0, 1], [2, 3], [4, 5], [6, 7]];
+  const SF = [[0, 1], [2, 3]];
+  const HUMAN_GROUP = [0, 4];
+
+  function pool() {
+    const out = [];
+    Object.keys(E.OPPONENTS).forEach(tier => E.OPPONENTS[tier].forEach(o => out.push({ ...o, str: TIER_STR[tier], scorerW: o.scorerW || [3, 2, 1] })));
+    EXTRA.forEach(o => out.push({ ...o, str: TIER_STR[o.tier], scorerW: [3, 2, 1] }));
+    return out;
+  }
+  function slotsOf(group, rank) {
+    const r16 = R16.findIndex(p => p.some(x => x.g === group && x.rank === rank));
+    const qf = QF.findIndex(p => p.indexOf(r16) >= 0);
+    const sf = SF.findIndex(p => p.indexOf(qf) >= 0);
+    return { r16, qf, sf, final: 0 };
+  }
+  function cpuPlay(seed, a, b, key) {
+    const r = E.rngFor(seed, 'cpu', key);
+    const d = ((a.str || 55) - (b.str || 55)) / 10;
+    let gf = 0, ga = 0;
+    for (let i = 0; i < 5; i++) {
+      if (r.chance(Math.max(0.06, Math.min(0.42, 0.16 + d * 0.02)))) gf++;
+      if (r.chance(Math.max(0.06, Math.min(0.42, 0.16 - d * 0.02)))) ga++;
+    }
+    if (gf === ga) { if (r.chance(0.5 + d * 0.04)) gf++; else ga++; }
+    return [gf, ga];
+  }
+  function table(teams, played) {
+    const rows = teams.map((t, i) => ({ i, t, pts: 0, gf: 0, ga: 0 }));
+    for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+      const sc = played[i + '-' + j];
+      if (!sc) continue;
+      rows[i].gf += sc[0]; rows[i].ga += sc[1];
+      rows[j].gf += sc[1]; rows[j].ga += sc[0];
+      if (sc[0] > sc[1]) rows[i].pts += 3;
+      else if (sc[1] > sc[0]) rows[j].pts += 3;
+      else { rows[i].pts++; rows[j].pts++; }
+    }
+    rows.sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf || a.i - b.i);
+    return rows;
+  }
+  function buildCup(seed) {
+    seed = E.normalizeSeed(seed) || 'COPA';
+    const r = E.rngFor(seed, 'chave');
+    const cpus = r.shuffle(pool()).slice(0, 30);
+    let k = 0;
+    const groups = [];
+    for (let g = 0; g < 8; g++) {
+      const teams = [];
+      for (let s = 0; s < 4; s++) {
+        if ((g === 0 && s === 0) || (g === 4 && s === 0)) teams.push({ human: g === 0 ? 0 : 1, nome: g === 0 ? 'Você' : 'Amigo', flag: '⚽', str: 60, scorers: [], gk: '', placeholder: true });
+        else teams.push({ ...cpus[k++], human: null });
+      }
+      const played = {};
+      for (let i = 0; i < 4; i++) for (let j = i + 1; j < 4; j++) {
+        if (teams[i].human != null || teams[j].human != null) continue;
+        played[i + '-' + j] = cpuPlay(seed, teams[i], teams[j], 'g' + g + '-' + i + '-' + j);
+      }
+      groups.push({ id: LETTERS[g], index: g, half: g < 4 ? 0 : 1, teams, played });
+    }
+    const cup = { seed, groups, letters: LETTERS };
+    cup.ko = [0, 1].map(role => [1, 2].map(rank => koPath(cup, role, rank)));
+    return cup;
+  }
+function qualifier(cup, g, rank) {
+  const group = cup.groups[g];
+  const human = group.teams.findIndex(t => t.human != null);
+  if (human >= 0 && [1, 2, 3].some(j => !group.played['0-' + j])) return null;
+  const rows = table(group.teams, group.played);
+  const row = rows[rank - 1];
+  if (!row || row.t.human != null) return null;
+  return row.t;
+}
+  function koPath(cup, role, rank) {
+    const g = HUMAN_GROUP[role];
+    const sl = slotsOf(g, rank);
+    const pair = R16[sl.r16];
+    const other = pair[0].g === g && pair[0].rank === rank ? pair[1] : pair[0];
+    const r16 = qualifier(cup, other.g, other.rank);
+    const qfPair = QF[sl.qf];
+    const otherR16 = qfPair[0] === sl.r16 ? qfPair[1] : qfPair[0];
+    const qf = winnerOfR16(cup, otherR16);
+    const sfPair = SF[sl.sf];
+    const otherQf = sfPair[0] === sl.qf ? sfPair[1] : sfPair[0];
+    const sf = winnerOfQf(cup, otherQf, role);
+    return { rank, slots: sl, r16, qf, sf };
+  }
+  function sidesOf(cup, idx) {
+    const p = R16[idx];
+    return [qualifier(cup, p[0].g, p[0].rank), qualifier(cup, p[1].g, p[1].rank)];
+  }
+  function winnerOfR16(cup, idx) {
+    const [a, b] = sidesOf(cup, idx);
+    if (!a || !b) return null;
+    const sc = cpuPlay(cup.seed, a, b, 'r16-' + idx);
+    return sc[0] >= sc[1] ? a : b;
+  }
+  function winnerOfQf(cup, qfIdx, skipRole) {
+    const [i, j] = QF[qfIdx];
+    const a = winnerOfR16(cup, i), b = winnerOfR16(cup, j);
+    if (!a || !b) return null;
+    const sc = cpuPlay(cup.seed, a, b, 'qf-' + qfIdx);
+    return sc[0] >= sc[1] ? a : b;
+  }
+  function humanGroup(role) { return HUMAN_GROUP[role]; }
+  function halfOf(role) { return role === 0 ? 0 : 1; }
+  function recordHuman(cup, role, games) {
+    const g = cup.groups[HUMAN_GROUP[role]];
+    const opps = [1, 2, 3];
+    games.forEach((sc, n) => { if (!sc) return; const j = opps[n]; g.played['0-' + j] = sc.slice(); });
+    return table(g.teams, g.played);
+  }
+  function placement(cup, role, games) {
+    const rows = recordHuman(cup, role, games);
+    const me = rows.findIndex(x => x.i === 0);
+    const row = rows[me];
+    const rank = me + 1;
+    const qualified = row.pts >= E.GROUP_PTS_NEEDED && rank <= 2;
+    return { rows, rank, pts: row.pts, qualified };
+  }
+  // games: até 3 placares [gf, ga] do humano contra os rivais 1, 2 e 3. Não muta a copa.
+  function placePlayer(cup, role, games) {
+    const copy = JSON.parse(JSON.stringify(cup));
+    copy.ko = cup.ko;
+    const g = copy.groups[HUMAN_GROUP[role]];
+    g.teams[0] = { ...g.teams[0] };
+    return placement(copy, role, games || []);
+  }
+  function asOpponent(team, stage) {
+    return {
+      nome: team.nome, flag: team.flag, scorers: team.scorers || ['o atacante', 'o meia', 'o ponta'], gk: team.gk || 'o goleiro',
+      scorerW: team.scorerW || [3, 2, 1], stage, baseStr: team.str || 57, jit: { atk: 0, mid: 0, def: 0, gk: 0 }
+    };
+  }
+  function groupOpponents(cup, role) {
+    const g = cup.groups[HUMAN_GROUP[role]];
+    return [1, 2, 3].map((s, i) => asOpponent(g.teams[s], i));
+  }
+function koOpponents(cup, role, rank) {
+  const path = koPath(cup, role, rank);
+  if (!path.r16 || !path.qf || !path.sf) return null;
+  return [path.r16, path.qf, path.sf].map((t, i) => asOpponent(t, i + 3));
+}
+  function prepareKo(cup, role, games) {
+  const copy = JSON.parse(JSON.stringify(cup));
+  const p = placement(copy, role, games || []);
+  const ko = p.qualified ? koOpponents(copy, role, p.rank) : null;
+  return { rank: p.rank, pts: p.pts, qualified: p.qualified, rows: p.rows.map(r => ({ i: r.i, pts: r.pts, gf: r.gf, ga: r.ga, nome: r.t.nome, human: r.t.human })), ko };
+}
+function meetOnlyInFinal(roleA, rankA, roleB, rankB) {
+    const a = slotsOf(HUMAN_GROUP[roleA], rankA), b = slotsOf(HUMAN_GROUP[roleB], rankB);
+    return a.sf !== b.sf && a.qf !== b.qf && a.r16 !== b.r16 && a.final === b.final;
+  }
+
+  const B = { LETTERS, R16, QF, SF, HUMAN_GROUP, buildCup, slotsOf, humanGroup, halfOf, groupOpponents, koOpponents, placePlayer, prepareKo, recordHuman, meetOnlyInFinal, asOpponent, table };
+  if (typeof module !== 'undefined' && module.exports) module.exports = B;
+  else root.FFBracket = B;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>/* Final ao vivo: mesma semente, mesmos elencos e as mesmas cartas nos mesmos minutos. */
+(function (root) {
+  'use strict';
+  const E = typeof module !== 'undefined' && module.exports ? require('./engine.js') : root.FFEngine;
+
+  function packSquad(run, nome) {
+    return {
+      nome: String(nome || (run.coach && run.coach.nome) || 'Fominha').slice(0, 24),
+      selecao: run.selecao,
+      players: run.players.map(p => ({ nome: p.nome, pos: p.pos, rating: p.rating, traits: p.traits || '' })),
+      cards: (run.cards || []).slice(),
+      relics: (run.relics || []).slice(),
+      coach: run.coach ? { nome: run.coach.nome, slots: JSON.parse(JSON.stringify(run.coach.slots)) } : null,
+      level: run.level || 1,
+      fichas: run.fichas || 0
+    };
+  }
+  function unpackSquad(sq, seed) {
+    const coach = sq.coach ? E.makeCoach(sq.coach.nome, sq.coach.slots) : null;
+    const run = E.newRun(seed || 'FINAL', sq.level || 1, sq.selecao, coach);
+    run.players = (sq.players || run.players).map(p => ({ nome: p.nome, pos: p.pos, rating: p.rating, traits: p.traits || '', id: p.nome, origem: '' }));
+    run.cards = (sq.cards || []).slice();
+    run.relics = (sq.relics || []).slice();
+    run.fichas = sq.fichas || 0;
+    run.stage = 6;
+    run.cardLog = {};
+    return run;
+  }
+  function aiCard(m, side) {
+    const cards = E.pvpCards(m, side);
+    if (!cards.length) return null;
+    const losing = m.score[side] < m.score[1 - side];
+    const prefer = losing
+      ? ['pressao', 'craque', 'peixinho', 'chuveirinho', 'longe', 'submagica', 'paredao', 'casinha']
+      : ['casinha', 'paredao', 'craque', 'pressao', 'peixinho', 'longe', 'chuveirinho', 'submagica'];
+    return prefer.find(c => cards.indexOf(c) >= 0) || null;
+  }
+  // choices: lista na ordem das pausas, { c0, c1 } ou null pra guardar. Sem escolha = guarda.
+  function playFinal(home, away, seed, choices, aiSides) {
+    const h = home && home.opponents ? home : unpackSquad(home, seed);
+    const a = away && away.opponents ? away : unpackSquad(away, seed);
+    const m = E.createPvpMatch(h, a, seed);
+    const events = [];
+    const used = [];
+    let i = 0, guard = 0;
+    while (!m.done && guard++ < 500) {
+      if (m.awaiting) {
+        const spec = (choices && choices[i]) || null;
+        i++;
+        let c0 = spec && spec.c0 !== undefined ? spec.c0 : null;
+        let c1 = spec && spec.c1 !== undefined ? spec.c1 : null;
+        if (aiSides && aiSides[0] && (c0 == null)) c0 = aiCard(m, 0);
+        if (aiSides && aiSides[1] && (c1 == null)) c1 = aiCard(m, 1);
+        used.push({ min: m.minute, c0: c0 || null, c1: c1 || null });
+        events.push(...E.applyPvpCards(m, c0, c1));
+        continue;
+      }
+      events.push(...E.stepMatch(m));
+    }
+    const res = E.pvpResult(m);
+    return {
+      score: res.score, winner: res.winner, pens: res.pens ? res.pens.score : null,
+      epics: res.epics, choices: used,
+      texts: events.map(e => e.min + '|' + e.kind + '|' + (e.side == null ? '' : e.side) + '|' + (e.card || '') + '|' + e.text)
+    };
+  }
+  function sameFinal(x, y) {
+    return x.score[0] === y.score[0] && x.score[1] === y.score[1] && x.winner === y.winner
+      && JSON.stringify(x.choices) === JSON.stringify(y.choices)
+      && JSON.stringify(x.epics) === JSON.stringify(y.epics)
+      && JSON.stringify(x.texts) === JSON.stringify(y.texts);
+  }
+
+  const L = { packSquad, unpackSquad, aiCard, playFinal, sameFinal };
+  if (typeof module !== 'undefined' && module.exports) module.exports = L;
+  else root.FFLive = L;
 })(typeof window !== 'undefined' ? window : this);
 </script>
 <script>// Fominha FC · meta-jogo (sem DOM): datas, sequência, missões, cosméticos, divisões,
@@ -2074,6 +2522,14 @@ function duelEncode(d) { return b64e(JSON.stringify(d)); }
 function duelDecode(code) {
   try {
     const d = JSON.parse(b64d(String(code)));
+    if (d && d.v === 2) {
+      if (!/^[A-Z0-9]{4,12}$/.test(String(d.id || ''))) return null;
+      if (!E.normalizeSeed(d.s) || !(d.l >= 1 && d.l <= 6)) return null;
+      d.s = E.normalizeSeed(d.s);
+      d.host = String(d.host || 'Fominha').slice(0, 24);
+      d.id = String(d.id);
+      return d;
+    }
     const okSide = x => x && typeof x.n === 'string' && E.SELECOES[x.sel] && Number.isFinite(x.p) && Array.isArray(x.h) && x.h.length <= 7;
     if (d.v !== 1 || !E.normalizeSeed(d.s) || !(d.l >= 1 && d.l <= 6) || !okSide(d.a) || (d.b && !okSide(d.b))) return null;
     d.s = E.normalizeSeed(d.s); return d;
@@ -2116,6 +2572,97 @@ const M = { dayKey, addDays, dayDiff, isoWeek, weekIndex, weekEnds, REACH, reach
   duelSide, duelEncode, duelDecode, duelWinner, BOLAO, STAKES, bolaoSettle, coachKey, galleryAdd, hallOfFame };
 if (typeof module !== 'undefined' && module.exports) module.exports = M; else root.FFMeta = M;
 })(this);
+</script>
+<script>/* Canal do duelo: presença + broadcast. A tabela `duels` é opcional (reconexão). */
+(function (root) {
+  'use strict';
+  const C = typeof module !== 'undefined' && module.exports ? require('./config.js') : root.FFConfig;
+  const CDN = 'https://esm.sh/@supabase/supabase-js@2.117.3';
+  let client = null, channel = null, dbOk = null;
+
+  function loadLib() {
+    if (root.__ffSb) return Promise.resolve(root.__ffSb);
+    return import(CDN).then(m => { root.__ffSb = m; return m; }).catch(() => null);
+  }
+  async function clientOrNull() {
+    if (client) return client;
+    const m = await loadLib();
+    if (!m || !m.createClient) return null;
+    client = m.createClient(C.SUPABASE_URL, C.SUPABASE_PUBLISHABLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      realtime: { params: { eventsPerSecond: 8 } }
+    });
+    return client;
+  }
+  function leave() {
+    if (channel && client) { try { client.removeChannel(channel); } catch (e) { /* já saiu */ } }
+    channel = null;
+  }
+  async function join(opts) {
+    leave();
+    const sb = await clientOrNull();
+    if (!sb) { opts.onStatus('off'); return null; }
+    const name = 'fominha-duel-' + opts.id;
+    const ch = sb.channel(name, { config: { broadcast: { self: false }, presence: { key: 'r' + opts.role } } });
+    channel = ch;
+    ch.on('broadcast', { event: 'msg' }, ({ payload }) => { if (opts.onEvent) opts.onEvent(payload); });
+    ch.on('presence', { event: 'sync' }, () => { if (opts.onPresence) opts.onPresence(flatten(ch.presenceState())); });
+    const status = await new Promise(resolve => {
+      let done = false;
+      const t = setTimeout(() => { if (!done) { done = true; resolve('off'); } }, 8000);
+      ch.subscribe(st => {
+        if (st === 'SUBSCRIBED' || st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') {
+          if (done) return;
+          done = true; clearTimeout(t);
+          resolve(st === 'SUBSCRIBED' ? 'on' : 'off');
+        }
+      });
+    });
+    if (status !== 'on') { leave(); opts.onStatus('off'); return null; }
+    opts.onStatus('on');
+    if (opts.state) await ch.track(opts.state);
+    if (opts.onPresence) opts.onPresence(flatten(ch.presenceState()));
+    probeDb(sb, opts.id);
+    return ch;
+  }
+  function flatten(state) {
+    const out = [];
+    Object.keys(state || {}).forEach(k => (state[k] || []).forEach(p => out.push(p)));
+    return out;
+  }
+  async function track(state) { if (channel) { try { await channel.track(state); } catch (e) { /* offline */ } } }
+  async function send(payload) {
+    if (!channel) return false;
+    const res = await channel.send({ type: 'broadcast', event: 'msg', payload });
+    return res === 'ok';
+  }
+  async function probeDb(sb, id) {
+    if (dbOk === false) return;
+    const { error } = await sb.from('duels').select('id').eq('id', id).maybeSingle();
+    dbOk = !error;
+  }
+  async function save(id, state) {
+    if (dbOk === false) return false;
+    const sb = await clientOrNull();
+    if (!sb) return false;
+    const { error } = await sb.from('duels').upsert({ id, state, updated_at: new Date().toISOString() });
+    if (error) { dbOk = false; return false; }
+    dbOk = true;
+    return true;
+  }
+  async function load(id) {
+    if (dbOk === false) return null;
+    const sb = await clientOrNull();
+    if (!sb) return null;
+    const { data, error } = await sb.from('duels').select('state').eq('id', id).maybeSingle();
+    if (error) { dbOk = false; return null; }
+    return data ? data.state : null;
+  }
+
+  const N = { join, leave, track, send, save, load, clientOrNull };
+  if (typeof module !== 'undefined' && module.exports) module.exports = N;
+  else root.FFNet = N;
+})(typeof window !== 'undefined' ? window : this);
 </script>
 <script>/* Fominha FC · Copa Relâmpago · interface v3 */
 (function () {
@@ -2288,11 +2835,20 @@ function render() {
   clearTimeout(G.timer); clearInterval(G.decT); clearInterval(G.spinT);
   document.querySelectorAll('.tip,.sheet,.modal,.epicfx').forEach(x => x.remove()); SIM.epic = null;
   window.scrollTo(0, 0);
-  ({ home: renderHome, daily: renderDaily, selecao: renderSelecao, coach: renderCoach, hub: renderHub, match: renderMatch, result: renderResult, reward: renderReward, shop: renderShop, verdict: renderVerdict, desafios: renderDesafios, album: renderAlbum, tecnicos: renderTecnicos, perfil: renderPerfil, duelo: renderDuelo })[G.screen]();
+  ({ home: renderHome, daily: renderDaily, selecao: renderSelecao, coach: renderCoach, hub: renderHub, match: renderMatch, result: renderResult, reward: renderReward, shop: renderShop, verdict: renderVerdict, desafios: renderDesafios, album: renderAlbum, tecnicos: renderTecnicos, perfil: renderPerfil, duelo: renderDuelo, chave: renderChave, espera: renderEspera, caiu: renderCaiu })[G.screen]();
   syncTabbar(); saveStore();
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
 }
-function go(screen) { G.screen = screen; render(); }
+function go(screen) {
+  if (screen === 'hub' && G.run && G.run.cupRole != null && G.cup) {
+    syncCupKo();
+    if (G.run.status !== 'playing' && G.run.stage < 6) screen = 'caiu';
+    else if (G.run.stage === 6 && G.run.status === 'playing') screen = G.cup.status === 'off' ? (armOfflineFinal(), 'hub') : 'espera';
+    else if (G.run.stage >= 3 && !G.cup.koSeen) { G.cup.koSeen = true; G.cup.mode = 'ko'; screen = 'chave'; }
+  }
+  G.screen = screen; render();
+  if (G.cup && G.run) { saveSnap(); cupPublish(); }
+}
 
 // ---------- dicas (onboarding) ----------
 const TIPS = {
@@ -2344,7 +2900,8 @@ function renderHome() {
     <p class="small mut" style="margin:8px 0 10px">${esc(E.LEVELS[lv - 1].desc)}${st.unlocked < E.MAX_PLAYABLE_LEVEL ? ' Seja campeão pra liberar o próximo nível.' : ''}</p>
     <input class="seed" id="seedIn" maxlength="12" placeholder="SEMENTE (OPCIONAL)" value="${esc(G.pendingSeed)}" autocomplete="off" autocapitalize="characters" aria-label="Semente para desafiar amigo">
     <p class="xs mut" style="margin:6px 0 12px">Vazio = Copa aleatória. Cole a semente de um amigo pra jogar a mesma Copa e comparar a pontuação.</p>
-    <button class="btn shine" data-act="start">${ic('play')} Começar a Copa</button></div>
+    <button class="btn shine" data-act="start">${ic('play')} Começar a Copa</button>
+    <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
   <button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
@@ -2544,7 +3101,7 @@ function pitchLines() {
     <rect x="0" y="43" width="3" height="14" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width=".5"/><rect x="152" y="43" width="3" height="14" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width=".5"/></svg>`;
 }
 function renderMatch() {
-  const run = G.run, m = G.match, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
+  const mine = G.run, m = G.match, run = m && m.pvp ? m.run : mine, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
   let toks = '';
   const tc = c => lum(c) > 0.6 ? '#111' : '#fff';
   for (let i = 0; i < 7; i++) toks += `<div class="tok t0 ${i === 0 ? 'gk' : ''}" style="background:${i === 0 ? '#1f2937' : sel.kit[0]};border-color:${sel.kit[1]};color:${i === 0 ? '#fff' : tc(sel.kit[0])}">${NUMS[i]}</div>`;
@@ -2553,11 +3110,11 @@ function renderMatch() {
   app.innerHTML = `
   <div class="mc">
     <div class="sb">
-      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}</div></div>
-      <div class="mid"><div class="score" id="sc">0<i>:</i>0</div><span class="clock"><span class="live"></span><span id="clk">0'</span></span></div>
-      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
+      <div class="mid"><div class="score" id="sc">${m.score[0]}<i>:</i>${m.score[1]}</div><span class="clock"><span class="live"></span><span id="clk">${m.minute}'</span></span></div>
+      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
     </div>
-    <div class="prog"><i id="prog"></i></div>
+    <div class="prog"><i id="prog" style="width:${Math.min(100, m.minute / 90 * 100)}%"></i></div>
     <div class="stagelbl"><span>${esc(E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
   </div>
   <div class="momentum"><div class="mh"><span style="color:var(--lime)">▲ ${esc(sel.curto)}</span><span>Momentum</span><span style="color:#ff9a9d">${esc(oppShort(op))} ▼</span></div>
@@ -2565,13 +3122,14 @@ function renderMatch() {
     <div class="mstats" id="mstats"></div></div>
   <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball"></div></div><div class="wx" aria-hidden="true"></div></div>
   <div class="fxbar" id="fxbar"></div>
-  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span><button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button></div>
+  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
-  G.queue = []; G.shownScore = [0, 0];
+  G.queue = []; G.shownScore = m.score.slice();
   G.mom = Array.from({ length: 30 }, () => [0, 0]); G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
   initSim();
   updateFx(); drawMomentum(); drawStats();
-  G.timer = setTimeout(tick, 700);
+  if (m.pvp && G.holdKick && Date.now() < G.holdKick) G.timer = setTimeout(tick, Math.max(200, G.holdKick - Date.now()));
+  else G.timer = setTimeout(tick, 700);
 }
 function addMom(side, min, v) { const b = Math.min(29, Math.floor(Math.max(0, min - 1) / 3)); G.mom[b][side] += v; }
 function drawMomentum() {
@@ -2728,7 +3286,7 @@ function pushFeed(e) {
 }
 function goalFx(e) {
   const fx = document.createElement('div');
-  const mine = e.side === 0;
+  const mine = (G.match && G.match.pvp && G.cup) ? e.side === G.cup.role : e.side === 0;
   fx.className = 'goalfx ' + (e.gtype === 'mao' ? 'mao' : mine ? '' : 'rival');
   const title = e.gtype === 'mao' ? '✋ LA MANO<br>DE DIOS' : mine ? (e.value > 1 ? `GOOOL!<br>+${e.value}` : 'GOOOL!') : 'GOL DELES';
   const sub = e.gtype === 'mao' ? 'O juiz valida o gol irregular!' : (e.label && mine && e.label !== 'GOOOL!' ? e.label + ' ' : '') + (e.scorer || '') + (e.sub ? ' · ' + e.sub : '');
@@ -2757,7 +3315,7 @@ function enqueue(evs) {
       G.queue.push({ t: 'event', e });
     } else G.queue.push({ t: 'event', e });
   }
-  if (!evs.length && m.minute > 1 && m.minute < 90 && Math.random() < 0.14) {
+  if (!m.pvp && !evs.length && m.minute > 1 && m.minute < 90 && Math.random() < 0.14) {
     const side = Math.random() < 0.55 ? SIM.poss : 1 - SIM.poss;
     G.queue.push({ t: 'ambient', side, min: m.minute });
   }
@@ -2815,6 +3373,7 @@ function tick() {
 }
 const DEC_SECS = 20;
 function showDecision() {
+  if (G.match && G.match.pvp) return showPvpDecision();
   const m = G.match, run = G.run;
   const pl = E.playableCards(m);
   const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
@@ -2855,24 +3414,32 @@ function useCard(c) {
 }
 function endMatch() {
   SIM.on = false;
+  if (G.match && G.match.pvp) return endPvp();
   G.result = E.finishMatch(G.run, G.match);
+  if (G.run && G.run.cupRole != null && G.run.status === 'eliminated' && G.run.stage < 6) { finalizeRun(); return go('caiu'); }
   if (G.run.status !== 'playing') finalizeRun();
   go('result');
 }
 
 // ---------- resultado ----------
 function renderResult() {
-  const r = G.result, run = G.run, m = G.match;
+  const r = G.result, m = G.match;
+  const pvp = !!(m && m.pvp && G.cup);
+  const role = pvp ? G.cup.role : 0;
+  const run = pvp ? (role === 0 ? m.run : m.away) : G.run;
+  const oppFlag = pvp && role === 1 ? E.SELECOES[m.run.selecao].flag : m.opp.flag;
+  const kicks = (r.pens && r.pens.kicks) || [];
+  const pscore = r.pens && r.pens.score ? (role === 0 ? r.pens.score : [r.pens.score[1], r.pens.score[0]]) : null;
   const title = r.pens ? (r.outcome === 'W' ? 'Nos pênaltis!' : 'Caiu nos pênaltis') : { W: 'Vitória!', D: 'Empate', L: 'Derrota' }[r.outcome];
   const pk = (k, mine) => `<span class="pk ${k.ok ? 'ok' : 'no'} ${mine && k.coach ? 'c' : ''}" title="${esc(k.nome || '')}">${k.ok ? '✓' : '✕'}</span>`;
-  const pens = r.pens ? `<div class="panel"><div class="ph">${ic('target')} Pênaltis <span class="r disp" style="color:#fff">${r.pens.score[0]} x ${r.pens.score[1]}</span></div>
-     <div class="pens"><span style="font-size:22px">${selOf(run).flag}</span><div>${r.pens.kicks.filter(k => k.side === 0).map(k => pk(k, true)).join('')}</div><span style="font-size:22px">${m.opp.flag}</span><div>${r.pens.kicks.filter(k => k.side === 1).map(k => pk(k)).join('')}</div></div>
-     ${r.pens.kicks.some(k => k.coach) ? `<div class="xs mut" style="margin-top:6px">Contorno azul = cobrança salva pela Mentalidade do técnico.</div>` : ''}</div>` : '';
-  const goals = r.mGoals.map(g => `<div class="gl"><span class="m">${g.min}'</span><span>${ballSvg('ico')}</span><span><b style="color:${g.side === 0 ? '#fff' : '#ff9a9d'}">${esc(g.scorer)}</b> ${g.type === 'mao' ? '<span class="mut">(mão!)</span>' : g.value > 1 ? `<span style="color:var(--gold)">(vale ${g.value})</span>` : ''}</span></div>`).join('');
+  const pens = pscore ? `<div class="panel"><div class="ph">${ic('target')} Pênaltis <span class="r disp" style="color:#fff">${pscore[0]} x ${pscore[1]}</span></div>
+     <div class="pens"><span style="font-size:22px">${selOf(run).flag}</span><div>${kicks.filter(k => k.side === role).map(k => pk(k, true)).join('')}</div><span style="font-size:22px">${oppFlag}</span><div>${kicks.filter(k => k.side !== role).map(k => pk(k)).join('')}</div></div>
+     ${kicks.some(k => k.coach) ? `<div class="xs mut" style="margin-top:6px">Contorno azul = cobrança salva pela Mentalidade do técnico.</div>` : ''}</div>` : '';
+  const goals = (r.mGoals || []).map(g => `<div class="gl"><span class="m">${g.min}'</span><span>${ballSvg('ico')}</span><span><b style="color:${g.side === role ? '#fff' : '#ff9a9d'}">${esc(g.scorer)}</b> ${g.type === 'mao' ? '<span class="mut">(mão!)</span>' : g.value > 1 ? `<span style="color:var(--gold)">(vale ${g.value})</span>` : ''}</span></div>`).join('');
   const next = r.status === 'playing' ? (r.reward ? [ic('gift') + ' Abrir pacote', ''] : r.shop ? [ic('hanger') + ' Ir pro Vestiário', ''] : [ic('play') + ' Continuar', '']) : [ic('trophy') + ' Ver o veredito', 'gold'];
   app.innerHTML = `${topbar(run)}
     <div class="reshero"><div class="eyebrow">${esc(E.STAGES[r.stage].nome)}</div><div class="big ${r.outcome}">${title}</div></div>
-    <div class="resscore"><span class="f">${selOf(run).flag}</span><span class="s">${r.gf} <span class="mut" style="font-size:34px">x</span> ${r.ga}</span><span class="f">${m.opp.flag}</span></div>
+    <div class="resscore"><span class="f">${selOf(run).flag}</span><span class="s">${r.gf} <span class="mut" style="font-size:34px">x</span> ${r.ga}</span><span class="f">${oppFlag}</span></div>
     ${r.groupMsg ? `<p style="text-align:center;font-weight:800;margin:4px 0 10px">${esc(r.groupMsg)}</p>` : ''}
     ${pens}
     <div class="panel"><div class="ph">${ic('whistle')} Por que ${r.outcome === 'W' ? 'você ganhou' : r.outcome === 'L' ? 'você perdeu' : 'empatou'}</div><ul class="why">${r.why.map(w => `<li>${ic('check')}<span>${esc(w)}</span></li>`).join('')}</ul></div>
@@ -3056,7 +3623,7 @@ function renderVerdict() {
   ${G.unlockedNow ? `<div class="panel unlock">${ic('lock')} <b>Nível ${G.unlockedNow.n} · ${esc(G.unlockedNow.nome)} liberado!</b><div class="small mut">${esc(G.unlockedNow.desc)}</div></div>` : ''}
   <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
     <button class="btn gold shine" data-act="share">${ic('share')} Compartilhar card</button>
-    <button class="btn sec" data-act="duelLink">${ic('users')} Duelo: desafiar amigo <small>copia o link</small></button>
+    <button class="btn sec" data-act="duelLink">${ic('users')} ${G.cup && G.cup.status === 'off' ? 'Comparar por link <small>o ao vivo não conectou</small>' : 'Duelo: desafiar amigo <small>copia o link</small>'}</button>
     <button class="btn" data-act="again">${ic('play')} Jogar de novo</button>
     <div class="row"><button class="btn sec" data-act="sameSeed">${ic('dice')} Mesma semente</button><button class="btn sec" data-act="home">${ic('home')} Início</button></div>
   </div>`;
@@ -3472,6 +4039,391 @@ function bolaoSheet() {
   document.body.appendChild(box);
 }
 
+// ---------- duelo ao vivo (chave compartilhada) ----------
+function syncCupKo() {
+  const run = G.run;
+  if (!run || run.cupRole == null || run.cupKo || run.stage < 3 || !G.cup) return;
+  const games = [0, 1, 2].map(s => { const h = run.history.find(x => x.stage === s); return h ? [h.gf, h.ga] : null; });
+  if (games.some(g => !g)) return;
+  const cup = G.cup.built || (G.cup.built = FFBracket.buildCup(run.seed));
+  const prep = FFBracket.prepareKo(cup, run.cupRole, games);
+  run.cupRank = prep.rank; run.cupPts = prep.pts; run.cupQualified = prep.qualified;
+  if (prep.ko) { prep.ko.forEach((o, i) => { run.opponents[i + 3] = o; }); run.cupKo = true; }
+}
+function armOfflineFinal() {
+  if (!G.run || G.run.opponents[6] || !G.cup) return;
+  const cup = G.cup.built || FFBracket.buildCup(G.run.seed);
+  const other = G.cup.role === 0 ? 1 : 0;
+  const t = cup.ko[other][0].qf || cup.ko[other][0].r16;
+  if (t) G.run.opponents[6] = FFBracket.asOpponent(t, 6);
+  G.cup.offlineFinal = true;
+}
+function saveSnap() {
+  if (!G.cup || !G.run) return;
+  try { sessionStorage.setItem('ffcupSnap', JSON.stringify({ id: G.cup.id, role: G.cup.role, koSeen: !!G.cup.koSeen, run: G.run, final: G.cup.final || null })); } catch (e) { /* modo privado */ }
+}
+function restoreSnap() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem('ffcupSnap') || 'null');
+    if (!s || !G.cup || s.id !== G.cup.id) return;
+    G.run = s.run; G.cup.koSeen = !!s.koSeen; if (s.final) G.cup.final = s.final;
+  } catch (e) { /* ignora */ }
+}
+function presenceBody() {
+  const run = G.run, c = G.cup;
+  let phase = 'lobby';
+  if (run) {
+    if (run.status !== 'playing' && run.stage < 6) phase = 'caiu';
+    else if (G.match && G.match.pvp && !G.match.done) phase = 'final';
+    else if (run.stage >= 6 && run.status === 'playing') phase = 'espera';
+    else if (run.stage >= 3) phase = 'mata';
+    else phase = 'grupo';
+  }
+  const squad = (phase === 'espera' || phase === 'final') && run ? FFLive.packSquad(run, G.store.coachName || c.host) : null;
+  return { role: c.role, name: (G.store.coachName || c.host || 'Fominha').slice(0, 24), coach: run && run.coach ? run.coach.nome : '', selecao: run ? run.selecao : '', phase, stage: run ? run.stage : 0, status: run ? run.status : 'lobby', pts: run ? run.groupPts : 0, hist: run ? run.history.map(h => [h.stage, h.gf, h.ga, h.outcome]) : [], squad, locks: (c.final && c.final.locks) || [] };
+}
+function cupPublish() { if (G.cup && window.FFNet && G.cup.status === 'on') FFNet.track(presenceBody()); }
+function cupConnect() {
+  if (!G.cup || !window.FFNet) { if (G.cup) G.cup.status = 'off'; return; }
+  G.cup.status = 'connecting';
+  FFNet.join({
+    id: G.cup.id, role: G.cup.role, state: presenceBody(),
+    onStatus(st) { if (!G.cup) return; G.cup.status = st; if (['chave', 'espera', 'caiu'].indexOf(G.screen) >= 0) render(); },
+    onPresence(list) { onCupPresence(list); },
+    onEvent(p) { onCupEvent(p); }
+  }).then(() => { if (G.cup && G.cup.status === 'on') FFNet.load(G.cup.id).then(st => { if (st && st.final && G.cup && !G.match) resumeFinal(st.final); }); });
+}
+function onCupPresence(list) {
+  if (!G.cup) return;
+  G.cup.friend = list.find(p => p.role !== G.cup.role) || null;
+  G.cup.online = list.map(p => p.role);
+  if (['chave', 'espera', 'caiu'].indexOf(G.screen) >= 0) render();
+  const host = list.find(p => p.role === 0);
+  if (host && host.locks && host.locks.length) host.locks.forEach(lock => applyLock(lock));
+  if (!G.match && host && host.phase === 'final' && host.squad && host.locks && host.locks.length && G.run && G.run.stage >= 6 && G.run.status === 'playing') {
+    const me = FFLive.packSquad(G.run, G.store.coachName || G.cup.host);
+    resumeFinal({ home: host.role === 0 ? host.squad : me, away: host.role === 0 ? me : host.squad, locks: host.locks });
+  }
+  maybeKick();
+}
+function maybeKick() {
+  const f = G.cup && G.cup.friend, run = G.run;
+  if (!f || !run || G.cup.role !== 0 || G.cup.kicked || G.cup.status !== 'on') return;
+  if (run.stage < 6 || run.status !== 'playing' || f.phase !== 'espera' || !f.squad) return;
+  G.cup.kicked = true;
+  const home = FFLive.packSquad(run, G.store.coachName || 'Fominha');
+  const startAt = Date.now() + 900;
+  FFNet.send({ t: 'kick', startAt, home, away: f.squad });
+  beginFinal(home, f.squad, startAt);
+}
+function onCupEvent(p) {
+  if (!p || !G.cup) return;
+  if (p.t === 'kick' && G.cup.role === 1) beginFinal(p.home, p.away, p.startAt);
+  if (p.t === 'card' && G.match && G.match.pvp) { G.pvpPick = G.pvpPick || [undefined, undefined]; G.pvpPick[p.side] = p.card; paintFriendPick(); if (G.cup.role === 0) maybeSendLock(); }
+  if (p.t === 'lock') applyLock(p);
+}
+function beginFinal(home, away, startAt) {
+  if (!G.cup || (G.match && G.match.pvp && !G.match.done)) return;
+  const h = FFLive.unpackSquad(home, G.cup.seed), a = FFLive.unpackSquad(away, G.cup.seed);
+  G.speed = 1;
+  G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
+  G.cup.final = { home, away, locks: (G.cup.final && G.cup.final.locks) || [] };
+  G.cup.pendingLocks = [];
+  G.holdKick = startAt || Date.now();
+  saveSnap();
+  go('match');
+}
+function resumeFinal(final) {
+  if (!final || !final.home || !final.away || !G.cup) return;
+  if (G.match && G.match.pvp && !G.match.done) return;
+  const h = FFLive.unpackSquad(final.home, G.cup.seed), a = FFLive.unpackSquad(final.away, G.cup.seed);
+  G.speed = 1;
+  G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
+  (final.locks || []).forEach(lock => { while (!G.match.done && !G.match.awaiting) E.stepMatch(G.match); if (G.match.awaiting && G.match.minute === lock.min) E.applyPvpCards(G.match, lock.c0, lock.c1); });
+  G.cup.final = final;
+  G.cup.pendingLocks = [];
+  if (G.match.done) { endPvp(); return; }
+  G.screen = 'match'; render();
+}
+function showPvpDecision() {
+  if (drainPendingLock()) return;
+  const m = G.match, role = G.cup.role, mine = role === 0 ? m.run : m.away;
+  G.pvpPick = [undefined, undefined]; G.pvpLocked = false;
+  const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
+  const secs = 12, C = 2 * Math.PI * 18;
+  const cards = mine.cards || [];
+  const playable = E.pvpCards(m, role);
+  const needMe = m.awaitingSides[role];
+  box.innerHTML = `<div class="inner" role="dialog" aria-label="Carta da final"><div class="grab"></div>
+    <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${m.score[0]} x ${m.score[1]}</div><div class="t">Final ao vivo</div></div>
+    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="dsec">${secs}</b></div></div>
+    <div class="dctx" style="border-left:3px solid var(--gold)">Os dois escolhem ao mesmo tempo. Quem não escolher a tempo guarda a carta. <span id="fpick">Amigo escolhendo...</span></div>
+    ${needMe ? `<div class="dcards">${cards.map((c, i) => { const d = E.CARDS[c], used = playable.indexOf(c) < 0; return `<button class="pcard ${used ? 'used' : ''}" style="--rc:${rc(d.rar)};animation-delay:${i * 0.07}s" ${used ? 'disabled' : `data-act="pvpcard" data-c="${c}"`}><span class="med">${d.icon}</span><span><span class="rr">Carta · ${E.RARITIES[d.rar].nome}</span><div class="in">${esc(d.nome)}</div><div class="id">${esc(d.desc)}</div><span class="use">${used ? 'JÁ USADA' : 'TOQUE PARA USAR'}</span></span></button>`; }).join('')}</div>
+    <button class="btn sec" style="margin-top:12px" data-act="pvpcard" data-c="">${ic('arrow')} Guardar e seguir</button>` : `<p class="small">Você não tem carta neste minuto. Esperando o amigo.</p>`}</div>`;
+  document.body.appendChild(box);
+  if (!needMe) { G.pvpPick[role] = null; if (window.FFNet) FFNet.send({ t: 'card', min: m.minute, side: role, card: null }); maybeSendLock(); }
+  let left = secs * 10;
+  G.decT = setInterval(() => {
+    if (!document.body.contains(box)) { clearInterval(G.decT); return; }
+    left--;
+    const r = $('#dring'), s = $('#dsec');
+    if (r) r.setAttribute('stroke-dashoffset', String(C * (1 - left / (secs * 10))));
+    if (s) s.textContent = Math.ceil(left / 10);
+    if (left <= 0) { clearInterval(G.decT); pvpTimeout(); }
+  }, 100);
+}
+function paintFriendPick() {
+  const el = $('#fpick'); if (!el || !G.cup) return;
+  const side = 1 - G.cup.role, card = G.pvpPick && G.pvpPick[side];
+  el.textContent = card === undefined ? 'Amigo escolhendo...' : card ? ('Amigo: ' + E.CARDS[card].nome) : 'Amigo guardou a carta.';
+}
+function pvpChoose(card) {
+  if (!G.match || !G.match.awaiting || G.pvpPick[G.cup.role] !== undefined) return;
+  G.pvpPick[G.cup.role] = card || null;
+  if (window.FFNet) FFNet.send({ t: 'card', min: G.match.minute, side: G.cup.role, card: card || null });
+  const btn = document.querySelector('#decision .dcards'); if (btn) btn.style.opacity = '.55';
+  maybeSendLock();
+}
+function cupAuthority() {
+  if (!G.cup) return false;
+  if (G.cup.role === 0) return true;
+  return (G.cup.online || []).indexOf(0) < 0;
+}
+function maybeSendLock() {
+  const m = G.match; if (!m || !m.awaiting || !cupAuthority() || G.pvpLocked) return;
+  const ready = [0, 1].every(s => !m.awaitingSides[s] || (G.pvpPick && G.pvpPick[s] !== undefined));
+  if (!ready) return;
+  const lock = { t: 'lock', min: m.minute, c0: G.pvpPick[0] || null, c1: G.pvpPick[1] || null };
+  if (window.FFNet && G.cup.status === 'on') FFNet.send(lock);
+  applyLock(lock);
+}
+function pvpTimeout() {
+  const m = G.match; if (!m || !m.awaiting) return;
+  G.pvpPick = G.pvpPick || [undefined, undefined];
+  if (G.pvpPick[G.cup.role] === undefined) G.pvpPick[G.cup.role] = null;
+  if (window.FFNet && G.cup.status === 'on') FFNet.send({ t: 'card', min: m.minute, side: G.cup.role, card: G.pvpPick[G.cup.role] });
+  if (cupAuthority()) { hostLockNow(false); return; }
+  G.decT = setTimeout(() => { if (m.awaiting && !G.pvpLocked) hostLockNow((G.cup.online || []).indexOf(0) < 0); }, 2500);
+}
+function hostLockNow(aiForMissing) {
+  const m = G.match; if (!m || !m.awaiting) return;
+  if (!cupAuthority() && !aiForMissing) return;
+  G.pvpPick = G.pvpPick || [undefined, undefined];
+  [0, 1].forEach(s => {
+    if (!m.awaitingSides[s]) { G.pvpPick[s] = null; return; }
+    if (G.pvpPick[s] !== undefined) return;
+    const online = s === G.cup.role || (G.cup.online || []).indexOf(s) >= 0;
+    G.pvpPick[s] = online ? null : FFLive.aiCard(m, s);
+  });
+  if (!cupAuthority()) {
+    const lock = { t: 'lock', min: m.minute, c0: G.pvpPick[0] || null, c1: G.pvpPick[1] || null };
+    applyLock(lock);
+    return;
+  }
+  maybeSendLock();
+}
+function drainPendingLock() {
+  const m = G.match;
+  if (!m || !m.awaiting || !G.cup || !G.cup.pendingLocks) return false;
+  const i = G.cup.pendingLocks.findIndex(l => l.min === m.minute);
+  if (i < 0) return false;
+  applyLock(G.cup.pendingLocks.splice(i, 1)[0]);
+  return true;
+}
+function applyLock(lock) {
+  const m = G.match;
+  if (!lock || !m || !m.pvp || !G.cup) return;
+  if ((G.cup.final && (G.cup.final.locks || []).some(l => l.min === lock.min)) || (G.pvpLocked && m.minute === lock.min)) return;
+  if (!m.awaiting || lock.min !== m.minute) {
+    G.cup.pendingLocks = G.cup.pendingLocks || [];
+    if (!G.cup.pendingLocks.some(l => l.min === lock.min)) G.cup.pendingLocks.push(lock);
+    return;
+  }
+  G.pvpLocked = true; clearInterval(G.decT); clearTimeout(G.decT);
+  const d = $('#decision'); if (d) d.remove();
+  const evs = E.applyPvpCards(m, lock.c0, lock.c1);
+  evs.forEach(e => G.queue.push({ t: 'event', e }));
+  G.cup.final = G.cup.final || {};
+  G.cup.final.locks = (G.cup.final.locks || []).concat([{ min: lock.min, c0: lock.c0, c1: lock.c1 }]);
+  if (window.FFNet) FFNet.save(G.cup.id, { final: G.cup.final });
+  saveSnap(); cupPublish();
+  G.timer = setTimeout(tick, 280);
+}
+function endPvp() {
+  SIM.on = false;
+  const m = G.match, res = E.pvpResult(m), role = G.cup.role;
+  const gf = res.score[role], ga = res.score[1 - role];
+  const outcome = res.winner === role ? 'W' : 'L';
+  const oppName = role === 0 ? E.SELECOES[m.away.selecao].nome : E.SELECOES[m.run.selecao].nome;
+  const oppFlag = role === 0 ? E.SELECOES[m.away.selecao].flag : E.SELECOES[m.run.selecao].flag;
+  G.run.history.push({ stage: 6, opp: oppName, flag: oppFlag, gf, ga, pens: res.pens ? (role === 0 ? res.pens.score : [res.pens.score[1], res.pens.score[0]]) : null, outcome, weather: m.weather, epics: m.epics.map(e => e.id), trailed: false, cards: (role === 0 ? m.used : m.usedAway).length });
+  G.run.status = outcome === 'W' ? 'champion' : 'eliminated';
+  G.run.totalGF += gf; G.run.totalGA += ga;
+  if (outcome === 'W') G.run.maxStage = 7;
+  G.result = { outcome, gf, ga, pens: res.pens, fichas: outcome === 'W' ? [{ label: 'Vitória na final ao vivo', v: 3 }] : [], ganho: outcome === 'W' ? 3 : 0, why: [outcome === 'W' ? 'A final ao vivo ficou com você. Os dois viram o mesmo jogo.' : 'A final ao vivo ficou com o seu amigo. Os dois viram o mesmo jogo.'], groupMsg: '', reward: false, shop: false, status: G.run.status, stage: 6, mGoals: m.goals.slice(), epics: m.epics.slice(), weather: m.weather };
+  if (outcome === 'W') G.run.fichas += 3;
+  if (G.cup.friend) G.cup.friend.phase = 'fim';
+  finalizeRun(); cupPublish(); go('result');
+}
+function friendRole() {
+  const f = G.cup && G.cup.friend;
+  if (f && (f.role === 0 || f.role === 1)) return f.role;
+  return G.cup && G.cup.role === 0 ? 1 : 0;
+}
+function gamesFromHist(hist) {
+  return [0, 1, 2].map(s => {
+    const h = (hist || []).find(x => Array.isArray(x) ? x[0] === s : x.stage === s);
+    if (!h) return null;
+    return Array.isArray(h) ? [h[1], h[2]] : [h.gf, h.ga];
+  });
+}
+function histFor(role) {
+  if (G.run && G.cup.role === role) return G.run.history;
+  if (G.cup.friend && friendRole() === role) return G.cup.friend.hist;
+  return [];
+}
+function stageFor(role) {
+  if (G.run && G.cup.role === role) return G.run.stage;
+  if (G.cup.friend && friendRole() === role) return G.cup.friend.stage || 0;
+  return 0;
+}
+function cupView() {
+  const base = G.cup.built || (G.cup.built = FFBracket.buildCup(G.cup.seed));
+  const cup = JSON.parse(JSON.stringify(base));
+  [0, 1].forEach(role => {
+    const games = gamesFromHist(histFor(role));
+    if (games.every(Boolean)) FFBracket.recordHuman(cup, role, games);
+  });
+  return cup;
+}
+function pathInfo(cup, role) {
+  const games = gamesFromHist(histFor(role));
+  const stage = stageFor(role);
+  if (games.every(Boolean)) {
+    const prep = FFBracket.prepareKo(cup, role, games);
+    if (!prep.qualified || !prep.ko) return { out: true, pts: prep.pts, rank: prep.rank, stage, bits: [] };
+    return { out: false, rank: prep.rank, stage, bits: [{ nome: 'Oitavas', team: prep.ko[0] }, { nome: 'Quartas', team: prep.ko[1] }, { nome: 'Semi', team: prep.ko[2] }] };
+  }
+  const known = cup.ko && cup.ko[role] ? cup.ko[role][0] : {};
+  return { out: false, rank: null, stage, bits: [{ nome: 'Oitavas', team: known.r16 }, { nome: 'Quartas', team: known.qf }, { nome: 'Semi', team: known.sf }] };
+}
+function groupRows(group) {
+  const rows = FFBracket.table(group.teams, group.played);
+  return rows.map(r => {
+    const t = r.t, you = t.human === G.cup.role, pal = t.human != null && !you;
+    const nome = you ? ('Você · ' + (G.store.coachName || 'Fominha')) : pal ? (((G.cup.friend && G.cup.friend.name) || 'Amigo') + (G.cup.friend && G.cup.friend.coach ? ' · ' + G.cup.friend.coach : '')) : t.nome;
+    return `<div class="grow ${you ? 'you' : ''} ${pal ? 'pal' : ''}"><b>${t.flag && t.flag !== '⚽' ? t.flag + ' ' : ''}${esc(nome)}</b><span class="pts">${r.pts}</span></div>`;
+  }).join('');
+}
+function pathNodes(role, on) {
+  const info = pathInfo(cupView(), role);
+  if (info.out) return `<div class="pnode ${on} out"><b>Grupos</b>caiu antes da final · ${info.pts} pts</div>`;
+  return info.bits.map((b, i) => {
+    const round = i + 3;
+    const cls = info.stage > round ? 'done' : info.stage === round ? 'now' : '';
+    const team = b.team ? (b.team.flag ? b.team.flag + ' ' : '') + b.team.nome : 'sai do grupo';
+    return `<div class="pnode ${on} ${cls}"><b>${b.nome}${info.stage > round ? ' ✓' : ''}</b>${esc(team)}</div>`;
+  }).join('');
+}
+function renderChave() {
+  const c = G.cup; if (!c) return go('home');
+  const cup = cupView();
+  const fr = c.friend;
+  const offline = c.status === 'off';
+  const meName = G.store.coachName || 'Você';
+  const frName = (fr && fr.name) || 'Amigo';
+  const mineG = FFBracket.humanGroup(c.role), palG = FFBracket.humanGroup(1 - c.role);
+  const meInfo = pathInfo(cup, c.role), palInfo = pathInfo(cup, 1 - c.role);
+  const col = (role, on, nome, info) => `<div class="pathcol"><div class="pathlbl ${on}">${esc(nome)}${info.rank ? ' · ' + info.rank + 'º' : ''}<small>Grupo ${FFBracket.LETTERS[FFBracket.humanGroup(role)]}</small></div>${pathNodes(role, on === 'you' ? 'on' : 'pal')}</div>`;
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="home">${ic('back')} Início</button><span class="sp"></span><span class="chip">${ic('dice')} ${esc(c.seed)}</span><span class="chip">${c.role === 0 ? 'Anfitrião' : 'Convidado'}</span></div>
+    ${pageHead('Chave da Copa', 'Mesma semente, grupos opostos. Vocês só se encontram na final.')}
+    <div class="cupnote ${offline ? 'off' : ''}">${offline ? 'Sem conexão com o duelo ao vivo. A chave continua valendo e, no fim, o comparativo clássico por link.' : (fr ? `${ic('users')} ${esc(frName)} está ${fr.phase === 'espera' ? 'esperando na final' : fr.phase === 'caiu' ? 'eliminado' : 'no jogo'} · ${esc(E.STAGES[Math.min(6, fr.stage || 0)].curto)}` : 'Manda o link. A chave atualiza quando o amigo entrar.')}</div>
+    <div class="panel"><div class="ph">${ic('flag')} Caminho até a final ${c.mode === 'ko' ? '<span class="r">mata-mata</span>' : ''}</div>
+      <div class="paths">${col(c.role, 'you', 'Você · ' + meName, meInfo)}<div class="finalmeet">FINAL<br>vocês dois</div>${col(1 - c.role, 'pal', frName, palInfo)}</div>
+      <p class="xs mut" style="margin:8px 0 0">Oitavas e quartas já mostram os CPUs. A semi fecha quando o grupo acaba. Os dois lados só se cruzam na final.</p>
+      ${fr && fr.hist && fr.hist.length ? `<div class="friendprog">${esc(frName)} ao vivo: ${fr.hist.map(h => E.STAGES[h[0]].curto + ' ' + h[1] + '-' + h[2]).join(' · ')}</div>` : ''}
+    </div>
+    <div class="ggrid">${cup.groups.map(g => `<div class="gcard ${g.index === mineG ? 'me' : ''} ${g.index === palG ? 'them' : ''}"><div class="gh">Grupo ${g.id}${g.index === mineG ? ' · ' + esc(meName) : ''}${g.index === palG ? ' · ' + esc(frName) : ''}</div>${groupRows(g)}</div>`).join('')}</div>
+    <div class="mctrl">${G.run && G.run.status === 'playing' ? `<button class="btn shine" data-act="cupBack">${ic('play')} Voltar pro meu jogo</button>` : `<button class="btn gold shine" data-act="cupTeam">${ic('play')} Montar meu time</button>`}
+      ${c.role === 0 ? `<button class="btn sec" data-act="cupCopy">${ic('share')} Copiar link do duelo</button>` : ''}</div>`;
+}
+function renderEspera() {
+  const fr = G.cup && G.cup.friend, nome = (fr && fr.name) || 'seu amigo';
+  const where = !fr ? 'ainda não entrou na sala' : fr.phase === 'caiu' ? 'caiu antes da final' : fr.phase === 'espera' ? 'também chegou na final' : `está em ${E.STAGES[Math.min(6, fr.stage || 0)].nome}`;
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="cupBoard">${ic('flag')} Chave</button><span class="sp"></span><span class="chip">${ic('users')} Final</span></div>
+    <div class="waitbig"><div class="eyebrow g">Sala de espera</div><div class="disp" style="font-size:34px;font-style:italic;text-transform:uppercase">A final te espera</div>
+      <p class="small">${esc(nome)} ${esc(where)}.</p>
+      ${fr && fr.phase === 'caiu' ? `<p class="friendprog">Seu amigo caiu antes da final.</p><button class="btn gold huge" data-act="cupRetry" style="margin-top:12px">Tentar de novo</button>` : `<p class="friendprog">${fr && fr.hist ? fr.hist.map(h => E.STAGES[h[0]].curto + ' ' + h[1] + '-' + h[2]).join(' · ') : 'A final começa sozinha quando os dois estiverem aqui.'}</p>`}
+    </div>
+    <button class="btn sec" data-act="cupBoard">${ic('flag')} Ver a chave de novo</button>`;
+}
+function renderCaiu() {
+  const fr = G.cup && G.cup.friend;
+  const waited = fr && (fr.phase === 'espera' || fr.phase === 'final');
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="home">${ic('back')} Início</button><span class="sp"></span><span class="chip">${ic('users')} Duelo</span></div>
+    <div class="caiubig"><div class="eyebrow" style="color:#ff9a9d">Fim da linha</div>
+      <div class="disp" style="font-size:32px;font-style:italic;text-transform:uppercase;line-height:1.05">${waited ? 'Seu amigo te esperou na final!' : 'Você caiu antes da final'}</div>
+      <p class="small">${waited ? 'Ele já está lá. A taça ficou esperando vocês dois.' : 'A final era o único lugar em que vocês podiam se encontrar.'}</p>
+      ${fr ? `<p class="friendprog">${esc(fr.name || 'Amigo')}: ${esc(fr.phase === 'espera' ? 'esperando na final' : fr.phase === 'caiu' ? 'também caiu' : E.STAGES[Math.min(6, fr.stage || 0)].nome)}</p>` : ''}
+    </div>
+    <button class="btn gold huge shine" data-act="cupRetry">Tentar de novo</button>
+    <button class="btn sec" style="margin-top:8px" data-act="cupBoard">${ic('flag')} Ver a chave</button>`;
+}
+function cupRetry() {
+  const c = G.cup; if (!c) return go('home');
+  G.run = null; G.match = null; G.result = null; c.koSeen = false; c.kicked = false; c.mode = 'start'; c.final = null; c.built = FFBracket.buildCup(c.seed);
+  try { sessionStorage.removeItem('ffcupSnap'); } catch (e) { /* ignora */ }
+  go('chave');
+}
+function openLiveDuel(seed) {
+  const s = E.normalizeSeed(seed || '') || E.randomSeed();
+  const d = { v: 2, id: E.randomSeed(), s, l: Math.min(G.store.level || 1, E.MAX_PLAYABLE_LEVEL), host: G.store.coachName || 'Fominha' };
+  G.cup = { id: d.id, seed: d.s, level: d.l, host: d.host, role: 0, mode: 'start', koSeen: false, status: 'connecting', friend: null };
+  try { sessionStorage.setItem('ffcup', d.id); } catch (e) { /* ignora */ }
+  const url = duelLink(d); G.lastDuelLink = url;
+  copyText(`⚔️ Duelo ao vivo no Fominha FC! Mesma Copa, grupos opostos, a gente só se encontra na final: ${url}`);
+  history.replaceState(null, '', location.pathname + location.search + '#duelo=' + M.duelEncode(d));
+  go('chave'); cupConnect();
+}
+function previewDuel(which) {
+  window.__noTips = true;
+  const cup = FFBracket.buildCup('SCREEN1');
+  G.store.coachName = 'Patrick';
+  G.cup = { id: 'SCREEN1', seed: 'SCREEN1', level: 1, role: 0, host: 'Patrick', status: 'on', mode: which === 'ko' ? 'ko' : 'start', koSeen: true, built: cup, friend: { role: 1, name: 'Amigo', coach: 'Felipão', selecao: 'cam90', phase: which === 'wait' ? 'mata' : which === 'out' ? 'espera' : 'grupo', stage: which === 'wait' ? 4 : 1, status: 'playing', pts: 4, hist: [[0, 2, 1, 'W'], [1, 1, 0, 'W']] } };
+  if (which === 'start' || which === 'ko') {
+    if (which === 'ko') {
+      const slots = E.flatCoach(80, 'Patrick').slots;
+      G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', slots));
+      G.run.cupRole = 0; G.run.stage = 4; G.run.groupPts = 7; G.run.cupRank = 1; G.run.status = 'playing';
+      G.run.history = [{ stage: 0, gf: 2, ga: 0, outcome: 'W' }, { stage: 1, gf: 1, ga: 0, outcome: 'W' }, { stage: 2, gf: 3, ga: 1, outcome: 'W' }, { stage: 3, gf: 2, ga: 1, outcome: 'W' }];
+      G.cup.friend.phase = 'mata'; G.cup.friend.stage = 3; G.cup.friend.hist = [[0, 1, 0, 'W'], [1, 2, 2, 'D'], [2, 1, 0, 'W']];
+    }
+    G.screen = 'chave'; render(); return;
+  }
+  if (which === 'wait') {
+    G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run.cupRole = 0; G.run.stage = 6; G.run.status = 'playing';
+    G.cup.friend.phase = 'mata'; G.cup.friend.stage = 4;
+    G.screen = 'espera'; render(); return;
+  }
+  if (which === 'out') {
+    G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run.cupRole = 0; G.run.stage = 4; G.run.status = 'eliminated';
+    G.cup.friend.phase = 'espera';
+    G.screen = 'caiu'; render(); return;
+  }
+  if (which === 'final') {
+    const home = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    const away = E.newRun('SCREEN1', 1, 'cam90', E.makeCoach('Amigo', E.flatCoach(77, 'Amigo').slots));
+    home.cards = ['pressao', 'craque', 'paredao']; away.cards = ['casinha', 'longe'];
+    G.run = home; G.run.cupRole = 0;
+    G.match = E.createPvpMatch(home, away, 'SCREEN1');
+    G.match.minute = 23; G.match.score = [1, 0]; G.match.awaiting = true; G.match.awaitingSides = [true, true];
+    G.screen = 'match'; render();
+    clearTimeout(G.timer); SIM.on = false; showPvpDecision();
+  }
+}
+
 // ---------- duelo ----------
 function duelLink(d) { return location.href.split('#')[0] + '#duelo=' + M.duelEncode(d); }
 function duelSideHtml(s, win, lbl) {
@@ -3573,6 +4525,12 @@ function newRunFromPending(selId) {
   const st = G.store;
   G.run = E.newRun(G.pendingSeed, G.pendingLevel, selId, null, { legend: G.pendingLegend });
   G.run.daily = G.pendingDaily; G.run.legendWeek = G.pendingLegend ? M.isoWeek() : null; G.run.duel = G.pendingDuel || null;
+  if (G.cup && G.cup.seed === G.run.seed) {
+    G.run.cupRole = G.cup.role; G.run.cupId = G.cup.id;
+    G.cup.built = FFBracket.buildCup(G.run.seed);
+    FFBracket.groupOpponents(G.cup.built, G.cup.role).forEach((o, i) => { G.run.opponents[i] = o; });
+    try { sessionStorage.setItem('ffcup', G.cup.id); } catch (e) { /* ignora */ }
+  }
   if (G.pendingBolao && G.pendingDaily) { const b = G.pendingBolao; M.cosStore(st); if (b.stake > st.fominhas) b.stake = 0; st.fominhas -= b.stake; G.run.bolao = b; }
   G.pendingBolao = null;
   M.albumCollect(st, G.run.players); saveStore();
@@ -3608,6 +4566,13 @@ function onClick(ev) {
     case 'epicSel': G.epicIdx = +el.dataset.i; renderResult(); break;
     case 'epicPng': downloadEpic(el.dataset.i === 'm' ? G.epicModal : { ...G.result.epics[+el.dataset.i], seed: G.run.seed }); break;
     case 'epicCard': epicModal(G.run.epics[+el.dataset.i]); break;
+    case 'liveDuel': openLiveDuel($('#seedIn') ? $('#seedIn').value : ''); break;
+    case 'cupTeam': G.pendingSeed = G.cup.seed; G.pendingLevel = G.cup.level; G.pendingDaily = null; G.pendingLegend = null; G.pendingDuel = null; go('selecao'); break;
+    case 'cupCopy': { const url = G.lastDuelLink || (location.href.split('#')[0] + location.hash); copyText(url).then(ok => toast(ok ? 'Link do duelo copiado!' : url)); break; }
+    case 'cupBack': go(G.run && G.run.stage >= 3 && !G.cup.koSeen ? 'chave' : 'hub'); break;
+    case 'cupBoard': if (G.cup) { G.cup.mode = G.run && G.run.stage >= 3 ? 'ko' : 'start'; G.screen = 'chave'; render(); } break;
+    case 'cupRetry': cupRetry(); break;
+    case 'pvpcard': pvpChoose(el.dataset.c || ''); break;
     case 'duelLink': { const d = { v: 1, s: G.run.seed, l: G.run.level, a: M.duelSide(G.run, G.store.coachName || 'Fominha', G.verdict.points) }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Duelo no Fominha FC! Fiz ${fmtN(G.verdict.points)} pts na Copa ${G.run.seed}. Duvido você me passar: ${url}`).then(ok => toast(ok ? 'Link do duelo copiado! Manda no grupo ⚔️' : 'Não deu pra copiar o link')); break; }
     case 'duelReturn': { const R = G.metaRes.duel; const d = { v: 1, s: G.run.seed, l: G.run.level, a: R.me, b: R.them }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Respondi teu duelo no Fominha FC: ${fmtN(R.me.p)} x ${fmtN(R.them.p)}. Confere: ${url}`).then(ok => toast(ok ? 'Resposta copiada! Devolve pro amigo ⚔️' : 'Não deu pra copiar')); break; }
     case 'duelAccept': { const d = G.duelIn; const duel = d.b ? { v: 1, s: d.s, l: d.l, a: d.a } : d; startRun(d.s, null); G.pendingLevel = d.l; G.pendingDuel = duel; history.replaceState(null, '', location.pathname + location.search); render(); break; }
@@ -3642,14 +4607,24 @@ function onClick(ev) {
   }
 }
 // expõe para testes/screenshot
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug };
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel };
 document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);
   if (!h) return false;
   const d = M.duelDecode(h[1]);
-  if (d) { G.duelIn = d; G.screen = 'duelo'; return true; }
-  toast('Link de duelo inválido'); return false;
+  if (!d) { toast('Link de duelo inválido'); return false; }
+  if (d.v === 2) {
+    let role = 1;
+    try { if (sessionStorage.getItem('ffcup') === d.id) role = 0; } catch (e) { /* ignora */ }
+    G.cup = { id: d.id, seed: d.s, level: d.l, host: d.host, role, mode: 'start', koSeen: false, status: 'connecting', friend: null };
+    restoreSnap();
+    G.screen = 'chave';
+    if (G.cup.final && G.cup.final.home && G.cup.final.locks && G.cup.final.locks.length && G.run && G.run.stage >= 6 && G.run.status === 'playing') setTimeout(() => resumeFinal(G.cup.final), 20);
+    setTimeout(cupConnect, 40);
+    return true;
+  }
+  G.duelIn = d; G.screen = 'duelo'; return true;
 }
 window.addEventListener('hashchange', () => { if (readDuelHash()) render(); });
 readDuelHash();

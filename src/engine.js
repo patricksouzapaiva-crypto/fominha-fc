@@ -429,6 +429,10 @@ function teamLines(run, stage) {
   };
 }
 function oppLines(run, stage) {
+  if (stage === 6 && run.cupRole != null && run.opponents[6]) {
+    const o = run.opponents[6];
+    return { atk: o.baseStr + o.jit.atk, mid: o.baseStr + o.jit.mid, def: o.baseStr + o.jit.def, gk: o.baseStr + o.jit.gk };
+  }
   if (stage === 6) return { ...(run.legend ? LEGENDS[run.legend].lines : BOSS.lines) };
   const o = run.opponents[stage];
   const lvl = run.level >= 2 && stage <= 2 ? 4 : 0;
@@ -437,6 +441,10 @@ function oppLines(run, stage) {
 }
 function opponentInfo(run, stage) {
   stage = stage == null ? run.stage : stage;
+  if (stage === 6 && run.cupRole != null && run.opponents[6]) {
+    const o = run.opponents[6];
+    return { nome: o.nome, flag: o.flag, boss: false, scorers: o.scorers, scorerW: o.scorerW, gk: o.gk, lines: oppLines(run, 6) };
+  }
   if (stage === 6 && run.legend) { const L = LEGENDS[run.legend]; return { nome: L.nome, flag: L.flag, kit: L.kit, boss: true, legend: L.id, rule: L.rule, tecnico: L.tecnico, apelido: L.apelido, regra: L.regra, scorers: L.scorers, scorerW: L.scorerW, gk: L.gk, lines: oppLines(run, 6) }; }
   if (stage === 6) return { nome: BOSS.nome, flag: BOSS.flag, boss: true, rule: 'mao', apelido: BOSS.apelido, regra: BOSS.regra, scorers: BOSS.scorers, scorerW: BOSS.scorerW, gk: BOSS.gk, lines: oppLines(run, 6) };
   const o = run.opponents[stage];
@@ -472,12 +480,53 @@ function createMatch(run) {
   return m;
 }
 
+// Final ao vivo: os dois lados são campanhas de verdade. O placar é canônico
+// (casa = jogador do grupo A, visitante = jogador do grupo E) pros dois celulares.
+function blankFx() { return { pressaoUntil: -1, casinhaUntil: -1, chuvaUntil: -1, longeUntil: -1, craque: false, peixinho: false, paredao: false, sub: 0, fatigue: 0, paredaoMult: 1 }; }
+function createPvpMatch(home, away, seed) {
+  seed = normalizeSeed(seed) || 'FINAL';
+  const stage = 6;
+  const r = rngFor(seed, 'final-ao-vivo');
+  const out = run => run.players.filter(p => p.pos !== 'GOL').slice().sort((a, b) => b.rating - a.rating).slice(0, 4);
+  const aw = out(away);
+  const opp = {
+    nome: SELECOES[away.selecao].nome, flag: SELECOES[away.selecao].flag, kit: SELECOES[away.selecao].kit,
+    boss: false, scorers: aw.map(p => p.nome), scorerW: aw.map(p => Math.max(1, p.rating - 55)),
+    gk: (away.players.find(p => p.pos === 'GOL') || { nome: 'Goleiro' }).nome, lines: teamLines(away, stage)
+  };
+  const m = {
+    stage, ko: true, opp, base: [teamLines(home, stage), opp.lines],
+    rng: r, minute: 0, score: [0, 0], done: false, awaiting: false, awaitingSides: [false, false],
+    pauses: [r.int(17, 25), r.int(47, 56), r.int(68, 78), r.int(82, 86)].sort((a, b) => a - b),
+    fx: blankFx(), fxAway: blankFx(), used: [], usedAway: [], peCoelhoUsed: false, peCoelhoAway: false,
+    juizMin: has(home, 'juiz_ladrao') ? r.int(20, 70) : -1,
+    juizMinAway: has(away, 'juiz_ladrao') ? r.int(20, 70) : -1,
+    maoMin: -1, maoDone: false,
+    goals: [], stats: { lances: [0, 0], shots: [0, 0], bigSaves: [0, 0], cardGoals: [], relicExtra: {}, posts: [0, 0], coach: { atk: 0, def: 0, mei: 0, bol: 0, mot: 0, est: 0 }, coachAway: { atk: 0, def: 0, mei: 0, bol: 0, mot: 0, est: 0 } },
+    lastPauseMin: -1, motShown: false, motShownAway: false, pvp: true,
+    weather: rngFor(seed, 'final-clima').weighted(Object.keys(WEATHER_W), k => WEATHER_W[k]),
+    erng: rngFor(seed, 'final-epico'), epics: [], trailed: false, myGoalsBy: {}, awayGoalsBy: {}, placaDone: false
+  };
+  if (cs(home, 'est') < 3.5 && cs(away, 'est') < 3.5) m.pauses.pop();
+  Object.defineProperty(m, 'run', { value: home, enumerable: false, writable: true });
+  Object.defineProperty(m, 'away', { value: away, enumerable: false, writable: true });
+  return m;
+}
+function awayPlayable(m) { return (m.away && m.away.cards ? m.away.cards : []).filter(c => m.usedAway.indexOf(c) < 0); }
+function pvpCards(m, side) { return side === 0 ? playableCards(m) : awayPlayable(m); }
+
 function lines(m, side) {
   const b = m.base[side];
   const hot = m.weather === 'calor' && m.minute > 60 ? 2 : 0;
   if (side === 1) {
-    const vb = m.opp.rule === 'virada' && m.score[1] < m.score[0] ? 6 : 0;
-    return (hot || vb) ? { atk: b.atk + vb, mid: b.mid + vb - hot, def: b.def + vb, gk: b.gk + vb } : b;
+    const vb = !m.pvp && m.opp.rule === 'virada' && m.score[1] < m.score[0] ? 6 : 0;
+    if (!m.pvp) return (hot || vb) ? { atk: b.atk + vb, mid: b.mid + vb - hot, def: b.def + vb, gk: b.gk + vb } : b;
+    const fa = m.fxAway, away = m.away;
+    let add = fa.sub;
+    if (away.selecao === 'cam90' && m.score[1] < m.score[0]) add += 6;
+    const mot = cs(away, 'mot');
+    if (mot) { if (m.score[1] < m.score[0]) add += CK.motLose * mot; add += CK.motKO * mot; }
+    return { atk: b.atk * fa.paredaoMult + add, mid: b.mid * fa.paredaoMult + add - fa.fatigue - hot, def: b.def * fa.paredaoMult + add, gk: b.gk * fa.paredaoMult + add };
   }
   const run = m.run, f = m.fx;
   let add = f.sub - 0; let mult = f.paredaoMult;
@@ -547,9 +596,11 @@ function tpl(s, o) { return s.replace(/\{(\w)\}/g, (_, k) => o[k] != null ? o[k]
 
 function ballFor(side, kind) {
   // posição da bola em % (x, y) no campinho; time 0 ataca para a direita
+  // na final ao vivo o RNG da partida entra no lugar de Math.random, pra os dois celulares baterem
+  const rnd = ballFor.rng || Math.random;
   const gx = side === 0 ? 90 : 10;
-  const y = kind === 'goal' ? 50 : 30 + Math.random() * 40;
-  return [kind === 'goal' ? (side === 0 ? 99 : 1) : gx + (side === 0 ? -1 : 1) * Math.random() * 8, y];
+  const y = kind === 'goal' ? 50 : 30 + rnd() * 40;
+  return [kind === 'goal' ? (side === 0 ? 99 : 1) : gx + (side === 0 ? -1 : 1) * rnd() * 8, y];
 }
 
 function stepMatch(m) {
@@ -565,9 +616,21 @@ function stepMatch(m) {
     else ev.push({ min, kind: 'info', text: 'Futebol Total: a Pressão alta acaba, mas ninguém cansou.' });
   }
   if (f.casinhaUntil === min) ev.push({ min, kind: 'info', text: 'O time destranca a casinha e volta a jogar.' });
+  if (m.pvp) {
+    const fa = m.fxAway, away = m.away;
+    if (fa.pressaoUntil === min) {
+      if (away.selecao !== 'hol74') { fa.fatigue = m.weather === 'calor' ? 6 : 4; ev.push({ min, kind: 'info', text: `Acabou o gás da Pressão alta de ${SELECOES[away.selecao].curto}: o time cansou.` }); }
+      else ev.push({ min, kind: 'info', text: `${SELECOES[away.selecao].curto}: a Pressão alta acaba, mas ninguém cansou.` });
+    }
+    if (fa.casinhaUntil === min) ev.push({ min, kind: 'info', text: `${SELECOES[away.selecao].curto} destranca a casinha.` });
+  }
 
   // eventos roteirizados
-  if (min === m.juizMin) {
+  if (m.pvp && min === m.juizMinAway && min !== m.juizMin) {
+    const mine = r.chance(0.4);
+    ev.push({ min, kind: 'info', side: mine ? 1 : 0, text: `🃏 Juiz Ladrão de ${SELECOES[m.away.selecao].curto}! Pênalti do nada${mine ? ' a favor deles!' : ' contra eles!'}` });
+    resolveLance(m, mine ? 1 : 0, 'penalti', ev, { juiz: true });
+  } else if (min === m.juizMin) {
     const mine = r.chance(0.6);
     ev.push({ min, kind: 'info', side: mine ? 0 : 1, text: `🃏 Juiz Ladrão! O árbitro aponta a marca do pênalti do nada${mine ? ', pra você!' : '... pro rival!'}` });
     resolveLance(m, mine ? 0 : 1, 'penalti', ev, { juiz: true });
@@ -596,6 +659,11 @@ function stepMatch(m) {
         if (m.opp.rule === 'pressao' && min <= 20) p -= 0.12;
         const p0 = clamp(p, 0.2, 0.82);
         p = clamp(p + CK.mei * cs(run, 'mei'), 0.2, 0.86);
+        if (m.pvp) {
+          if (min <= m.fxAway.pressaoUntil) p -= 0.14;
+          if (min <= m.fxAway.casinhaUntil) p += 0.1;
+          p = clamp(p - CK.mei * cs(m.away, 'mei'), 0.14, 0.86);
+        }
         const xs = r.next();
         side = xs < p ? 0 : 1;
         if (side === 0 && xs >= p0) posse = true;
@@ -608,9 +676,21 @@ function stepMatch(m) {
     m.motShown = true; m.stats.coach.mot++;
     ev.push({ min, kind: 'coach', attr: 'mot', text: `🔥 ${run.coach.nome} (garra de ${csrc(run, 'mot')}) incendeia o banco: +${n1(CK.motLose * cs(run, 'mot'))} de força enquanto estiver perdendo!` });
   }
-  if (m.pauses.indexOf(min) >= 0 && min < 90 && playableCards(m).length > 0) {
-    m.awaiting = true; m.lastPauseMin = min;
-    ev.push({ min, kind: 'decision', text: 'Momento decisivo! Use uma carta ou guarde.' });
+  if (m.pvp && !m.motShownAway && cs(m.away, 'mot') > 0 && m.score[1] < m.score[0] && min < 90) {
+    m.motShownAway = true; m.stats.coachAway.mot++;
+    ev.push({ min, kind: 'coach', attr: 'mot', text: `🔥 ${m.away.coach.nome} incendeia o banco de ${SELECOES[m.away.selecao].curto} enquanto estiver perdendo!` });
+  }
+  if (m.pauses.indexOf(min) >= 0 && min < 90) {
+    if (m.pvp) {
+      const a = playableCards(m).length > 0, b = awayPlayable(m).length > 0;
+      if (a || b) {
+        m.awaiting = true; m.awaitingSides = [a, b]; m.lastPauseMin = min;
+        ev.push({ min, kind: 'decision', sides: [a, b], text: 'Momento decisivo! Os dois técnicos podem usar uma carta.' });
+      }
+    } else if (playableCards(m).length > 0) {
+      m.awaiting = true; m.lastPauseMin = min;
+      ev.push({ min, kind: 'decision', text: 'Momento decisivo! Use uma carta ou guarde.' });
+    }
   }
   if (min >= 90) {
     m.done = true;
@@ -639,6 +719,7 @@ function chooseType(m, side) {
 }
 
 function resolveLance(m, side, forcedType, ev, opts) {
+  ballFor.rng = m.pvp ? () => m.rng.next() : null;
   const r = m.rng, run = m.run, f = m.fx, min = m.minute, st = m.stage;
   const type = forcedType || chooseType(m, side);
   const A = lines(m, side), D = lines(m, 1 - side);
@@ -703,13 +784,28 @@ function resolveLance(m, side, forcedType, ev, opts) {
       atkB = CK.atk * cs(run, 'atk');
       bolB = (type === 'escanteio' || type === 'falta' || type === 'cruz') ? CK.bol * cs(run, 'bol') : 0;
       q = clamp(q + atkB + bolB, 0.03, 0.8);
-    } else q = clamp(q * (1 - CK.def * cs(run, 'def')), 0.03, 0.8);
+      if (m.pvp) q = clamp(q * (1 - CK.def * cs(m.away, 'def')), 0.03, 0.8);
+      if (m.pvp && min <= m.fxAway.casinhaUntil) q *= 0.55;
+    } else {
+      q = clamp(q * (1 - CK.def * cs(run, 'def')), 0.03, 0.8);
+      if (m.pvp) {
+        const ar = m.away;
+        q = clamp(q + CK.atk * cs(ar, 'atk') + ((type === 'escanteio' || type === 'falta' || type === 'cruz') ? CK.bol * cs(ar, 'bol') : 0), 0.03, 0.8);
+        if (m.fxAway.craque && (type === 'jogada' || forcedType === 'jogada')) { q = clamp(q + 0.32 + CK.estQ * cs(ar, 'est'), 0.03, 0.85); m.fxAway.craque = false; }
+      }
+    }
   } else {
     q = clamp(q + (scorerRating - D.gk) * 0.004, 0.55, 0.93);
   }
   m.stats.shots[side]++;
 
-  // Paredão (carta)
+  // Paredão (carta). Na final ao vivo cada lado fecha o próprio gol.
+  if (m.pvp && side === 0 && m.fxAway.paredao) {
+    m.fxAway.paredao = false;
+    m.stats.bigSaves[1]++;
+    ev.push({ min, kind: 'lance', side, scorer: scorerName, text: text + ' 🛡️ PAREDÃO de ' + SELECOES[m.away.selecao].curto + '! ' + m.opp.gk + ' fecha o gol!', ball: ballFor(side), hl: true });
+    return;
+  }
   if (side === 1 && f.paredao) {
     f.paredao = false;
     m.stats.bigSaves[0]++;
@@ -818,9 +914,14 @@ function playCard(m, cardId) {
   const ev = [];
   if (!m.awaiting) return ev;
   m.awaiting = false;
-  if (!cardId) { ev.push({ min, kind: 'info', text: 'Você guardou as cartas. Segue o jogo.' }); return ev; }
+  if (!cardId) {
+    const who = m.pvp ? SELECOES[run.selecao].curto : 'Você';
+    ev.push({ min, kind: 'info', text: m.pvp ? `${who} guardou as cartas.` : 'Você guardou as cartas. Segue o jogo.' });
+    return ev;
+  }
   if (playableCards(m).indexOf(cardId) < 0) return ev;
   m.used.push(cardId);
+  run.cardLog = run.cardLog || {};
   run.cardLog[cardId] = (run.cardLog[cardId] || 0) + 1;
   const c = CARDS[cardId];
   let t = '';
@@ -846,8 +947,49 @@ function playCard(m, cardId) {
     const bonus = { pressao: `+${ex} min`, casinha: `+${ex} min`, chuveirinho: `+${ex} min`, longe: `+${ex} min`, craque: `+${pp(CK.estQ * es)} p.p. de chance`, peixinho: `+${pp(CK.estQ * es)} p.p. de chance`, submagica: `+${n1(CK.estSub * es)} de força extra` }[cardId];
     t += ` 📋 Prancheta de ${csrc(run, 'est')}: ${bonus}.`;
   }
-  ev.push({ min, kind: 'card', card: cardId, text: `${c.icon} ${t}` });
+  ev.push({ min, kind: 'card', card: cardId, side: 0, text: `${m.pvp ? SELECOES[run.selecao].curto + ': ' : ''}${c.icon} ${t}` });
   return ev;
+}
+function applyAwayCard(m, cardId) {
+  const away = m.away, f = m.fxAway, min = m.minute, ev = [];
+  const nome = SELECOES[away.selecao].curto;
+  if (!cardId) { ev.push({ min, kind: 'info', side: 1, text: `${nome} guardou as cartas.` }); return ev; }
+  if (awayPlayable(m).indexOf(cardId) < 0) return ev;
+  m.usedAway.push(cardId);
+  away.cardLog = away.cardLog || {};
+  away.cardLog[cardId] = (away.cardLog[cardId] || 0) + 1;
+  const c = CARDS[cardId];
+  let t = '';
+  const ex = Math.round(CK.estMin * cs(away, 'est'));
+  switch (cardId) {
+    case 'pressao': f.pressaoUntil = min + (away.selecao === 'hol74' ? 30 : 15) + ex; t = 'Pressão alta!'; break;
+    case 'casinha': f.casinhaUntil = min + 25 + ex; t = 'Fechar a casinha!'; break;
+    case 'craque': f.craque = true; t = 'Craque decide!'; break;
+    case 'submagica': f.sub += 6 + CK.estSub * cs(away, 'est'); t = 'Substituição mágica! +6 em tudo.'; break;
+    case 'chuveirinho': f.chuvaUntil = min + 15 + ex; t = 'Chuveirinho!'; break;
+    case 'longe': f.longeUntil = min + 15 + ex; t = 'Chute de longe!'; break;
+    case 'paredao': f.paredao = true; t = 'Paredão no gol!'; break;
+    case 'peixinho': f.peixinho = true; t = 'Peixinho ensaiado!'; break;
+  }
+  if (cs(away, 'est') > 0 && cardId !== 'paredao') m.stats.coachAway.est++;
+  ev.push({ min, kind: 'card', card: cardId, side: 1, text: `${nome}: ${c.icon} ${t}` });
+  return ev;
+}
+function applyPvpCards(m, c0, c1) {
+  if (!m.pvp || !m.awaiting) return [];
+  const sides = m.awaitingSides || [false, false];
+  const ev = [];
+  if (sides[0]) ev.push(...playCard(m, c0 || null));
+  else m.awaiting = false;
+  if (sides[1]) ev.push(...applyAwayCard(m, c1 || null));
+  m.awaiting = false;
+  return ev;
+}
+function pvpResult(m) {
+  let winner = m.score[0] > m.score[1] ? 0 : m.score[1] > m.score[0] ? 1 : -1;
+  let pens = null;
+  if (winner < 0) { pens = shootout(m); winner = pens.win ? 0 : 1; }
+  return { score: m.score.slice(), winner, pens, epics: m.epics.map(e => ({ id: e.id, min: e.min, scorer: e.scorer, nome: e.nome })) };
 }
 
 function simulateRest(m, chooser) {
@@ -1137,6 +1279,7 @@ const E = {
   MAX_RELICS, MAX_CARDS, GROUP_PTS_NEEDED, RELIC_PRICE,
   selecaoChoices, newRun, teamLines, oppLines, opponentInfo, promessaIndex, effRating, maxInterest, interestFor,
   createMatch, stepMatch, playCard, playableCards, simulateRest, finishMatch, lines,
+  createPvpMatch, applyPvpCards, pvpCards, pvpResult, awayPlayable,
   genRewards, rerollRewards, rerollRewardsCost, genShop, rerollShop, rerollShopCost, needsTarget, applyItem, buyItem, sellRelic, itemPrice,
   verdict, stageReachedLabel, runScore, isKO, has,
   EPICS, EPIC_IDS, EPIC_RATE, WEATHER, WEATHER_W, weatherFor, LEGENDS, LEGEND_IDS,

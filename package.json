@@ -8,12 +8,13 @@
   },
   "scripts": {
     "build": "node build.js",
-    "test": "node test/sim.test.js && node test/coach.test.js && node test/relics.test.js && node test/epic.test.js && node test/meta.test.js"
+    "test": "node test/sim.test.js && node test/coach.test.js && node test/relics.test.js && node test/epic.test.js && node test/meta.test.js && node test/bracket.test.js && node test/live.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.3",
     "playwright-core": "^1.64.0"
   }
 }

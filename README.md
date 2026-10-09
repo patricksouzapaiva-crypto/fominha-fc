@@ -25,7 +25,19 @@ Os testes de unidade rodam no Node, sem navegador:
 npm test
 ```
 
-Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js` e `test/meta.test.js`.
+Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js`, `test/meta.test.js`, `test/bracket.test.js` e `test/live.test.js`.
+
+`node test/realtime.test.js` abre dois clientes no Supabase (chave publishable) e confere o broadcast da final ao vivo. `node test/duel-screens.js` grava as telas do duelo em `docs/screens/duel/`.
+
+## Duelo ao vivo
+
+No início, **Duelo ao vivo** cria um link (`#duelo=`, versão 2). Quem abre entra na outra metade da mesma chave: um fica no grupo A e o outro no grupo E, e os dois só podem se cruzar na final. O resto da chave são seleções da semente.
+
+A sala usa Supabase Realtime (broadcast + presence), só nesse modo. A Copa solo continua num arquivo só, sem rede. Se o Supabase não responder, a chave segue offline e o veredito oferece o comparativo antigo por link.
+
+Quem chega na final primeiro espera o amigo e vê em que fase ele está. Os dois na final jogam o mesmo jogo, com o mesmo relógio e as mesmas cartas. Se um cair antes, a tela pede **Tentar de novo** na mesma semente.
+
+A tabela `public.duels` é opcional (serve pra retomar a final depois de recarregar). Sem ela o duelo funciona na hora. Se quiser persistência, cole no SQL Editor o arquivo `supabase/migrations/001_duels.sql`.
 
 Os scripts `test/*.e2e.js`, `test/screens*.js`, `test/pace.js` e `test/share.js` usam Playwright e um Chromium instalado. Eles não entram no `npm test`.
 

@@ -169,11 +169,20 @@ function render() {
   clearTimeout(G.timer); clearInterval(G.decT); clearInterval(G.spinT);
   document.querySelectorAll('.tip,.sheet,.modal,.epicfx').forEach(x => x.remove()); SIM.epic = null;
   window.scrollTo(0, 0);
-  ({ home: renderHome, daily: renderDaily, selecao: renderSelecao, coach: renderCoach, hub: renderHub, match: renderMatch, result: renderResult, reward: renderReward, shop: renderShop, verdict: renderVerdict, desafios: renderDesafios, album: renderAlbum, tecnicos: renderTecnicos, perfil: renderPerfil, duelo: renderDuelo })[G.screen]();
+  ({ home: renderHome, daily: renderDaily, selecao: renderSelecao, coach: renderCoach, hub: renderHub, match: renderMatch, result: renderResult, reward: renderReward, shop: renderShop, verdict: renderVerdict, desafios: renderDesafios, album: renderAlbum, tecnicos: renderTecnicos, perfil: renderPerfil, duelo: renderDuelo, chave: renderChave, espera: renderEspera, caiu: renderCaiu })[G.screen]();
   syncTabbar(); saveStore();
   app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter');
 }
-function go(screen) { G.screen = screen; render(); }
+function go(screen) {
+  if (screen === 'hub' && G.run && G.run.cupRole != null && G.cup) {
+    syncCupKo();
+    if (G.run.status !== 'playing' && G.run.stage < 6) screen = 'caiu';
+    else if (G.run.stage === 6 && G.run.status === 'playing') screen = G.cup.status === 'off' ? (armOfflineFinal(), 'hub') : 'espera';
+    else if (G.run.stage >= 3 && !G.cup.koSeen) { G.cup.koSeen = true; G.cup.mode = 'ko'; screen = 'chave'; }
+  }
+  G.screen = screen; render();
+  if (G.cup && G.run) { saveSnap(); cupPublish(); }
+}
 
 // ---------- dicas (onboarding) ----------
 const TIPS = {
@@ -225,7 +234,8 @@ function renderHome() {
     <p class="small mut" style="margin:8px 0 10px">${esc(E.LEVELS[lv - 1].desc)}${st.unlocked < E.MAX_PLAYABLE_LEVEL ? ' Seja campeão pra liberar o próximo nível.' : ''}</p>
     <input class="seed" id="seedIn" maxlength="12" placeholder="SEMENTE (OPCIONAL)" value="${esc(G.pendingSeed)}" autocomplete="off" autocapitalize="characters" aria-label="Semente para desafiar amigo">
     <p class="xs mut" style="margin:6px 0 12px">Vazio = Copa aleatória. Cole a semente de um amigo pra jogar a mesma Copa e comparar a pontuação.</p>
-    <button class="btn shine" data-act="start">${ic('play')} Começar a Copa</button></div>
+    <button class="btn shine" data-act="start">${ic('play')} Começar a Copa</button>
+    <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
   <button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
@@ -425,7 +435,7 @@ function pitchLines() {
     <rect x="0" y="43" width="3" height="14" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width=".5"/><rect x="152" y="43" width="3" height="14" fill="rgba(255,255,255,.35)" stroke="#fff" stroke-width=".5"/></svg>`;
 }
 function renderMatch() {
-  const run = G.run, m = G.match, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
+  const mine = G.run, m = G.match, run = m && m.pvp ? m.run : mine, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
   let toks = '';
   const tc = c => lum(c) > 0.6 ? '#111' : '#fff';
   for (let i = 0; i < 7; i++) toks += `<div class="tok t0 ${i === 0 ? 'gk' : ''}" style="background:${i === 0 ? '#1f2937' : sel.kit[0]};border-color:${sel.kit[1]};color:${i === 0 ? '#fff' : tc(sel.kit[0])}">${NUMS[i]}</div>`;
@@ -434,11 +444,11 @@ function renderMatch() {
   app.innerHTML = `
   <div class="mc">
     <div class="sb">
-      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}</div></div>
-      <div class="mid"><div class="score" id="sc">0<i>:</i>0</div><span class="clock"><span class="live"></span><span id="clk">0'</span></span></div>
-      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
+      <div class="mid"><div class="score" id="sc">${m.score[0]}<i>:</i>${m.score[1]}</div><span class="clock"><span class="live"></span><span id="clk">${m.minute}'</span></span></div>
+      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
     </div>
-    <div class="prog"><i id="prog"></i></div>
+    <div class="prog"><i id="prog" style="width:${Math.min(100, m.minute / 90 * 100)}%"></i></div>
     <div class="stagelbl"><span>${esc(E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
   </div>
   <div class="momentum"><div class="mh"><span style="color:var(--lime)">▲ ${esc(sel.curto)}</span><span>Momentum</span><span style="color:#ff9a9d">${esc(oppShort(op))} ▼</span></div>
@@ -446,13 +456,14 @@ function renderMatch() {
     <div class="mstats" id="mstats"></div></div>
   <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball"></div></div><div class="wx" aria-hidden="true"></div></div>
   <div class="fxbar" id="fxbar"></div>
-  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span><button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button></div>
+  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
-  G.queue = []; G.shownScore = [0, 0];
+  G.queue = []; G.shownScore = m.score.slice();
   G.mom = Array.from({ length: 30 }, () => [0, 0]); G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
   initSim();
   updateFx(); drawMomentum(); drawStats();
-  G.timer = setTimeout(tick, 700);
+  if (m.pvp && G.holdKick && Date.now() < G.holdKick) G.timer = setTimeout(tick, Math.max(200, G.holdKick - Date.now()));
+  else G.timer = setTimeout(tick, 700);
 }
 function addMom(side, min, v) { const b = Math.min(29, Math.floor(Math.max(0, min - 1) / 3)); G.mom[b][side] += v; }
 function drawMomentum() {
@@ -609,7 +620,7 @@ function pushFeed(e) {
 }
 function goalFx(e) {
   const fx = document.createElement('div');
-  const mine = e.side === 0;
+  const mine = (G.match && G.match.pvp && G.cup) ? e.side === G.cup.role : e.side === 0;
   fx.className = 'goalfx ' + (e.gtype === 'mao' ? 'mao' : mine ? '' : 'rival');
   const title = e.gtype === 'mao' ? '✋ LA MANO<br>DE DIOS' : mine ? (e.value > 1 ? `GOOOL!<br>+${e.value}` : 'GOOOL!') : 'GOL DELES';
   const sub = e.gtype === 'mao' ? 'O juiz valida o gol irregular!' : (e.label && mine && e.label !== 'GOOOL!' ? e.label + ' ' : '') + (e.scorer || '') + (e.sub ? ' · ' + e.sub : '');
@@ -638,7 +649,7 @@ function enqueue(evs) {
       G.queue.push({ t: 'event', e });
     } else G.queue.push({ t: 'event', e });
   }
-  if (!evs.length && m.minute > 1 && m.minute < 90 && Math.random() < 0.14) {
+  if (!m.pvp && !evs.length && m.minute > 1 && m.minute < 90 && Math.random() < 0.14) {
     const side = Math.random() < 0.55 ? SIM.poss : 1 - SIM.poss;
     G.queue.push({ t: 'ambient', side, min: m.minute });
   }
@@ -696,6 +707,7 @@ function tick() {
 }
 const DEC_SECS = 20;
 function showDecision() {
+  if (G.match && G.match.pvp) return showPvpDecision();
   const m = G.match, run = G.run;
   const pl = E.playableCards(m);
   const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
@@ -736,24 +748,32 @@ function useCard(c) {
 }
 function endMatch() {
   SIM.on = false;
+  if (G.match && G.match.pvp) return endPvp();
   G.result = E.finishMatch(G.run, G.match);
+  if (G.run && G.run.cupRole != null && G.run.status === 'eliminated' && G.run.stage < 6) { finalizeRun(); return go('caiu'); }
   if (G.run.status !== 'playing') finalizeRun();
   go('result');
 }
 
 // ---------- resultado ----------
 function renderResult() {
-  const r = G.result, run = G.run, m = G.match;
+  const r = G.result, m = G.match;
+  const pvp = !!(m && m.pvp && G.cup);
+  const role = pvp ? G.cup.role : 0;
+  const run = pvp ? (role === 0 ? m.run : m.away) : G.run;
+  const oppFlag = pvp && role === 1 ? E.SELECOES[m.run.selecao].flag : m.opp.flag;
+  const kicks = (r.pens && r.pens.kicks) || [];
+  const pscore = r.pens && r.pens.score ? (role === 0 ? r.pens.score : [r.pens.score[1], r.pens.score[0]]) : null;
   const title = r.pens ? (r.outcome === 'W' ? 'Nos pênaltis!' : 'Caiu nos pênaltis') : { W: 'Vitória!', D: 'Empate', L: 'Derrota' }[r.outcome];
   const pk = (k, mine) => `<span class="pk ${k.ok ? 'ok' : 'no'} ${mine && k.coach ? 'c' : ''}" title="${esc(k.nome || '')}">${k.ok ? '✓' : '✕'}</span>`;
-  const pens = r.pens ? `<div class="panel"><div class="ph">${ic('target')} Pênaltis <span class="r disp" style="color:#fff">${r.pens.score[0]} x ${r.pens.score[1]}</span></div>
-     <div class="pens"><span style="font-size:22px">${selOf(run).flag}</span><div>${r.pens.kicks.filter(k => k.side === 0).map(k => pk(k, true)).join('')}</div><span style="font-size:22px">${m.opp.flag}</span><div>${r.pens.kicks.filter(k => k.side === 1).map(k => pk(k)).join('')}</div></div>
-     ${r.pens.kicks.some(k => k.coach) ? `<div class="xs mut" style="margin-top:6px">Contorno azul = cobrança salva pela Mentalidade do técnico.</div>` : ''}</div>` : '';
-  const goals = r.mGoals.map(g => `<div class="gl"><span class="m">${g.min}'</span><span>${ballSvg('ico')}</span><span><b style="color:${g.side === 0 ? '#fff' : '#ff9a9d'}">${esc(g.scorer)}</b> ${g.type === 'mao' ? '<span class="mut">(mão!)</span>' : g.value > 1 ? `<span style="color:var(--gold)">(vale ${g.value})</span>` : ''}</span></div>`).join('');
+  const pens = pscore ? `<div class="panel"><div class="ph">${ic('target')} Pênaltis <span class="r disp" style="color:#fff">${pscore[0]} x ${pscore[1]}</span></div>
+     <div class="pens"><span style="font-size:22px">${selOf(run).flag}</span><div>${kicks.filter(k => k.side === role).map(k => pk(k, true)).join('')}</div><span style="font-size:22px">${oppFlag}</span><div>${kicks.filter(k => k.side !== role).map(k => pk(k)).join('')}</div></div>
+     ${kicks.some(k => k.coach) ? `<div class="xs mut" style="margin-top:6px">Contorno azul = cobrança salva pela Mentalidade do técnico.</div>` : ''}</div>` : '';
+  const goals = (r.mGoals || []).map(g => `<div class="gl"><span class="m">${g.min}'</span><span>${ballSvg('ico')}</span><span><b style="color:${g.side === role ? '#fff' : '#ff9a9d'}">${esc(g.scorer)}</b> ${g.type === 'mao' ? '<span class="mut">(mão!)</span>' : g.value > 1 ? `<span style="color:var(--gold)">(vale ${g.value})</span>` : ''}</span></div>`).join('');
   const next = r.status === 'playing' ? (r.reward ? [ic('gift') + ' Abrir pacote', ''] : r.shop ? [ic('hanger') + ' Ir pro Vestiário', ''] : [ic('play') + ' Continuar', '']) : [ic('trophy') + ' Ver o veredito', 'gold'];
   app.innerHTML = `${topbar(run)}
     <div class="reshero"><div class="eyebrow">${esc(E.STAGES[r.stage].nome)}</div><div class="big ${r.outcome}">${title}</div></div>
-    <div class="resscore"><span class="f">${selOf(run).flag}</span><span class="s">${r.gf} <span class="mut" style="font-size:34px">x</span> ${r.ga}</span><span class="f">${m.opp.flag}</span></div>
+    <div class="resscore"><span class="f">${selOf(run).flag}</span><span class="s">${r.gf} <span class="mut" style="font-size:34px">x</span> ${r.ga}</span><span class="f">${oppFlag}</span></div>
     ${r.groupMsg ? `<p style="text-align:center;font-weight:800;margin:4px 0 10px">${esc(r.groupMsg)}</p>` : ''}
     ${pens}
     <div class="panel"><div class="ph">${ic('whistle')} Por que ${r.outcome === 'W' ? 'você ganhou' : r.outcome === 'L' ? 'você perdeu' : 'empatou'}</div><ul class="why">${r.why.map(w => `<li>${ic('check')}<span>${esc(w)}</span></li>`).join('')}</ul></div>
@@ -937,7 +957,7 @@ function renderVerdict() {
   ${G.unlockedNow ? `<div class="panel unlock">${ic('lock')} <b>Nível ${G.unlockedNow.n} · ${esc(G.unlockedNow.nome)} liberado!</b><div class="small mut">${esc(G.unlockedNow.desc)}</div></div>` : ''}
   <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
     <button class="btn gold shine" data-act="share">${ic('share')} Compartilhar card</button>
-    <button class="btn sec" data-act="duelLink">${ic('users')} Duelo: desafiar amigo <small>copia o link</small></button>
+    <button class="btn sec" data-act="duelLink">${ic('users')} ${G.cup && G.cup.status === 'off' ? 'Comparar por link <small>o ao vivo não conectou</small>' : 'Duelo: desafiar amigo <small>copia o link</small>'}</button>
     <button class="btn" data-act="again">${ic('play')} Jogar de novo</button>
     <div class="row"><button class="btn sec" data-act="sameSeed">${ic('dice')} Mesma semente</button><button class="btn sec" data-act="home">${ic('home')} Início</button></div>
   </div>`;
@@ -1353,6 +1373,391 @@ function bolaoSheet() {
   document.body.appendChild(box);
 }
 
+// ---------- duelo ao vivo (chave compartilhada) ----------
+function syncCupKo() {
+  const run = G.run;
+  if (!run || run.cupRole == null || run.cupKo || run.stage < 3 || !G.cup) return;
+  const games = [0, 1, 2].map(s => { const h = run.history.find(x => x.stage === s); return h ? [h.gf, h.ga] : null; });
+  if (games.some(g => !g)) return;
+  const cup = G.cup.built || (G.cup.built = FFBracket.buildCup(run.seed));
+  const prep = FFBracket.prepareKo(cup, run.cupRole, games);
+  run.cupRank = prep.rank; run.cupPts = prep.pts; run.cupQualified = prep.qualified;
+  if (prep.ko) { prep.ko.forEach((o, i) => { run.opponents[i + 3] = o; }); run.cupKo = true; }
+}
+function armOfflineFinal() {
+  if (!G.run || G.run.opponents[6] || !G.cup) return;
+  const cup = G.cup.built || FFBracket.buildCup(G.run.seed);
+  const other = G.cup.role === 0 ? 1 : 0;
+  const t = cup.ko[other][0].qf || cup.ko[other][0].r16;
+  if (t) G.run.opponents[6] = FFBracket.asOpponent(t, 6);
+  G.cup.offlineFinal = true;
+}
+function saveSnap() {
+  if (!G.cup || !G.run) return;
+  try { sessionStorage.setItem('ffcupSnap', JSON.stringify({ id: G.cup.id, role: G.cup.role, koSeen: !!G.cup.koSeen, run: G.run, final: G.cup.final || null })); } catch (e) { /* modo privado */ }
+}
+function restoreSnap() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem('ffcupSnap') || 'null');
+    if (!s || !G.cup || s.id !== G.cup.id) return;
+    G.run = s.run; G.cup.koSeen = !!s.koSeen; if (s.final) G.cup.final = s.final;
+  } catch (e) { /* ignora */ }
+}
+function presenceBody() {
+  const run = G.run, c = G.cup;
+  let phase = 'lobby';
+  if (run) {
+    if (run.status !== 'playing' && run.stage < 6) phase = 'caiu';
+    else if (G.match && G.match.pvp && !G.match.done) phase = 'final';
+    else if (run.stage >= 6 && run.status === 'playing') phase = 'espera';
+    else if (run.stage >= 3) phase = 'mata';
+    else phase = 'grupo';
+  }
+  const squad = (phase === 'espera' || phase === 'final') && run ? FFLive.packSquad(run, G.store.coachName || c.host) : null;
+  return { role: c.role, name: (G.store.coachName || c.host || 'Fominha').slice(0, 24), coach: run && run.coach ? run.coach.nome : '', selecao: run ? run.selecao : '', phase, stage: run ? run.stage : 0, status: run ? run.status : 'lobby', pts: run ? run.groupPts : 0, hist: run ? run.history.map(h => [h.stage, h.gf, h.ga, h.outcome]) : [], squad, locks: (c.final && c.final.locks) || [] };
+}
+function cupPublish() { if (G.cup && window.FFNet && G.cup.status === 'on') FFNet.track(presenceBody()); }
+function cupConnect() {
+  if (!G.cup || !window.FFNet) { if (G.cup) G.cup.status = 'off'; return; }
+  G.cup.status = 'connecting';
+  FFNet.join({
+    id: G.cup.id, role: G.cup.role, state: presenceBody(),
+    onStatus(st) { if (!G.cup) return; G.cup.status = st; if (['chave', 'espera', 'caiu'].indexOf(G.screen) >= 0) render(); },
+    onPresence(list) { onCupPresence(list); },
+    onEvent(p) { onCupEvent(p); }
+  }).then(() => { if (G.cup && G.cup.status === 'on') FFNet.load(G.cup.id).then(st => { if (st && st.final && G.cup && !G.match) resumeFinal(st.final); }); });
+}
+function onCupPresence(list) {
+  if (!G.cup) return;
+  G.cup.friend = list.find(p => p.role !== G.cup.role) || null;
+  G.cup.online = list.map(p => p.role);
+  if (['chave', 'espera', 'caiu'].indexOf(G.screen) >= 0) render();
+  const host = list.find(p => p.role === 0);
+  if (host && host.locks && host.locks.length) host.locks.forEach(lock => applyLock(lock));
+  if (!G.match && host && host.phase === 'final' && host.squad && host.locks && host.locks.length && G.run && G.run.stage >= 6 && G.run.status === 'playing') {
+    const me = FFLive.packSquad(G.run, G.store.coachName || G.cup.host);
+    resumeFinal({ home: host.role === 0 ? host.squad : me, away: host.role === 0 ? me : host.squad, locks: host.locks });
+  }
+  maybeKick();
+}
+function maybeKick() {
+  const f = G.cup && G.cup.friend, run = G.run;
+  if (!f || !run || G.cup.role !== 0 || G.cup.kicked || G.cup.status !== 'on') return;
+  if (run.stage < 6 || run.status !== 'playing' || f.phase !== 'espera' || !f.squad) return;
+  G.cup.kicked = true;
+  const home = FFLive.packSquad(run, G.store.coachName || 'Fominha');
+  const startAt = Date.now() + 900;
+  FFNet.send({ t: 'kick', startAt, home, away: f.squad });
+  beginFinal(home, f.squad, startAt);
+}
+function onCupEvent(p) {
+  if (!p || !G.cup) return;
+  if (p.t === 'kick' && G.cup.role === 1) beginFinal(p.home, p.away, p.startAt);
+  if (p.t === 'card' && G.match && G.match.pvp) { G.pvpPick = G.pvpPick || [undefined, undefined]; G.pvpPick[p.side] = p.card; paintFriendPick(); if (G.cup.role === 0) maybeSendLock(); }
+  if (p.t === 'lock') applyLock(p);
+}
+function beginFinal(home, away, startAt) {
+  if (!G.cup || (G.match && G.match.pvp && !G.match.done)) return;
+  const h = FFLive.unpackSquad(home, G.cup.seed), a = FFLive.unpackSquad(away, G.cup.seed);
+  G.speed = 1;
+  G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
+  G.cup.final = { home, away, locks: (G.cup.final && G.cup.final.locks) || [] };
+  G.cup.pendingLocks = [];
+  G.holdKick = startAt || Date.now();
+  saveSnap();
+  go('match');
+}
+function resumeFinal(final) {
+  if (!final || !final.home || !final.away || !G.cup) return;
+  if (G.match && G.match.pvp && !G.match.done) return;
+  const h = FFLive.unpackSquad(final.home, G.cup.seed), a = FFLive.unpackSquad(final.away, G.cup.seed);
+  G.speed = 1;
+  G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
+  (final.locks || []).forEach(lock => { while (!G.match.done && !G.match.awaiting) E.stepMatch(G.match); if (G.match.awaiting && G.match.minute === lock.min) E.applyPvpCards(G.match, lock.c0, lock.c1); });
+  G.cup.final = final;
+  G.cup.pendingLocks = [];
+  if (G.match.done) { endPvp(); return; }
+  G.screen = 'match'; render();
+}
+function showPvpDecision() {
+  if (drainPendingLock()) return;
+  const m = G.match, role = G.cup.role, mine = role === 0 ? m.run : m.away;
+  G.pvpPick = [undefined, undefined]; G.pvpLocked = false;
+  const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
+  const secs = 12, C = 2 * Math.PI * 18;
+  const cards = mine.cards || [];
+  const playable = E.pvpCards(m, role);
+  const needMe = m.awaitingSides[role];
+  box.innerHTML = `<div class="inner" role="dialog" aria-label="Carta da final"><div class="grab"></div>
+    <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${m.score[0]} x ${m.score[1]}</div><div class="t">Final ao vivo</div></div>
+    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="dsec">${secs}</b></div></div>
+    <div class="dctx" style="border-left:3px solid var(--gold)">Os dois escolhem ao mesmo tempo. Quem não escolher a tempo guarda a carta. <span id="fpick">Amigo escolhendo...</span></div>
+    ${needMe ? `<div class="dcards">${cards.map((c, i) => { const d = E.CARDS[c], used = playable.indexOf(c) < 0; return `<button class="pcard ${used ? 'used' : ''}" style="--rc:${rc(d.rar)};animation-delay:${i * 0.07}s" ${used ? 'disabled' : `data-act="pvpcard" data-c="${c}"`}><span class="med">${d.icon}</span><span><span class="rr">Carta · ${E.RARITIES[d.rar].nome}</span><div class="in">${esc(d.nome)}</div><div class="id">${esc(d.desc)}</div><span class="use">${used ? 'JÁ USADA' : 'TOQUE PARA USAR'}</span></span></button>`; }).join('')}</div>
+    <button class="btn sec" style="margin-top:12px" data-act="pvpcard" data-c="">${ic('arrow')} Guardar e seguir</button>` : `<p class="small">Você não tem carta neste minuto. Esperando o amigo.</p>`}</div>`;
+  document.body.appendChild(box);
+  if (!needMe) { G.pvpPick[role] = null; if (window.FFNet) FFNet.send({ t: 'card', min: m.minute, side: role, card: null }); maybeSendLock(); }
+  let left = secs * 10;
+  G.decT = setInterval(() => {
+    if (!document.body.contains(box)) { clearInterval(G.decT); return; }
+    left--;
+    const r = $('#dring'), s = $('#dsec');
+    if (r) r.setAttribute('stroke-dashoffset', String(C * (1 - left / (secs * 10))));
+    if (s) s.textContent = Math.ceil(left / 10);
+    if (left <= 0) { clearInterval(G.decT); pvpTimeout(); }
+  }, 100);
+}
+function paintFriendPick() {
+  const el = $('#fpick'); if (!el || !G.cup) return;
+  const side = 1 - G.cup.role, card = G.pvpPick && G.pvpPick[side];
+  el.textContent = card === undefined ? 'Amigo escolhendo...' : card ? ('Amigo: ' + E.CARDS[card].nome) : 'Amigo guardou a carta.';
+}
+function pvpChoose(card) {
+  if (!G.match || !G.match.awaiting || G.pvpPick[G.cup.role] !== undefined) return;
+  G.pvpPick[G.cup.role] = card || null;
+  if (window.FFNet) FFNet.send({ t: 'card', min: G.match.minute, side: G.cup.role, card: card || null });
+  const btn = document.querySelector('#decision .dcards'); if (btn) btn.style.opacity = '.55';
+  maybeSendLock();
+}
+function cupAuthority() {
+  if (!G.cup) return false;
+  if (G.cup.role === 0) return true;
+  return (G.cup.online || []).indexOf(0) < 0;
+}
+function maybeSendLock() {
+  const m = G.match; if (!m || !m.awaiting || !cupAuthority() || G.pvpLocked) return;
+  const ready = [0, 1].every(s => !m.awaitingSides[s] || (G.pvpPick && G.pvpPick[s] !== undefined));
+  if (!ready) return;
+  const lock = { t: 'lock', min: m.minute, c0: G.pvpPick[0] || null, c1: G.pvpPick[1] || null };
+  if (window.FFNet && G.cup.status === 'on') FFNet.send(lock);
+  applyLock(lock);
+}
+function pvpTimeout() {
+  const m = G.match; if (!m || !m.awaiting) return;
+  G.pvpPick = G.pvpPick || [undefined, undefined];
+  if (G.pvpPick[G.cup.role] === undefined) G.pvpPick[G.cup.role] = null;
+  if (window.FFNet && G.cup.status === 'on') FFNet.send({ t: 'card', min: m.minute, side: G.cup.role, card: G.pvpPick[G.cup.role] });
+  if (cupAuthority()) { hostLockNow(false); return; }
+  G.decT = setTimeout(() => { if (m.awaiting && !G.pvpLocked) hostLockNow((G.cup.online || []).indexOf(0) < 0); }, 2500);
+}
+function hostLockNow(aiForMissing) {
+  const m = G.match; if (!m || !m.awaiting) return;
+  if (!cupAuthority() && !aiForMissing) return;
+  G.pvpPick = G.pvpPick || [undefined, undefined];
+  [0, 1].forEach(s => {
+    if (!m.awaitingSides[s]) { G.pvpPick[s] = null; return; }
+    if (G.pvpPick[s] !== undefined) return;
+    const online = s === G.cup.role || (G.cup.online || []).indexOf(s) >= 0;
+    G.pvpPick[s] = online ? null : FFLive.aiCard(m, s);
+  });
+  if (!cupAuthority()) {
+    const lock = { t: 'lock', min: m.minute, c0: G.pvpPick[0] || null, c1: G.pvpPick[1] || null };
+    applyLock(lock);
+    return;
+  }
+  maybeSendLock();
+}
+function drainPendingLock() {
+  const m = G.match;
+  if (!m || !m.awaiting || !G.cup || !G.cup.pendingLocks) return false;
+  const i = G.cup.pendingLocks.findIndex(l => l.min === m.minute);
+  if (i < 0) return false;
+  applyLock(G.cup.pendingLocks.splice(i, 1)[0]);
+  return true;
+}
+function applyLock(lock) {
+  const m = G.match;
+  if (!lock || !m || !m.pvp || !G.cup) return;
+  if ((G.cup.final && (G.cup.final.locks || []).some(l => l.min === lock.min)) || (G.pvpLocked && m.minute === lock.min)) return;
+  if (!m.awaiting || lock.min !== m.minute) {
+    G.cup.pendingLocks = G.cup.pendingLocks || [];
+    if (!G.cup.pendingLocks.some(l => l.min === lock.min)) G.cup.pendingLocks.push(lock);
+    return;
+  }
+  G.pvpLocked = true; clearInterval(G.decT); clearTimeout(G.decT);
+  const d = $('#decision'); if (d) d.remove();
+  const evs = E.applyPvpCards(m, lock.c0, lock.c1);
+  evs.forEach(e => G.queue.push({ t: 'event', e }));
+  G.cup.final = G.cup.final || {};
+  G.cup.final.locks = (G.cup.final.locks || []).concat([{ min: lock.min, c0: lock.c0, c1: lock.c1 }]);
+  if (window.FFNet) FFNet.save(G.cup.id, { final: G.cup.final });
+  saveSnap(); cupPublish();
+  G.timer = setTimeout(tick, 280);
+}
+function endPvp() {
+  SIM.on = false;
+  const m = G.match, res = E.pvpResult(m), role = G.cup.role;
+  const gf = res.score[role], ga = res.score[1 - role];
+  const outcome = res.winner === role ? 'W' : 'L';
+  const oppName = role === 0 ? E.SELECOES[m.away.selecao].nome : E.SELECOES[m.run.selecao].nome;
+  const oppFlag = role === 0 ? E.SELECOES[m.away.selecao].flag : E.SELECOES[m.run.selecao].flag;
+  G.run.history.push({ stage: 6, opp: oppName, flag: oppFlag, gf, ga, pens: res.pens ? (role === 0 ? res.pens.score : [res.pens.score[1], res.pens.score[0]]) : null, outcome, weather: m.weather, epics: m.epics.map(e => e.id), trailed: false, cards: (role === 0 ? m.used : m.usedAway).length });
+  G.run.status = outcome === 'W' ? 'champion' : 'eliminated';
+  G.run.totalGF += gf; G.run.totalGA += ga;
+  if (outcome === 'W') G.run.maxStage = 7;
+  G.result = { outcome, gf, ga, pens: res.pens, fichas: outcome === 'W' ? [{ label: 'Vitória na final ao vivo', v: 3 }] : [], ganho: outcome === 'W' ? 3 : 0, why: [outcome === 'W' ? 'A final ao vivo ficou com você. Os dois viram o mesmo jogo.' : 'A final ao vivo ficou com o seu amigo. Os dois viram o mesmo jogo.'], groupMsg: '', reward: false, shop: false, status: G.run.status, stage: 6, mGoals: m.goals.slice(), epics: m.epics.slice(), weather: m.weather };
+  if (outcome === 'W') G.run.fichas += 3;
+  if (G.cup.friend) G.cup.friend.phase = 'fim';
+  finalizeRun(); cupPublish(); go('result');
+}
+function friendRole() {
+  const f = G.cup && G.cup.friend;
+  if (f && (f.role === 0 || f.role === 1)) return f.role;
+  return G.cup && G.cup.role === 0 ? 1 : 0;
+}
+function gamesFromHist(hist) {
+  return [0, 1, 2].map(s => {
+    const h = (hist || []).find(x => Array.isArray(x) ? x[0] === s : x.stage === s);
+    if (!h) return null;
+    return Array.isArray(h) ? [h[1], h[2]] : [h.gf, h.ga];
+  });
+}
+function histFor(role) {
+  if (G.run && G.cup.role === role) return G.run.history;
+  if (G.cup.friend && friendRole() === role) return G.cup.friend.hist;
+  return [];
+}
+function stageFor(role) {
+  if (G.run && G.cup.role === role) return G.run.stage;
+  if (G.cup.friend && friendRole() === role) return G.cup.friend.stage || 0;
+  return 0;
+}
+function cupView() {
+  const base = G.cup.built || (G.cup.built = FFBracket.buildCup(G.cup.seed));
+  const cup = JSON.parse(JSON.stringify(base));
+  [0, 1].forEach(role => {
+    const games = gamesFromHist(histFor(role));
+    if (games.every(Boolean)) FFBracket.recordHuman(cup, role, games);
+  });
+  return cup;
+}
+function pathInfo(cup, role) {
+  const games = gamesFromHist(histFor(role));
+  const stage = stageFor(role);
+  if (games.every(Boolean)) {
+    const prep = FFBracket.prepareKo(cup, role, games);
+    if (!prep.qualified || !prep.ko) return { out: true, pts: prep.pts, rank: prep.rank, stage, bits: [] };
+    return { out: false, rank: prep.rank, stage, bits: [{ nome: 'Oitavas', team: prep.ko[0] }, { nome: 'Quartas', team: prep.ko[1] }, { nome: 'Semi', team: prep.ko[2] }] };
+  }
+  const known = cup.ko && cup.ko[role] ? cup.ko[role][0] : {};
+  return { out: false, rank: null, stage, bits: [{ nome: 'Oitavas', team: known.r16 }, { nome: 'Quartas', team: known.qf }, { nome: 'Semi', team: known.sf }] };
+}
+function groupRows(group) {
+  const rows = FFBracket.table(group.teams, group.played);
+  return rows.map(r => {
+    const t = r.t, you = t.human === G.cup.role, pal = t.human != null && !you;
+    const nome = you ? ('Você · ' + (G.store.coachName || 'Fominha')) : pal ? (((G.cup.friend && G.cup.friend.name) || 'Amigo') + (G.cup.friend && G.cup.friend.coach ? ' · ' + G.cup.friend.coach : '')) : t.nome;
+    return `<div class="grow ${you ? 'you' : ''} ${pal ? 'pal' : ''}"><b>${t.flag && t.flag !== '⚽' ? t.flag + ' ' : ''}${esc(nome)}</b><span class="pts">${r.pts}</span></div>`;
+  }).join('');
+}
+function pathNodes(role, on) {
+  const info = pathInfo(cupView(), role);
+  if (info.out) return `<div class="pnode ${on} out"><b>Grupos</b>caiu antes da final · ${info.pts} pts</div>`;
+  return info.bits.map((b, i) => {
+    const round = i + 3;
+    const cls = info.stage > round ? 'done' : info.stage === round ? 'now' : '';
+    const team = b.team ? (b.team.flag ? b.team.flag + ' ' : '') + b.team.nome : 'sai do grupo';
+    return `<div class="pnode ${on} ${cls}"><b>${b.nome}${info.stage > round ? ' ✓' : ''}</b>${esc(team)}</div>`;
+  }).join('');
+}
+function renderChave() {
+  const c = G.cup; if (!c) return go('home');
+  const cup = cupView();
+  const fr = c.friend;
+  const offline = c.status === 'off';
+  const meName = G.store.coachName || 'Você';
+  const frName = (fr && fr.name) || 'Amigo';
+  const mineG = FFBracket.humanGroup(c.role), palG = FFBracket.humanGroup(1 - c.role);
+  const meInfo = pathInfo(cup, c.role), palInfo = pathInfo(cup, 1 - c.role);
+  const col = (role, on, nome, info) => `<div class="pathcol"><div class="pathlbl ${on}">${esc(nome)}${info.rank ? ' · ' + info.rank + 'º' : ''}<small>Grupo ${FFBracket.LETTERS[FFBracket.humanGroup(role)]}</small></div>${pathNodes(role, on === 'you' ? 'on' : 'pal')}</div>`;
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="home">${ic('back')} Início</button><span class="sp"></span><span class="chip">${ic('dice')} ${esc(c.seed)}</span><span class="chip">${c.role === 0 ? 'Anfitrião' : 'Convidado'}</span></div>
+    ${pageHead('Chave da Copa', 'Mesma semente, grupos opostos. Vocês só se encontram na final.')}
+    <div class="cupnote ${offline ? 'off' : ''}">${offline ? 'Sem conexão com o duelo ao vivo. A chave continua valendo e, no fim, o comparativo clássico por link.' : (fr ? `${ic('users')} ${esc(frName)} está ${fr.phase === 'espera' ? 'esperando na final' : fr.phase === 'caiu' ? 'eliminado' : 'no jogo'} · ${esc(E.STAGES[Math.min(6, fr.stage || 0)].curto)}` : 'Manda o link. A chave atualiza quando o amigo entrar.')}</div>
+    <div class="panel"><div class="ph">${ic('flag')} Caminho até a final ${c.mode === 'ko' ? '<span class="r">mata-mata</span>' : ''}</div>
+      <div class="paths">${col(c.role, 'you', 'Você · ' + meName, meInfo)}<div class="finalmeet">FINAL<br>vocês dois</div>${col(1 - c.role, 'pal', frName, palInfo)}</div>
+      <p class="xs mut" style="margin:8px 0 0">Oitavas e quartas já mostram os CPUs. A semi fecha quando o grupo acaba. Os dois lados só se cruzam na final.</p>
+      ${fr && fr.hist && fr.hist.length ? `<div class="friendprog">${esc(frName)} ao vivo: ${fr.hist.map(h => E.STAGES[h[0]].curto + ' ' + h[1] + '-' + h[2]).join(' · ')}</div>` : ''}
+    </div>
+    <div class="ggrid">${cup.groups.map(g => `<div class="gcard ${g.index === mineG ? 'me' : ''} ${g.index === palG ? 'them' : ''}"><div class="gh">Grupo ${g.id}${g.index === mineG ? ' · ' + esc(meName) : ''}${g.index === palG ? ' · ' + esc(frName) : ''}</div>${groupRows(g)}</div>`).join('')}</div>
+    <div class="mctrl">${G.run && G.run.status === 'playing' ? `<button class="btn shine" data-act="cupBack">${ic('play')} Voltar pro meu jogo</button>` : `<button class="btn gold shine" data-act="cupTeam">${ic('play')} Montar meu time</button>`}
+      ${c.role === 0 ? `<button class="btn sec" data-act="cupCopy">${ic('share')} Copiar link do duelo</button>` : ''}</div>`;
+}
+function renderEspera() {
+  const fr = G.cup && G.cup.friend, nome = (fr && fr.name) || 'seu amigo';
+  const where = !fr ? 'ainda não entrou na sala' : fr.phase === 'caiu' ? 'caiu antes da final' : fr.phase === 'espera' ? 'também chegou na final' : `está em ${E.STAGES[Math.min(6, fr.stage || 0)].nome}`;
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="cupBoard">${ic('flag')} Chave</button><span class="sp"></span><span class="chip">${ic('users')} Final</span></div>
+    <div class="waitbig"><div class="eyebrow g">Sala de espera</div><div class="disp" style="font-size:34px;font-style:italic;text-transform:uppercase">A final te espera</div>
+      <p class="small">${esc(nome)} ${esc(where)}.</p>
+      ${fr && fr.phase === 'caiu' ? `<p class="friendprog">Seu amigo caiu antes da final.</p><button class="btn gold huge" data-act="cupRetry" style="margin-top:12px">Tentar de novo</button>` : `<p class="friendprog">${fr && fr.hist ? fr.hist.map(h => E.STAGES[h[0]].curto + ' ' + h[1] + '-' + h[2]).join(' · ') : 'A final começa sozinha quando os dois estiverem aqui.'}</p>`}
+    </div>
+    <button class="btn sec" data-act="cupBoard">${ic('flag')} Ver a chave de novo</button>`;
+}
+function renderCaiu() {
+  const fr = G.cup && G.cup.friend;
+  const waited = fr && (fr.phase === 'espera' || fr.phase === 'final');
+  app.innerHTML = `<div class="topbar"><button class="chip" data-act="home">${ic('back')} Início</button><span class="sp"></span><span class="chip">${ic('users')} Duelo</span></div>
+    <div class="caiubig"><div class="eyebrow" style="color:#ff9a9d">Fim da linha</div>
+      <div class="disp" style="font-size:32px;font-style:italic;text-transform:uppercase;line-height:1.05">${waited ? 'Seu amigo te esperou na final!' : 'Você caiu antes da final'}</div>
+      <p class="small">${waited ? 'Ele já está lá. A taça ficou esperando vocês dois.' : 'A final era o único lugar em que vocês podiam se encontrar.'}</p>
+      ${fr ? `<p class="friendprog">${esc(fr.name || 'Amigo')}: ${esc(fr.phase === 'espera' ? 'esperando na final' : fr.phase === 'caiu' ? 'também caiu' : E.STAGES[Math.min(6, fr.stage || 0)].nome)}</p>` : ''}
+    </div>
+    <button class="btn gold huge shine" data-act="cupRetry">Tentar de novo</button>
+    <button class="btn sec" style="margin-top:8px" data-act="cupBoard">${ic('flag')} Ver a chave</button>`;
+}
+function cupRetry() {
+  const c = G.cup; if (!c) return go('home');
+  G.run = null; G.match = null; G.result = null; c.koSeen = false; c.kicked = false; c.mode = 'start'; c.final = null; c.built = FFBracket.buildCup(c.seed);
+  try { sessionStorage.removeItem('ffcupSnap'); } catch (e) { /* ignora */ }
+  go('chave');
+}
+function openLiveDuel(seed) {
+  const s = E.normalizeSeed(seed || '') || E.randomSeed();
+  const d = { v: 2, id: E.randomSeed(), s, l: Math.min(G.store.level || 1, E.MAX_PLAYABLE_LEVEL), host: G.store.coachName || 'Fominha' };
+  G.cup = { id: d.id, seed: d.s, level: d.l, host: d.host, role: 0, mode: 'start', koSeen: false, status: 'connecting', friend: null };
+  try { sessionStorage.setItem('ffcup', d.id); } catch (e) { /* ignora */ }
+  const url = duelLink(d); G.lastDuelLink = url;
+  copyText(`⚔️ Duelo ao vivo no Fominha FC! Mesma Copa, grupos opostos, a gente só se encontra na final: ${url}`);
+  history.replaceState(null, '', location.pathname + location.search + '#duelo=' + M.duelEncode(d));
+  go('chave'); cupConnect();
+}
+function previewDuel(which) {
+  window.__noTips = true;
+  const cup = FFBracket.buildCup('SCREEN1');
+  G.store.coachName = 'Patrick';
+  G.cup = { id: 'SCREEN1', seed: 'SCREEN1', level: 1, role: 0, host: 'Patrick', status: 'on', mode: which === 'ko' ? 'ko' : 'start', koSeen: true, built: cup, friend: { role: 1, name: 'Amigo', coach: 'Felipão', selecao: 'cam90', phase: which === 'wait' ? 'mata' : which === 'out' ? 'espera' : 'grupo', stage: which === 'wait' ? 4 : 1, status: 'playing', pts: 4, hist: [[0, 2, 1, 'W'], [1, 1, 0, 'W']] } };
+  if (which === 'start' || which === 'ko') {
+    if (which === 'ko') {
+      const slots = E.flatCoach(80, 'Patrick').slots;
+      G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', slots));
+      G.run.cupRole = 0; G.run.stage = 4; G.run.groupPts = 7; G.run.cupRank = 1; G.run.status = 'playing';
+      G.run.history = [{ stage: 0, gf: 2, ga: 0, outcome: 'W' }, { stage: 1, gf: 1, ga: 0, outcome: 'W' }, { stage: 2, gf: 3, ga: 1, outcome: 'W' }, { stage: 3, gf: 2, ga: 1, outcome: 'W' }];
+      G.cup.friend.phase = 'mata'; G.cup.friend.stage = 3; G.cup.friend.hist = [[0, 1, 0, 'W'], [1, 2, 2, 'D'], [2, 1, 0, 'W']];
+    }
+    G.screen = 'chave'; render(); return;
+  }
+  if (which === 'wait') {
+    G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run.cupRole = 0; G.run.stage = 6; G.run.status = 'playing';
+    G.cup.friend.phase = 'mata'; G.cup.friend.stage = 4;
+    G.screen = 'espera'; render(); return;
+  }
+  if (which === 'out') {
+    G.run = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run.cupRole = 0; G.run.stage = 4; G.run.status = 'eliminated';
+    G.cup.friend.phase = 'espera';
+    G.screen = 'caiu'; render(); return;
+  }
+  if (which === 'final') {
+    const home = E.newRun('SCREEN1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    const away = E.newRun('SCREEN1', 1, 'cam90', E.makeCoach('Amigo', E.flatCoach(77, 'Amigo').slots));
+    home.cards = ['pressao', 'craque', 'paredao']; away.cards = ['casinha', 'longe'];
+    G.run = home; G.run.cupRole = 0;
+    G.match = E.createPvpMatch(home, away, 'SCREEN1');
+    G.match.minute = 23; G.match.score = [1, 0]; G.match.awaiting = true; G.match.awaitingSides = [true, true];
+    G.screen = 'match'; render();
+    clearTimeout(G.timer); SIM.on = false; showPvpDecision();
+  }
+}
+
 // ---------- duelo ----------
 function duelLink(d) { return location.href.split('#')[0] + '#duelo=' + M.duelEncode(d); }
 function duelSideHtml(s, win, lbl) {
@@ -1454,6 +1859,12 @@ function newRunFromPending(selId) {
   const st = G.store;
   G.run = E.newRun(G.pendingSeed, G.pendingLevel, selId, null, { legend: G.pendingLegend });
   G.run.daily = G.pendingDaily; G.run.legendWeek = G.pendingLegend ? M.isoWeek() : null; G.run.duel = G.pendingDuel || null;
+  if (G.cup && G.cup.seed === G.run.seed) {
+    G.run.cupRole = G.cup.role; G.run.cupId = G.cup.id;
+    G.cup.built = FFBracket.buildCup(G.run.seed);
+    FFBracket.groupOpponents(G.cup.built, G.cup.role).forEach((o, i) => { G.run.opponents[i] = o; });
+    try { sessionStorage.setItem('ffcup', G.cup.id); } catch (e) { /* ignora */ }
+  }
   if (G.pendingBolao && G.pendingDaily) { const b = G.pendingBolao; M.cosStore(st); if (b.stake > st.fominhas) b.stake = 0; st.fominhas -= b.stake; G.run.bolao = b; }
   G.pendingBolao = null;
   M.albumCollect(st, G.run.players); saveStore();
@@ -1489,6 +1900,13 @@ function onClick(ev) {
     case 'epicSel': G.epicIdx = +el.dataset.i; renderResult(); break;
     case 'epicPng': downloadEpic(el.dataset.i === 'm' ? G.epicModal : { ...G.result.epics[+el.dataset.i], seed: G.run.seed }); break;
     case 'epicCard': epicModal(G.run.epics[+el.dataset.i]); break;
+    case 'liveDuel': openLiveDuel($('#seedIn') ? $('#seedIn').value : ''); break;
+    case 'cupTeam': G.pendingSeed = G.cup.seed; G.pendingLevel = G.cup.level; G.pendingDaily = null; G.pendingLegend = null; G.pendingDuel = null; go('selecao'); break;
+    case 'cupCopy': { const url = G.lastDuelLink || (location.href.split('#')[0] + location.hash); copyText(url).then(ok => toast(ok ? 'Link do duelo copiado!' : url)); break; }
+    case 'cupBack': go(G.run && G.run.stage >= 3 && !G.cup.koSeen ? 'chave' : 'hub'); break;
+    case 'cupBoard': if (G.cup) { G.cup.mode = G.run && G.run.stage >= 3 ? 'ko' : 'start'; G.screen = 'chave'; render(); } break;
+    case 'cupRetry': cupRetry(); break;
+    case 'pvpcard': pvpChoose(el.dataset.c || ''); break;
     case 'duelLink': { const d = { v: 1, s: G.run.seed, l: G.run.level, a: M.duelSide(G.run, G.store.coachName || 'Fominha', G.verdict.points) }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Duelo no Fominha FC! Fiz ${fmtN(G.verdict.points)} pts na Copa ${G.run.seed}. Duvido você me passar: ${url}`).then(ok => toast(ok ? 'Link do duelo copiado! Manda no grupo ⚔️' : 'Não deu pra copiar o link')); break; }
     case 'duelReturn': { const R = G.metaRes.duel; const d = { v: 1, s: G.run.seed, l: G.run.level, a: R.me, b: R.them }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Respondi teu duelo no Fominha FC: ${fmtN(R.me.p)} x ${fmtN(R.them.p)}. Confere: ${url}`).then(ok => toast(ok ? 'Resposta copiada! Devolve pro amigo ⚔️' : 'Não deu pra copiar')); break; }
     case 'duelAccept': { const d = G.duelIn; const duel = d.b ? { v: 1, s: d.s, l: d.l, a: d.a } : d; startRun(d.s, null); G.pendingLevel = d.l; G.pendingDuel = duel; history.replaceState(null, '', location.pathname + location.search); render(); break; }
@@ -1523,14 +1941,24 @@ function onClick(ev) {
   }
 }
 // expõe para testes/screenshot
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug };
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel };
 document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);
   if (!h) return false;
   const d = M.duelDecode(h[1]);
-  if (d) { G.duelIn = d; G.screen = 'duelo'; return true; }
-  toast('Link de duelo inválido'); return false;
+  if (!d) { toast('Link de duelo inválido'); return false; }
+  if (d.v === 2) {
+    let role = 1;
+    try { if (sessionStorage.getItem('ffcup') === d.id) role = 0; } catch (e) { /* ignora */ }
+    G.cup = { id: d.id, seed: d.s, level: d.l, host: d.host, role, mode: 'start', koSeen: false, status: 'connecting', friend: null };
+    restoreSnap();
+    G.screen = 'chave';
+    if (G.cup.final && G.cup.final.home && G.cup.final.locks && G.cup.final.locks.length && G.run && G.run.stage >= 6 && G.run.status === 'playing') setTimeout(() => resumeFinal(G.cup.final), 20);
+    setTimeout(cupConnect, 40);
+    return true;
+  }
+  G.duelIn = d; G.screen = 'duelo'; return true;
 }
 window.addEventListener('hashchange', () => { if (readDuelHash()) render(); });
 readDuelHash();

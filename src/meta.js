@@ -242,6 +242,14 @@ function duelEncode(d) { return b64e(JSON.stringify(d)); }
 function duelDecode(code) {
   try {
     const d = JSON.parse(b64d(String(code)));
+    if (d && d.v === 2) {
+      if (!/^[A-Z0-9]{4,12}$/.test(String(d.id || ''))) return null;
+      if (!E.normalizeSeed(d.s) || !(d.l >= 1 && d.l <= 6)) return null;
+      d.s = E.normalizeSeed(d.s);
+      d.host = String(d.host || 'Fominha').slice(0, 24);
+      d.id = String(d.id);
+      return d;
+    }
     const okSide = x => x && typeof x.n === 'string' && E.SELECOES[x.sel] && Number.isFinite(x.p) && Array.isArray(x.h) && x.h.length <= 7;
     if (d.v !== 1 || !E.normalizeSeed(d.s) || !(d.l >= 1 && d.l <= 6) || !okSide(d.a) || (d.b && !okSide(d.b))) return null;
     d.s = E.normalizeSeed(d.s); return d;
