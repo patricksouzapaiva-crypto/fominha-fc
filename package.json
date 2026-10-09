@@ -1,0 +1,19 @@
+{
+  "name": "fominha-fc",
+  "version": "1.0.0",
+  "description": "Fominha FC · Copa Relâmpago — jogo de navegador autocontido",
+  "main": "build.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "test": "node test/sim.test.js && node test/coach.test.js && node test/relics.test.js && node test/epic.test.js && node test/meta.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright-core": "^1.64.0"
+  }
+}
