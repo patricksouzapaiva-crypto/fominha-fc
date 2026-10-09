@@ -103,6 +103,27 @@ function nums(over) {
   assert.strictEqual(back.members[0].length, 20);
 }
 
+// escudos originais: iniciais, listras e desenhos diferentes
+{
+  const fla = C.badge('flamengo');
+  const pal = C.badge('palmeiras');
+  const vas = C.badge('vasco');
+  const cru = C.badge('cruzeiro');
+  assert(fla.includes('FLA') && pal.includes('PAL') && vas.includes('VAS') && cru.includes('CRU'));
+  assert(fla !== pal && vas !== cru);
+  assert(fla.includes('clipPath') && pal.includes('a20 20'));
+  assert(cru.includes('#ffd76a'));
+  Object.keys(C.CLUBS).forEach(id => {
+    const svg = C.badge(id, 'sm');
+    assert(svg.startsWith('<svg') && svg.includes(C.clubOf(id).curto.replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase()), id);
+  });
+  const c = C.create({ seed: 'RELATO', nome: 'Nara', nums: nums({ atk: 70 }), policy: 'play' });
+  const before = JSON.stringify(c.titles);
+  C.skipLive(c);
+  assert(c.report && Array.isArray(c.report.goals) && c.report.goals.length === c.report.gf + c.report.ga);
+  assert.strictEqual(JSON.stringify(c.titles), before);
+}
+
 // equilíbrio: boa sobe em ~4-8, ruim é demitida, mentor acelera de verdade
 {
   const b = C.balance(12);

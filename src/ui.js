@@ -213,7 +213,7 @@ function coachCardHtml(nome, slots, opts) {
 // ---------- telas ----------
 function render() {
   clearTimeout(G.timer); clearInterval(G.decT); clearInterval(G.spinT);
-  document.querySelectorAll('.tip,.sheet,.modal,.epicfx,.walkout').forEach(x => x.remove()); SIM.epic = null;
+  document.querySelectorAll('.tip,.sheet,.modal,.epicfx,.walkout,.penshoot').forEach(x => x.remove()); SIM.epic = null; G.penSkip = null; G.held = false;
   if (G.screen !== 'match' && window.FFAudio) FFAudio.crowdStop();
   window.scrollTo(0, 0);
   app.classList.toggle('career', String(G.screen || '').indexOf('car') === 0);
@@ -486,6 +486,8 @@ function pitchLines() {
 }
 function renderMatch() {
   const mine = G.run, m = G.match, run = m && m.pvp ? m.run : mine, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
+  const homeCrest = run.careerClubId && window.FFCareer ? FFCareer.badge(run.careerClubId, 'sm') : sel.flag;
+  const awayCrest = run.careerFoeId && window.FFCareer ? FFCareer.badge(run.careerFoeId, 'sm') : op.flag;
   let toks = '';
   const tc = c => lum(c) > 0.6 ? '#111' : '#fff';
   for (let i = 0; i < 7; i++) toks += `<div class="tok t0 ${i === 0 ? 'gk' : ''}" style="background:${i === 0 ? '#1f2937' : sel.kit[0]};border-color:${sel.kit[1]};color:${i === 0 ? '#fff' : tc(sel.kit[0])}">${NUMS[i]}</div>`;
@@ -494,9 +496,9 @@ function renderMatch() {
   app.innerHTML = `
   <div class="mc">
     <div class="sb">
-      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${homeCrest}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
       <div class="mid"><div class="score" id="sc">${m.score[0]}<i>:</i>${m.score[1]}</div><span class="clock"><span class="live"></span><span id="clk">${m.minute}'</span></span></div>
-      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${awayCrest}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
     </div>
     <div class="prog"><i id="prog" style="width:${Math.min(100, m.minute / 90 * 100)}%"></i></div>
     <div class="stagelbl"><span>${esc(run.careerLabel || E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
@@ -504,7 +506,8 @@ function renderMatch() {
   <div class="momentum"><div class="mh"><span style="color:var(--lime)">▲ ${esc(sel.curto)}</span><span>Momentum</span><span style="color:#ff9a9d">${esc(oppShort(op))} ▼</span></div>
     <svg id="mom" viewBox="0 0 300 46" preserveAspectRatio="none" role="img" aria-label="Gráfico de pressão por minuto"></svg>
     <div class="mstats" id="mstats"></div></div>
-  <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball"></div></div><div class="wx" aria-hidden="true"></div></div>
+  <div class="stadium"><div class="stands" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="floods" aria-hidden="true"><b></b><b></b><b></b><b></b></div>
+  <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball">${ballSvg('pitch')}</div></div><div class="wx" aria-hidden="true"></div></div></div>
   <div class="fxbar" id="fxbar"></div>
   <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
@@ -572,6 +575,7 @@ function simFrame(now) {
   const dt = Math.min(0.05, (now - SIM.last) / 1000); SIM.last = now;
   const sp = G.speed, b = SIM.ball;
   if (!SIM.W) measure();
+  if (G.held) { SIM.last = now; requestAnimationFrame(simFrame); return; }
   if (SIM.holder && now > SIM.passAt && SIM.celebrate < 0) {
     const dir = SIM.poss === 0 ? 1 : -1;
     const mates = SIM.toks.filter(t => t.side === SIM.poss && t !== SIM.holder && t.i !== 0);
@@ -682,9 +686,11 @@ function goalFx(e) {
   fx.className = 'goalfx ' + (e.gtype === 'mao' ? 'mao' : mine ? '' : 'rival');
   const title = e.gtype === 'mao' ? '✋ LA MANO<br>DE DIOS' : mine ? (e.value > 1 ? `GOOOL!<br>+${e.value}` : 'GOOOL!') : 'GOL DELES';
   const sub = e.gtype === 'mao' ? 'O juiz valida o gol irregular!' : (e.label && mine && e.label !== 'GOOOL!' ? e.label + ' ' : '') + (e.scorer || '') + (e.sub ? ' · ' + e.sub : '');
-  fx.innerHTML = `<div class="gt">${title}<small>${esc(sub)}</small></div>`;
+  const hold = G.speed > 1;
+  fx.innerHTML = `<div class="gt">${title}<small>${esc(sub)}</small></div>${hold ? '<button class="tapgo" data-act="tapgo">Toque para continuar</button>' : ''}`;
+  if (hold) fx.classList.add('hold');
   document.body.appendChild(fx);
-  setTimeout(() => fx.remove(), 1700);
+  if (!hold) setTimeout(() => fx.remove(), 1700);
   const p = $('#pitch'); if (p) { p.classList.remove('flash', 'shake'); void p.offsetWidth; p.classList.add(mine ? 'flash' : 'shake'); }
   const sc = $('#sc'); if (sc) { sc.classList.remove('bump'); void sc.offsetWidth; sc.classList.add('bump'); }
   if (mine) celebrateFx([myKit(G.run)[0], myKit(G.run)[1], '#c6ff3d', '#ffffff', '#ffc83d']);
@@ -747,16 +753,23 @@ function tick() {
       else if (e.kind === 'end') FFAudio.whistle('full');
     }
     pushFeed(e);
+    let hold = false;
     if (e.epic) {
       if (e.kind === 'goal') { G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2.5); G.mst.shots[e.side]++; }
       else { G.mst.shots[e.side]++; G.mst.saves[1 - e.side]++; addMom(1 - e.side, e.min, 1.5); }
       wait = epicFx(e, sp) * sp;
+      if (sp > 1) hold = true;
     } else if (e.kind === 'goal') {
       G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2);
       if (e.gtype !== 'mao') G.mst.shots[e.side]++;
       shoot(e.side, 'goal');
-      setTimeout(() => { SIM.celebrate = e.side; goalFx(e); }, 250 / sp);
-      setTimeout(() => { SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(1 - e.side); }, PACE.goal / sp);
+      if (sp > 1) {
+        setTimeout(() => { if (G.screen === 'match') { SIM.celebrate = e.side; goalFx(e); } }, 160);
+        hold = true;
+      } else {
+        setTimeout(() => { SIM.celebrate = e.side; goalFx(e); }, 250 / sp);
+        setTimeout(() => { SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(1 - e.side); }, PACE.goal / sp);
+      }
       wait = PACE.goal;
     } else if (e.kind === 'lance') {
       const k = resultKind(e); shoot(e.side, k);
@@ -766,9 +779,11 @@ function tick() {
     } else if (e.kind === 'card') wait = PACE.card;
     else if (e.kind === 'half') { SIM.ball.x = 50; SIM.ball.y = 50; wait = PACE.info; }
     else wait = PACE.info;
+    if ((e.kind === 'counter' || e.kind === 'combo') && sp > 1) hold = true;
     const sc = $('#sc'); if (sc) sc.innerHTML = `${G.shownScore[0]}<i>:</i>${G.shownScore[1]}`;
     setClock(e.min);
     updateFx(); drawMomentum(); drawStats();
+    if (hold) { G.held = true; return; }
   }
   G.timer = setTimeout(tick, wait / sp);
 }
@@ -781,6 +796,7 @@ function showDecision() {
   document.body.appendChild(box);
   paintDecision();
   showTip('decision');
+  if (G.speed > 1) return;
   const C = 2 * Math.PI * 18;
   let left = DEC_SECS * 10;
   G.decT = setInterval(() => {
@@ -804,7 +820,7 @@ function paintDecision() {
   const beat = opp && Object.keys(E.BEATS).find(k => E.BEATS[k] === opp);
   inn.innerHTML = `<div class="grab"></div>
     <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${G.shownScore[0]} x ${G.shownScore[1]}</div><div class="t">Energia ${nrgPips(Math.max(0, left), m.nrgMax || 3)}</div></div>
-    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div></div>
+    ${G.speed > 1 ? '<div class="tapnote">Toque para continuar</div>' : `<div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div>`}</div>
     <div class="dctx">Toque pra marcar. Dá pra jogar várias se a energia alcançar. Sem escolha, a carta fica guardada.</div>
     ${opp ? `<p class="xs">Rival está em <b>${esc(E.STYLE_NAME[opp])}</b>. ${beat ? esc(E.STYLE_NAME[beat]) + ' dá CONTRA-GOLPE!' : ''}</p>` : ''}
     <div class="dcards">${run.cards.map(c => {
@@ -834,10 +850,11 @@ function useCard(c) {
 }
 function flashBanner(e) {
   const d = document.createElement('div');
-  d.className = 'banner ' + (e.kind === 'combo' ? 'combo' : 'golpe');
-  d.innerHTML = `<b>${e.kind === 'combo' ? 'COMBO' : 'CONTRA-GOLPE!'}</b><span>${esc(e.text)}</span>`;
+  const hold = G.speed > 1;
+  d.className = 'banner ' + (e.kind === 'combo' ? 'combo' : 'golpe') + (hold ? ' hold' : '');
+  d.innerHTML = `<b>${e.kind === 'combo' ? 'COMBO' : 'CONTRA-GOLPE!'}</b><span>${esc(e.text)}</span>${hold ? '<button class="tapgo" data-act="tapgo">Toque para continuar</button>' : ''}`;
   document.body.appendChild(d);
-  setTimeout(() => d.remove(), 1700);
+  if (!hold) setTimeout(() => d.remove(), 1700);
 }
 function showWalkout() {
   const run = G.run, m = G.match; if (!run || !m || RM()) return;
@@ -856,12 +873,85 @@ function endMatch() {
     const outcome = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
     G.careerPending = { gf, ga };
     G.result = { outcome, gf, ga, pens: null, fichas: [], ganho: 0, why: [`Placar do jogo decisivo: ${gf} a ${ga}.`], groupMsg: '', reward: false, shop: false, status: 'playing', stage: m.stage, mGoals: (m.goals || []).slice(), epics: (m.epics || []).slice(), weather: m.weather, used: (m.used || []).slice(), career: true };
+    if (G.run.careerKo && gf === ga && window.FFCareer && FFCareer.peekPens) {
+      const peek = FFCareer.peekPens(G.career);
+      if (peek) {
+        G.result.outcome = peek.ourWin ? 'W' : 'L';
+        G.result.pens = { kicks: peek.kicks, score: peek.score, win: peek.ourWin };
+        const foe = G.run.careerFoeId ? FFCareer.clubOf(G.run.careerFoeId).curto : oppShort(m.opp);
+        return showShootout({ kicks: peek.kicks, leftName: selOf(G.run).curto, rightName: foe, onDone: () => go('result') });
+      }
+    }
     return go('result');
   }
   G.result = E.finishMatch(G.run, G.match);
   if (G.run && G.run.cupRole != null && G.run.status === 'eliminated' && G.run.stage < 6) { finalizeRun(); return go('caiu'); }
   if (G.run.status !== 'playing') finalizeRun();
+  if (G.result.pens && G.result.pens.kicks && G.result.pens.kicks.length) {
+    return showShootout({ kicks: G.result.pens.kicks, leftName: selOf(G.run).curto, rightName: oppShort(G.match.opp), onDone: () => go('result') });
+  }
   go('result');
+}
+function showShootout(opts) {
+  document.querySelectorAll('.penshoot').forEach(x => x.remove());
+  const kicks = opts.kicks || [];
+  const box = document.createElement('div');
+  box.className = 'penshoot';
+  box.innerHTML = `<div class="penstage">
+    <div class="penhead"><b>${esc(opts.leftName || 'Nós')}</b><span id="pensc">0 × 0</span><b>${esc(opts.rightName || 'Eles')}</b></div>
+    <div class="pendots" id="pendots"></div>
+    <div class="penpitch"><div class="pengoal"></div><div class="penkeeper" id="penk"></div><div class="penball" id="penb"></div><div class="pentaker" id="pent"></div></div>
+    <div class="penwho" id="penwho"></div>
+    <p class="xs mut" id="pensudden"></p>
+    <button class="btn sec" data-act="penskip">Pular cobranças</button>
+  </div>`;
+  document.body.appendChild(box);
+  let i = 0, us = 0, them = 0, timer = null, dead = false;
+  const dots = [[], []];
+  const paint = () => {
+    const sc = $('#pensc'), dd = $('#pendots');
+    if (sc) sc.textContent = us + ' × ' + them;
+    if (dd) dd.innerHTML = `<span>${dots[0].map(ok => ok ? '●' : '○').join(' ')}</span><i></i><span>${dots[1].map(ok => ok ? '●' : '○').join(' ')}</span>`;
+    const sud = $('#pensudden');
+    if (sud) sud.textContent = dots[0].length > 5 && dots[0].length === dots[1].length ? 'Morte súbita' : '';
+  };
+  const finish = () => { dead = true; clearTimeout(timer); box.remove(); G.penSkip = null; if (opts.onDone) opts.onDone(); };
+  G.penSkip = finish;
+  const showKick = (k) => {
+    const who = $('#penwho'), ball = $('#penb'), taker = $('#pent'), keeper = $('#penk');
+    if (who) who.innerHTML = `<b>${esc(k.nome)}</b><small>${k.side === 0 ? esc(opts.leftName || '') : esc(opts.rightName || '')} · ${esc(k.keeper || 'goleiro na trave')}</small>`;
+    if (keeper) keeper.className = 'penkeeper';
+    if (taker) taker.className = 'pentaker ' + (k.side === 0 ? 'l' : 'r');
+    if (ball) { ball.className = 'penball'; void ball.offsetWidth; ball.classList.add('go', k.ok ? 'in' : 'miss'); }
+    if (taker) { void taker.offsetWidth; taker.classList.add('go'); }
+    if (keeper) keeper.classList.add(k.ok ? 'beat' : 'save');
+  };
+  const step = () => {
+    if (dead) return;
+    if (opts.pauseAt != null && i >= opts.pauseAt) { paint(); return; }
+    if (i >= kicks.length) { timer = setTimeout(finish, 640); return; }
+    const k = kicks[i++];
+    showKick(k);
+    timer = setTimeout(() => {
+      if (dead) return;
+      if (k.ok) { if (k.side === 0) us++; else them++; }
+      dots[k.side].push(!!k.ok);
+      paint();
+      timer = setTimeout(step, 380);
+    }, 720);
+  };
+  if (opts.pauseAt > 0) {
+    while (i < opts.pauseAt && i < kicks.length) {
+      const k = kicks[i++];
+      if (k.ok) { if (k.side === 0) us++; else them++; }
+      dots[k.side].push(!!k.ok);
+    }
+    paint();
+    if (i < kicks.length) showKick(kicks[i]);
+    return;
+  }
+  paint();
+  step();
 }
 
 // ---------- resultado ----------
@@ -1376,12 +1466,32 @@ function epicPos(id, k) {
   const xy = bez(P.segs[i], t);
   return { x: xy[0], y: xy[1], h: P.lift * Math.sin(Math.PI * t) * (i === n - 1 || n === 1 ? 1 : .6) };
 }
+function epicScene(id) {
+  const sky = `<defs><linearGradient id="esky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07121c"/><stop offset="1" stop-color="#12301c"/></linearGradient><radialGradient id="eflood" cx="50%" cy="0%" r="70%"><stop offset="0" stop-color="rgba(255,244,200,.55)"/><stop offset="1" stop-color="rgba(255,244,200,0)"/></radialGradient></defs>
+    <rect width="390" height="280" fill="url(#esky)"/><rect width="390" height="120" fill="url(#eflood)"/>
+    <g fill="#0a2014">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => `<circle cx="${18 + i * 32}" cy="${48 + (i % 3) * 10}" r="7" fill="${i % 2 ? '#c52626' : '#f2f2f2'}"/>`).join('')}</g>
+    <path d="M20 150 Q195 120 370 150 L370 250 L20 250 Z" fill="#176b32"/><path d="M20 168 H370" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+    <rect x="300" y="118" width="78" height="46" fill="none" stroke="#fff" stroke-width="3"/><rect x="300" y="132" width="78" height="18" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2"/>`;
+  const figs = {
+    bicicleta: `<g transform="translate(168 150) rotate(-78)"><ellipse cx="0" cy="18" rx="16" ry="7" fill="rgba(0,0,0,.35)"/><circle cx="0" cy="-6" r="9" fill="#f0c9a0"/><path d="M-8 2 h22 l6 28 h-16 z" fill="#c52626"/><path d="M-2 28 l-16 18 M8 28 l18 8" stroke="#111" stroke-width="5" stroke-linecap="round"/><circle cx="28" cy="-8" r="8" fill="#fff" stroke="#111"/></g>`,
+    cobertura: `<g transform="translate(150 168)"><circle cx="0" cy="-8" r="9" fill="#f0c9a0"/><path d="M-12 0 h20 l8 34 h-18 z" fill="#fff"/><path d="M-4 34 l-8 22 M8 34 l14 16" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><g transform="translate(250 176)"><circle cx="0" cy="0" r="8" fill="#ffd76a"/><path d="M-14 8 h22 l-4 28 h-14 z" fill="#111"/></g><circle cx="230" cy="92" r="9" fill="#fff" stroke="#111"/><path d="M170 150 Q210 70 230 92" fill="none" stroke="#ffd76a" stroke-width="2" stroke-dasharray="4 3"/>`,
+    olimpico: `<g transform="translate(70 150)"><circle cx="0" cy="0" r="8" fill="#f0c9a0"/><path d="M-10 8 h18 l4 30 h-16 z" fill="#0d80bf"/></g><path d="M80 140 Q200 40 330 150" fill="none" stroke="#ffd76a" stroke-width="3"/><circle cx="330" cy="150" r="8" fill="#fff" stroke="#111"/>`,
+    calcanhar: `<g transform="translate(210 160) scale(-1 1)"><circle cx="0" cy="-6" r="9" fill="#f0c9a0"/><path d="M-8 4 h20 l4 30 h-16 z" fill="#006437"/><path d="M6 32 l16 8" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><circle cx="168" cy="188" r="8" fill="#fff" stroke="#111"/>`,
+    golaco: `<g transform="translate(120 156)"><circle cx="0" cy="-4" r="9" fill="#f0c9a0"/><path d="M-10 6 h20 l6 32 h-16 z" fill="#ffd100"/></g><path d="M140 150 Q220 80 340 140" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="340" cy="140" r="8" fill="#fff"/>`,
+    goleiro: `<g transform="translate(80 160)"><circle cx="0" cy="0" r="9" fill="#f0c9a0"/><path d="M-14 8 h24 l-2 32 h-16 z" fill="#facc15"/></g><path d="M90 150 H340" stroke="#ffd76a" stroke-width="2" stroke-dasharray="6 4"/><circle cx="330" cy="148" r="8" fill="#fff"/>`,
+    penalti: `<g transform="translate(250 168)"><circle cx="0" cy="-10" r="9" fill="#f0c9a0"/><path d="M-16 0 h28 l-6 30 h-16 z" fill="#111"/><path d="M8 -6 l22 -16" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><circle cx="210" cy="150" r="8" fill="#fff" stroke="#111"/>`,
+    placa: `<text x="40" y="150" font-size="54" font-family="Arial Black,sans-serif" fill="#ffd76a">4×0</text>`,
+    hattrick: `<g transform="translate(180 150)"><circle cx="0" cy="0" r="9" fill="#f0c9a0"/><path d="M-12 10 h24 l2 32 h-22 z" fill="#c52626"/></g><text x="40" y="70" font-size="28" font-family="Arial Black,sans-serif" fill="#ffd76a">3º</text>`,
+    virada: `<text x="36" y="90" font-size="42" font-family="Arial Black,sans-serif" fill="#fff">90+2</text><circle cx="250" cy="160" r="10" fill="#fff"/>`
+  };
+  return `<div class="escene" aria-hidden="true"><svg viewBox="0 0 390 280">${sky}${figs[id] || figs.golaco}<g stroke="#ffd76a" stroke-width="2" fill="none" opacity=".8"><path d="M40 40 l18 6 M60 28 l8 16 M330 36 l-16 10"/></g></svg></div>`;
+}
 function epicFx(e, sp) {
   const ep = e.epic, P = EPIC_PATHS[ep.id] || EPIC_PATHS.hattrick, rm = RM(), mine = e.side === 0 || P.save;
   const slow = 1 / Math.min(sp, 1.5), DUR = 1700 * slow, END = P.segs[P.segs.length - 1][2];
   const pz = $('#pz');
   const box = document.createElement('div'); box.className = 'epicfx' + (rm ? ' rm' : ''); box.setAttribute('role', 'status');
-  box.innerHTML = `<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="eflash"></div>
+  box.innerHTML = `${epicScene(ep.id)}<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="eflash"></div>
     <div class="ebox"><div class="ek">⚡ LANCE ÉPICO</div><div class="ei">${ep.icon}</div><div class="en">${esc(ep.nome.toUpperCase())}!</div><div class="es">${esc(ep.scorer || '')} · ${ep.min}' · ${ep.score ? ep.score[0] + ' x ' + ep.score[1] : ''}</div><div class="ef">📻 “${esc(ep.frase)}”</div></div>`;
   document.body.appendChild(box);
   if (pz && !rm) { pz.style.transformOrigin = `${END[0]}% ${END[1]}%`; pz.classList.add('ez'); }
@@ -1399,10 +1509,16 @@ function epicFx(e, sp) {
   }, rm ? 100 : DUR + 60);
   const total = rm ? 2600 : DUR + 2600 * slow;
   setTimeout(() => {
-    box.classList.add('out'); setTimeout(() => box.remove(), 350);
+    if (!document.body.contains(box)) return;
     if (pz) pz.classList.remove('ez');
-    SIM.epic = null; SIM.trailEls.forEach(t => t.classList.remove('hot')); if (SIM.ballEl) SIM.ballEl.classList.remove('hot');
-    SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(e.kind === 'goal' ? 1 - e.side : 0);
+    SIM.epic = null; if (SIM.trailEls) SIM.trailEls.forEach(t => t.classList.remove('hot')); if (SIM.ballEl) SIM.ballEl.classList.remove('hot');
+    if (G.speed > 1) {
+      box.classList.add('hold', 'hit');
+      if (!box.querySelector('.tapgo')) box.insertAdjacentHTML('beforeend', '<button class="tapgo" data-act="tapgo">Toque para continuar</button>');
+      return;
+    }
+    box.classList.add('out'); setTimeout(() => box.remove(), 350);
+    SIM.celebrate = -1; if (SIM.ball) { SIM.ball.x = 50; SIM.ball.y = 50; } setPoss(e.kind === 'goal' ? 1 - e.side : 0);
   }, total);
   if (!G.seenEpic) { G.seenEpic = true; }
   return total + 250;
@@ -1765,7 +1881,12 @@ function endPvp() {
   G.result = { outcome, gf, ga, pens: res.pens, fichas: outcome === 'W' ? [{ label: 'Vitória na final ao vivo', v: 3 }] : [], ganho: outcome === 'W' ? 3 : 0, why: [outcome === 'W' ? 'A final ao vivo ficou com você. Os dois viram o mesmo jogo.' : 'A final ao vivo ficou com o seu amigo. Os dois viram o mesmo jogo.'], groupMsg: '', reward: false, shop: false, status: G.run.status, stage: 6, mGoals: m.goals.slice(), epics: m.epics.slice(), weather: m.weather };
   if (outcome === 'W') G.run.fichas += 3;
   if (G.cup.friend) G.cup.friend.phase = 'fim';
-  finalizeRun(); cupPublish(); go('result');
+  finalizeRun(); cupPublish();
+  if (res.pens && res.pens.kicks && res.pens.kicks.length) {
+    const kicks = res.pens.kicks.map(k => ({ side: k.side === role ? 0 : 1, nome: k.nome, ok: k.ok, coach: k.coach, keeper: 'goleiro' }));
+    return showShootout({ kicks, leftName: selOf(G.run).curto, rightName: oppName, onDone: () => go('result') });
+  }
+  go('result');
 }
 function friendRole() {
   const f = G.cup && G.cup.friend;
@@ -2074,7 +2195,7 @@ function somSheet() {
   const s = A.settings();
   const m = document.createElement('div'); m.className = 'modal somm';
   m.innerHTML = `<div class="box sombox"><div class="eyebrow g">Som do estádio</div><h3 class="ttl" style="margin-top:4px">Arquibancada</h3>
-    <p class="sub">Apito, torcida e fogos saem do próprio navegador. Nenhum arquivo de áudio.</p>
+    <p class="sub">Apito, torcida e chute usam gravações livres. Se o áudio não carregar, o jogo volta ao som do navegador.</p>
     <button class="btn ${s.on ? '' : 'sec'}" data-act="somOn">${s.on ? 'Som ligado' : 'Som desligado'}</button>
     <label class="somlab">Volume<input id="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></label>
     <button class="btn sec" data-x="1">Fechar</button></div>`;
@@ -2086,6 +2207,35 @@ function somSheet() {
 function syncCarName() {
   const el = document.getElementById('carName');
   if (el && G.carDraft) G.carDraft.nome = el.value.slice(0, 24);
+}
+function patchDraft() {
+  const d = G.carDraft;
+  if (!d) return;
+  const chip = app.querySelector('.topbar .chip:last-child');
+  if (chip) chip.textContent = d.left + ' pontos';
+  app.querySelectorAll('.panel .ph .r').forEach(r => {
+    if (r.textContent.indexOf('60 a 78') === 0) r.textContent = '60 a 78 · ' + d.left + ' para distribuir';
+  });
+  app.querySelectorAll('.prow').forEach(row => {
+    const minus = row.querySelector('[data-act=carMinus]');
+    const plus = row.querySelector('[data-act=carPlus]');
+    if (!minus) return;
+    const a = minus.dataset.a;
+    const b = row.querySelector('b');
+    if (b) b.textContent = d.nums[a];
+    minus.disabled = d.nums[a] <= 60;
+    if (plus) plus.disabled = d.nums[a] >= 78 || d.left <= 0;
+  });
+  const start = app.querySelector('[data-act=carStart]');
+  if (start) start.disabled = d.left !== 0;
+}
+function releaseHold() {
+  G.held = false;
+  document.querySelectorAll('.goalfx,.epicfx.hold,.banner.hold').forEach(x => x.remove());
+  const pz = $('#pz'); if (pz) pz.classList.remove('ez');
+  SIM.epic = null; SIM.celebrate = -1;
+  if (SIM.ball) { SIM.ball.x = 50; SIM.ball.y = 50; }
+  if (G.screen === 'match') tick();
 }
 function carGo(res) {
   if (!res) return;
@@ -2185,8 +2335,8 @@ function onClick(ev) {
     case 'carNew': G.carSlot = +el.dataset.i || 0; G.carDraft = FFCareer.draftNew(G.pendingSeed || 'FOMINHA'); go('carCriar'); break;
     case 'carCont': { const st = FFCareer.loadStore(); G.career = st.slots[+el.dataset.i]; if (G.career) { G.career.slot = +el.dataset.i; go(FFCareer.screenFor(G.career)); } break; }
     case 'carMuseu': G.carExtra = FFCareer.loadStore(); go('carMuseu'); break;
-    case 'carPlus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.left > 0 && d.nums[attr] < 78) { d.nums[attr]++; d.left--; render(); } break; }
-    case 'carMinus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.nums[attr] > 60) { d.nums[attr]--; d.left++; render(); } break; }
+    case 'carPlus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.left > 0 && d.nums[attr] < 78) { d.nums[attr]++; d.left--; patchDraft(); } break; }
+    case 'carMinus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.nums[attr] > 60) { d.nums[attr]--; d.left++; patchDraft(); } break; }
     case 'carClub': if (G.carDraft) { G.carDraft.clubId = el.dataset.id; render(); } break;
     case 'carStart': {
       syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
@@ -2202,7 +2352,12 @@ function onClick(ev) {
     case 'carBackHub': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
     case 'carHome': go('carHome'); break;
     case 'carOpt': FFCareer.chooseDecision(G.career, +el.dataset.i); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
-    case 'carAccept': FFCareer.acceptOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
+    case 'carAccept': {
+      FFCareer.acceptOffer(G.career, el.dataset.id);
+      if (FFCareer.closeInbox(G.career)) { FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); }
+      else { FFCareer.persist(G.career); render(); toast('Escolha um clube ou encerre a carreira.'); }
+      break;
+    }
     case 'carReject': FFCareer.rejectOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
     case 'carNeg': FFCareer.negotiate(G.career, el.dataset.id); render(); break;
     case 'carInboxOk': if (FFCareer.closeInbox(G.career)) { FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); } else toast('Escolha um clube ou encerre a carreira.'); break;
@@ -2210,6 +2365,15 @@ function onClick(ev) {
     case 'carAck': FFCareer.ackSummary(G.career); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
     case 'carRetire': FFCareer.retire(G.career, 'pedido'); go('carDoc'); break;
     case 'carShare': { const d = G.career && (G.career.doc || G.career); copyText(FFCareer.shareText(d)).then(ok => toast(ok ? 'Retrospectiva copiada!' : 'Não deu pra copiar')); break; }
+    case 'carReport': go('carReport'); break;
+    case 'carReportOk': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
+    case 'carPens': {
+      const r = G.career && G.career.report;
+      if (r && r.pens) showShootout({ kicks: r.pens, leftName: FFCareer.clubOf(G.career.clubId).curto, rightName: FFCareer.clubOf(r.foeId).curto });
+      break;
+    }
+    case 'tapgo': releaseHold(); break;
+    case 'penskip': if (G.penSkip) G.penSkip(); break;
   }
 }
 // expõe para testes/screenshot
@@ -2268,6 +2432,41 @@ function previewCards(which) {
 function previewCareer(which) {
   window.__noTips = true;
   if (which === 'som') { G.screen = 'home'; render(); somSheet(); return; }
+  if (which === 'relato') {
+    const d = FFCareer.demo('hub');
+    G.career = d.career;
+    if (G.career && G.career.phase === 'season') FFCareer.skipLive(G.career);
+    G.screen = 'carReport'; render(); return;
+  }
+  if (which === 'penaltis') {
+    G.screen = 'home'; render();
+    showShootout({
+      pauseAt: 2, leftName: 'FLA', rightName: 'VAS',
+      kicks: [
+        { side: 0, nome: 'Pedro Alves', ok: true, keeper: 'Carlos Souza' },
+        { side: 1, nome: 'Lucas Ribeiro', ok: true, keeper: 'João Silva' },
+        { side: 0, nome: 'Caio Mendes', ok: false, keeper: 'Carlos Souza' },
+        { side: 1, nome: 'Diego Costa', ok: true, keeper: 'João Silva' },
+        { side: 0, nome: 'André Lima', ok: true, keeper: 'Carlos Souza' }
+      ]
+    });
+    return;
+  }
+  if (which === 'overlay' || which === 'epic2') {
+    const run = E.newRun('EPIC3', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run = run; G.match = E.createMatch(run); G.speed = 3; G.screen = 'match'; G.shownScore = [1, 0];
+    render(); clearTimeout(G.timer); SIM.on = false; G.held = true;
+    const id = which === 'epic2' ? 'cobertura' : 'bicicleta';
+    const nome = id === 'cobertura' ? 'Gol de Cobertura' : 'Gol de Bicicleta';
+    epicFx({ epic: { id, nome, icon: id === 'cobertura' ? '🌈' : '🚲', scorer: 'Rafael Silva', min: 41, frase: nome.toUpperCase() + '! PODE PARAR O JOGO!', score: [1, 0] }, side: 0, kind: 'goal', min: 41 }, 3);
+    return;
+  }
+  if (which === 'lesao' || which === 'protesto' || which === 'joia') {
+    const d = FFCareer.demo('decisao');
+    G.career = d.career;
+    G.career.decision = FFCareer.sampleDecision(which);
+    G.screen = 'carDec'; render(); return;
+  }
   const d = FFCareer.demo(which === 'acesso' ? 'fogos' : which);
   G.career = d.career || null;
   G.carDraft = which === 'criar' ? d.extra : G.carDraft;

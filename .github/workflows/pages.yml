@@ -37,6 +37,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html copa-relampago.html .nojekyll _site/
+          cp -a assets _site/assets
 
       - name: Configurar Pages
         uses: actions/configure-pages@v6

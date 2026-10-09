@@ -811,6 +811,82 @@ body:has(.tabbar) #app{padding-bottom:96px}
 .walkout b{font-family:var(--disp);font-style:italic;font-size:34px;letter-spacing:-.5px}
 .walkout i{margin:0 8px;color:var(--lime);font-style:normal;font-family:var(--disp);font-weight:900}
 .walkout small{display:block;margin-top:8px;color:var(--mut);font-weight:800}
+
+/* ---------- v6: estádio, escudos, relato, pênaltis ---------- */
+.sb .crest:has(svg){width:44px;height:50px;border:none;background:none;border-radius:0;box-shadow:none}
+.sb .crest .badge{width:42px;height:48px}
+.ctr span.tn{display:flex;align-items:center;gap:6px;min-width:0}
+.ctr span.tn .badge{width:30px;height:36px}
+.stadium{position:relative;margin:6px 0 8px;border-radius:18px;overflow:hidden;background:#07140e;box-shadow:0 14px 28px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.06)}
+.stands{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:3px;height:46px;padding:7px 8px 0;background:linear-gradient(180deg,#101c16,#1a3324)}
+.stands i{border-radius:8px 8px 0 0;background:
+  radial-gradient(circle at 12% 70%,#f4f4f4 1.4px,transparent 1.7px),
+  radial-gradient(circle at 32% 45%,#c52626 1.4px,transparent 1.7px),
+  radial-gradient(circle at 55% 62%,#ffd76a 1.3px,transparent 1.6px),
+  radial-gradient(circle at 78% 40%,#9fd0ff 1.3px,transparent 1.6px),
+  repeating-linear-gradient(#24382c 0 5px,#1a2c22 5px 9px);
+  background-size:22px 14px,22px 14px,22px 14px,22px 14px,100% 100%}
+.floods{position:absolute;left:0;right:0;top:34px;height:24px;z-index:3;pointer-events:none}
+.floods b{position:absolute;top:0;width:8px;height:8px;border-radius:50%;background:#fff6c8;box-shadow:0 0 14px 5px rgba(255,236,170,.75),0 18px 24px 8px rgba(255,244,200,.18)}
+.floods b:nth-child(1){left:10px}.floods b:nth-child(2){left:22%}.floods b:nth-child(3){right:22%}.floods b:nth-child(4){right:10px}
+.stadium .pitch{border-radius:0 0 16px 16px;background:
+  repeating-linear-gradient(90deg,#1f7a3c 0 7%,#176833 7% 14%),
+  radial-gradient(ellipse at 50% 40%,rgba(255,255,255,.16),transparent 55%);
+  box-shadow:inset 0 18px 24px rgba(0,0,0,.28),inset 0 -20px 30px rgba(0,0,0,.35)}
+.tok{width:22px;height:26px;border-radius:6px 6px 8px 8px;font-size:9px;box-shadow:0 4px 0 rgba(0,0,0,.35),inset 0 -7px 0 rgba(0,0,0,.15);overflow:hidden}
+.tok::after{content:"";position:absolute;left:38%;top:0;bottom:0;width:24%;background:rgba(255,255,255,.28);pointer-events:none}
+.ball{width:16px;height:16px;background:none;box-shadow:none;border-radius:0}
+.ball .fball{width:16px;height:16px;filter:drop-shadow(1px 3px 0 rgba(0,0,0,.45))}
+.epicfx{background:#05080c}
+.escene{position:absolute;left:0;right:0;top:0;height:62vh;z-index:1;pointer-events:none;background:#071018}
+.escene svg{width:100%;height:100%}
+.epicfx.hold,.goalfx.hold,.banner.hold{pointer-events:auto}
+.tapgo{appearance:none;border:0;border-radius:999px;padding:10px 16px;font-weight:900;background:var(--gold);color:#2a1300;box-shadow:0 6px 0 #8a5a00}
+.goalfx .tapgo{position:absolute;bottom:18%;left:50%;transform:translateX(-50%)}
+.epicfx .tapgo{position:absolute;z-index:6;left:50%;bottom:18px;transform:translateX(-50%)}
+.banner .tapgo{margin-top:10px}
+.tapnote{margin-left:auto;font-size:11px;font-weight:900;color:var(--gold);letter-spacing:.2px}
+.eventcard{border-radius:18px;overflow:hidden;margin:8px 0 12px;background:linear-gradient(180deg,#163044,#102018);border:1px solid var(--line);box-shadow:0 10px 24px rgba(0,0,0,.28)}
+.eventcard .evart{display:block;width:100%;height:112px}
+.eventcard .eyebrow,.eventcard .ttl,.eventcard .sub{padding-left:12px;padding-right:12px}
+.eventcard .ttl{font-size:26px;padding-bottom:2px}
+.eventcard .sub{padding-bottom:12px}
+.report .rscore{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px}
+.report .rscore b{font-family:var(--disp);font-size:40px;letter-spacing:-1px;display:block;text-align:center}
+.report .rscore small{display:block;text-align:center;color:var(--mut);font-weight:800}
+.stats3{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;gap:6px}
+.stats3 b{display:block;font-family:var(--disp);font-size:20px}
+.stats3 span{color:var(--mut);font-size:11px;font-weight:800}
+.gl{display:grid;grid-template-columns:36px 1fr auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.gl small{display:block;color:var(--mut);font-weight:700}
+.cardpill{width:10px;height:14px;border-radius:2px;background:#ffd100}
+.cardpill.red{background:#e10600}
+.rates{display:flex;flex-direction:column;gap:2px}
+.rate{display:grid;grid-template-columns:36px 1fr 32px;gap:6px;font-size:13px}
+.rate em{font-style:normal;text-align:right;font-family:var(--disp)}
+.motm h3{margin:2px 0 8px;font-size:22px}
+.epicline{color:var(--gold);font-weight:800}
+.penshoot{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:radial-gradient(circle at 50% 30%,rgba(20,60,30,.4),rgba(4,10,8,.88))}
+.penstage{width:min(360px,100%);background:linear-gradient(180deg,#173024,#0d1a12);border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:14px 14px 16px;box-shadow:0 20px 40px rgba(0,0,0,.45)}
+.penhead{display:flex;justify-content:space-between;align-items:center;font-weight:900}
+.penhead span{font-family:var(--disp);font-size:28px}
+.pendots{display:flex;justify-content:space-between;align-items:center;margin:8px 0;font-size:18px;letter-spacing:3px;min-height:24px}
+.pendots i{width:8px}
+.penpitch{position:relative;height:190px;border-radius:14px;overflow:hidden;background:linear-gradient(#0e4a22,#1f8a3e 40%,#176b32);box-shadow:inset 0 0 30px rgba(0,0,0,.35)}
+.pengoal{position:absolute;left:50%;top:16px;width:132px;height:58px;transform:translateX(-50%);border:3px solid rgba(255,255,255,.9);border-bottom:none;background:rgba(0,0,0,.25)}
+.penkeeper{position:absolute;left:50%;top:26px;width:22px;height:32px;margin-left:-11px;border-radius:6px 6px 8px 8px;background:#111;transition:transform .35s}
+.penkeeper.save{transform:translateX(34px) rotate(8deg)}
+.penkeeper.beat{transform:translateX(-30px)}
+.penball{position:absolute;left:50%;bottom:36px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#c8c8c8 60%,#666);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.penball.go.in{transform:translateY(-118px) scale(.72)}
+.penball.go.miss{transform:translate(54px,-96px) scale(.8)}
+.pentaker{position:absolute;bottom:16px;width:16px;height:28px;border-radius:5px 5px 7px 7px;background:#c52626;transition:transform .45s}
+.pentaker.l{left:38%}
+.pentaker.r{right:38%;background:#0d80bf}
+.pentaker.go{transform:translateY(-36px)}
+.penwho{text-align:center;min-height:48px;margin-top:8px}
+.penwho b{display:block;font-size:18px}
+.penwho small{color:var(--mut);font-weight:700}
 </style>
 </head>
 <body>
@@ -3025,7 +3101,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
   else root.FFNet = N;
 })(typeof window !== 'undefined' ? window : this);
 </script>
-<script>/* Fominha FC · som procedural. Só Web Audio API, sem arquivos. */
+<script>/* Fominha FC · amostras livres, com fallback procedural se o arquivo não carregar. */
 (function (root) {
   const KEY = 'ffsom';
   let AC = null, master = null, noiseBuf = null, crowd = null, crowdGain = null, unlocked = false;
@@ -3094,6 +3170,53 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
   function chord(freqs, dur, peak) {
     freqs.forEach((f, i) => tone(f, dur, 'triangle', (peak || 0.12) * (1 - i * 0.15), i * 0.045));
   }
+  const FILES = {
+    click: 'click.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg', whistle: 'whistle.ogg',
+    'whistle-long': 'whistle-long.ogg', kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
+    crowd: 'crowd.ogg', chant: 'chant.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg'
+  };
+  const bufs = {};
+  let loading = false;
+  function sampleBase() {
+    try {
+      if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
+      const u = location.href.split('#')[0].split('?')[0];
+      return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/snd/';
+    } catch (e) { return ''; }
+  }
+  function loadSamples() {
+    const base = sampleBase();
+    if (!base || !AC || loading || typeof fetch !== 'function') return;
+    loading = true;
+    Object.keys(FILES).forEach(name => {
+      fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
+        if (!ab) return null;
+        return AC.decodeAudioData(ab);
+      }).then(buf => { if (buf) bufs[name] = buf; }).catch(() => {});
+    });
+  }
+  function playBuf(name, gain, loop) {
+    const buf = bufs[name];
+    const c = live();
+    if (!c || !buf) return null;
+    const s = c.createBufferSource();
+    s.buffer = buf;
+    s.loop = !!loop;
+    const g = c.createGain();
+    g.gain.value = gain == null ? 0.8 : gain;
+    s.connect(g); g.connect(master);
+    s.start();
+    return { src: s, gain: g };
+  }
+  function duckCrowd(to, back, sec) {
+    if (!crowdGain || !AC) return;
+    const t = AC.currentTime;
+    const now = crowdGain.gain.value;
+    crowdGain.gain.cancelScheduledValues(t);
+    crowdGain.gain.setValueAtTime(now, t);
+    crowdGain.gain.linearRampToValueAtTime(to, t + 0.06);
+    crowdGain.gain.linearRampToValueAtTime(back, t + sec);
+  }
 
   const FFAudio = {
     settings() { return { on: settings.on, vol: settings.vol }; },
@@ -3103,35 +3226,50 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       const c = ctx(); if (!c) return;
       if (c.state === 'suspended') c.resume();
       unlocked = true;
+      loadSamples();
     },
-    click() { tone(640, 0.04, 'sine', 0.045); },
+    click() { if (!playBuf('click', 0.55)) tone(640, 0.04, 'sine', 0.045); },
     flip() { noise(0.07, 0.12, { f: 1800, q: 0.6 }); tone(420, 0.05, 'square', 0.04); },
     pack() { noise(0.25, 0.14, { f: 900, q: 0.5 }); tone(520, 0.12, 'sawtooth', 0.05); tone(780, 0.16, 'triangle', 0.07, 0.08); },
-    playCard() { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); },
+    playCard() { if (!playBuf('card', 0.6)) { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); } },
     energy() { tone(880, 0.04, 'sine', 0.06); },
     counter() { tone(196, 0.12, 'sawtooth', 0.1); tone(392, 0.14, 'square', 0.05, 0.04); },
     combo() { chord([523, 659, 784], 0.16, 0.1); },
     level() { chord([523, 659, 784, 1046], 0.22, 0.11); },
     record() { chord([392, 494, 587, 784], 0.38, 0.12); },
     whistle(kind) {
+      const file = kind === 'full' ? 'whistle-long' : 'whistle';
+      if (playBuf(file, 0.7)) return;
       const hi = kind === 'full' ? 2100 : kind === 'card' ? 1700 : 1900;
       tone(hi, kind === 'full' ? 0.28 : 0.16, 'sine', 0.09);
       tone(hi * 1.01, kind === 'full' ? 0.28 : 0.12, 'triangle', 0.04, 0.02);
     },
-    net() { noise(0.12, 0.16, { f: 600, q: 0.8 }); },
+    net() { if (!playBuf('net', 0.75)) noise(0.12, 0.16, { f: 600, q: 0.8 }); },
     post() {
+      if (playBuf('post', 0.7)) { FFAudio.uuh(); return; }
       tone(240, 0.18, 'square', 0.08);
       tone(180, 0.22, 'sawtooth', 0.06, 0.02);
       noise(0.15, 0.1, { f: 1400, q: 2 });
       FFAudio.uuh();
     },
-    uuh() { noise(0.45, 0.1, { f: 500, q: 0.6 }); },
-    goal() { FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 }); },
-    concede() { FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05); },
+    uuh() { if (!playBuf('groan', 0.55)) noise(0.45, 0.1, { f: 500, q: 0.6 }); },
+    goal() {
+      duckCrowd(0.05, 0.12, 1.6);
+      if (playBuf('roar', 0.85)) { playBuf('net', 0.7); return; }
+      FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 });
+    },
+    concede() {
+      if (playBuf('boo', 0.7)) return;
+      FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05);
+    },
     stinger() { chord([349, 440, 523], 0.28, 0.1); },
-    fanfare() { chord([523, 659, 784, 1046], 0.42, 0.12); },
+    fanfare() { if (!playBuf('fanfare', 0.65)) chord([523, 659, 784, 1046], 0.42, 0.12); },
     crowdStart() {
       const c = live(); if (!c || crowd) return;
+      if (bufs.crowd) {
+        const played = playBuf('crowd', 0.22, true);
+        if (played) { crowd = played.src; crowdGain = played.gain; return; }
+      }
       const s = c.createBufferSource();
       s.buffer = noiseBuf; s.loop = true;
       const bp = c.createBiquadFilter();
@@ -3150,7 +3288,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       crowdGain.gain.cancelScheduledValues(t);
       crowdGain.gain.setValueAtTime(Math.max(0.02, crowdGain.gain.value), t);
       crowdGain.gain.linearRampToValueAtTime(peak, t + 0.12);
-      crowdGain.gain.linearRampToValueAtTime(0.022, t + 1.1);
+      crowdGain.gain.linearRampToValueAtTime(bufs.crowd ? 0.22 : 0.022, t + 1.1);
+      if (bufs.chant && peak > 0.12) playBuf('chant', 0.35);
     },
     crowdStop() {
       if (crowd) { try { crowd.stop(); } catch (e) { /* já parou */ } }
@@ -3162,9 +3301,254 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
   root.FFAudio = FFAudio;
 })(typeof window !== 'undefined' ? window : this);
 </script>
+<script>/* Escudos originais, um por clube. Cores, listras, formato, iniciais e um símbolo simples.
+   Não copia brasão, monograma registrado nem arte oficial. */
+(function (root) {
+  const RAW = {
+    flamengo: 'shield h flame 1',
+    palmeiras: 'circle solid palm 1',
+    saopaulo: 'delta thirds none 0 #ffffff',
+    corinthians: 'oval v cross 0',
+    gremio: 'shield v none 3 #0d80bf #111111 #ffffff',
+    internacional: 'shield solid none 2',
+    atleticomg: 'shield v rooster 1',
+    fluminense: 'shield thirds none 0 #ffffff',
+    botafogo: 'shield solid star 1',
+    bahia: 'shield thirds wave 0 #005ca9 #ffffff #c52626',
+    fortaleza: 'shield half lion 1',
+    athletico: 'shield h spiral 0',
+    cruzeiro: 'circle solid cross 4',
+    vasco: 'shield solid cross 0',
+    bragantino: 'shield h bull 0',
+    juventude: 'shield v leaf 1',
+    atleticogo: 'shield v dragon 0',
+    criciuma: 'hex h diamond 0',
+    vitoria: 'shield v none 0',
+    cuiaba: 'shield solid sun 0',
+    santos: 'shield v fish 0',
+    sport: 'shield h lion 1',
+    ceara: 'shield v wave 0',
+    goias: 'circle solid sun 0',
+    coritiba: 'shield h none 0',
+    avai: 'shield h lion 0',
+    ponte: 'shield v bridge 0',
+    guarani: 'shield solid leaf 0',
+    americamg: 'shield v rabbit 0',
+    chapecoense: 'shield solid bird 0',
+    crb: 'shield h tower 0',
+    nautico: 'circle v anchor 0',
+    operario: 'hex solid wheel 0',
+    novorizontino: 'shield solid sun 0',
+    vilanova: 'shield v none 0',
+    paysandu: 'shield v ship 2',
+    botafogosp: 'oval solid star 1',
+    amazonas: 'shield h wave 0',
+    athletic: 'shield v none 0',
+    londrina: 'shield solid tower 0',
+    figueirense: 'oval v leaf 0',
+    joinville: 'shield h ship 0',
+    csa: 'circle solid tower 1',
+    santacruz: 'shield h snake 0',
+    remo: 'shield solid lion 1',
+    sampaio: 'shield thirds none 0 #ffd100 #006437 #c52626',
+    confianca: 'shield solid heart 0',
+    botafogopb: 'shield solid star 1',
+    ferroviario: 'hex solid wheel 0',
+    saobernardo: 'shield solid tower 0',
+    ypiranga: 'shield solid flame 0',
+    tombense: 'shield v none 0',
+    voltaredonda: 'circle solid wheel 0',
+    ituano: 'shield solid key 0',
+    abc: 'oval v none 0',
+    americarn: 'circle h none 0',
+    brasilpel: 'shield solid wave 0',
+    portuguesa: 'shield thirds cross 0 #c52626 #ffffff #006437',
+    caxias: 'shield v mountain 0',
+    floresta: 'circle solid leaf 0',
+    retro: 'oval h none 0',
+    maranhao: 'shield solid moon 0',
+    jacuipense: 'shield solid leaf 0',
+    saoraimundo: 'shield solid cross 0',
+    brasiliense: 'shield solid sun 0',
+    gama: 'circle solid none 0',
+    capital: 'pent solid tower 0',
+    tunaluso: 'shield solid fish 0',
+    riobrancoes: 'shield solid wave 0',
+    serra: 'shield solid mountain 0',
+    desportiva: 'oval solid none 0',
+    realnoroeste: 'shield solid crown 0',
+    noviguacu: 'shield solid flame 0',
+    audax: 'hex solid arrow 0',
+    saobento: 'shield solid cross 0',
+    riobrancoac: 'shield solid wave 0',
+    humaita: 'shield solid mountain 0',
+    altos: 'shield solid mountain 0',
+    sousa: 'shield solid crown 0',
+    anapolis: 'circle solid sun 0',
+    benfica: 'shield solid eagle 1',
+    porto: 'circle solid dragon 0',
+    ajax: 'shield v none 0',
+    sevilla: 'oval v tower 0',
+    lyon: 'shield solid lion 0',
+    bruges: 'shield solid crown 0',
+    celtic: 'circle hoop none 0',
+    rangers: 'shield solid lion 0',
+    feyenoord: 'shield half none 0',
+    galatasaray: 'circle half lion 1',
+    bra: 'diamond solid none 5',
+    arg: 'shield v sun 3 #ffffff',
+    fra: 'shield v rooster 0 #ffffff',
+    ger: 'shield thirds eagle 0 #111111 #dd0000 #ffce00',
+    esp: 'shield thirds crown 0 #c52626 #ffd100 #c52626',
+    eng: 'shield solid lion 3'
+  };
+
+  let seq = 0;
+  function parse(s) {
+    const p = (s || 'shield solid none 0').split(/\s+/);
+    const rest = p.slice(4).filter(x => x.charAt(0) === '#');
+    return {
+      sh: p[0], pat: p[1], sym: p[2] === 'none' ? '' : p[2], stars: +p[3] || 0,
+      c3: rest.length === 1 ? rest[0] : '',
+      cols: rest.length >= 3 ? rest.slice(0, 3) : null
+    };
+  }
+  function hash(id) {
+    let h = 0;
+    for (let i = 0; i < id.length; i++) h = (h * 33 + id.charCodeAt(i)) >>> 0;
+    const sh = ['shield', 'circle', 'oval', 'hex', 'pent'][h % 5];
+    const pat = ['solid', 'h', 'v', 'sash'][(h >> 3) % 4];
+    const sym = ['star', 'leaf', 'wave', 'tower', 'sun', 'flame'][(h >> 6) % 6];
+    return { sh, pat, sym, stars: h % 2, c3: '', cols: null };
+  }
+  function specOf(id) { return RAW[id] ? parse(RAW[id]) : hash(id || '?'); }
+
+  function shape(sh) {
+    if (sh === 'circle') return 'M40 22 a20 20 0 1 0 .1 0 Z';
+    if (sh === 'oval') return 'M40 16 C54 16 62 28 62 46 C62 68 52 78 40 78 C28 78 18 68 18 46 C18 28 26 16 40 16 Z';
+    if (sh === 'hex') return 'M40 16 L60 28 V58 L40 74 L20 58 V28 Z';
+    if (sh === 'delta') return 'M40 14 L66 76 H14 Z';
+    if (sh === 'pent') return 'M40 14 L64 32 L56 74 H24 L16 32 Z';
+    if (sh === 'diamond') return 'M40 14 L64 46 L40 78 L16 46 Z';
+    return 'M40 14 L62 26 V48 C62 66 50 76 40 80 C30 76 18 66 18 48 V26 Z';
+  }
+  function symbol(name, fill) {
+    const s = {
+      star: `<polygon points="0,-11 2.8,-3.2 11,-3.2 4.4,1.4 6.6,9.2 0,4.6 -6.6,9.2 -4.4,1.4 -11,-3.2 -2.8,-3.2" fill="${fill}"/>`,
+      flame: `<path d="M0 10 C-7 4 -6 -2 -1 -8 C0 -2 3 0 1 -5 C7 0 7 6 0 10Z" fill="${fill}"/>`,
+      palm: `<path d="M0 10 V-1 M0 -1 C-8 -2 -9 -9 -2 -7 M0 -1 C8 -2 9 -9 2 -7 M0 -1 C-2 -9 4 -10 0 -4 M-3 10 H3" fill="none" stroke="${fill}" stroke-width="2.2" stroke-linecap="round"/>`,
+      rooster: `<path d="M-6 6 C-9 0 -4 -5 1 -3 C2 -8 8 -7 5 -2 C10 0 8 6 1 7 Z M1 -3 L4 -9 L6 -3" fill="${fill}"/>`,
+      cross: `<path d="M-3 -11 H3 V-3 H11 V3 H3 V11 H-3 V3 H-11 V-3 H-3 Z" fill="${fill}"/>`,
+      wave: `<path d="M-11 1 Q-6 -5 -1 1 T9 1" fill="none" stroke="${fill}" stroke-width="2.6" stroke-linecap="round"/>`,
+      anchor: `<circle cx="0" cy="-7" r="2.2" fill="none" stroke="${fill}" stroke-width="2"/><path d="M0 -5 V7 M-6 7 Q0 13 6 7 M-3.2 -7 H3.2" fill="none" stroke="${fill}" stroke-width="2.2" stroke-linecap="round"/>`,
+      lion: `<circle cx="0" cy="2" r="5.2" fill="${fill}"/><path d="M-7 0 Q-9 -8 -2 -5 M7 0 Q9 -8 2 -5 M-3 -2 H3 M-2 5 H2" fill="none" stroke="${fill}" stroke-width="1.7" stroke-linecap="round"/>`,
+      tower: `<path d="M-7 9 V-1 H-9 V-6 H-4 V-1 H4 V-6 H9 V-1 H7 V9 Z" fill="${fill}"/>`,
+      sun: `<circle cx="0" cy="0" r="4.2" fill="${fill}"/><path d="M0 -9 V-6.2 M0 6.2 V9 M-9 0 H-6.2 M6.2 0 H9 M-6.4 -6.4 L-4.4 -4.4 M6.4 -6.4 L4.4 -4.4 M-6.4 6.4 L-4.4 4.4 M6.4 6.4 L4.4 4.4" stroke="${fill}" stroke-width="1.7" stroke-linecap="round"/>`,
+      crown: `<path d="M-9 5 L-9 -2 L-4 2 L0 -7 L4 2 L9 -2 L9 5 Z" fill="${fill}"/>`,
+      leaf: `<path d="M0 9 C-9 2 -7 -7 0 -9 C7 -7 9 2 0 9 M0 7 V-5" fill="${fill}"/>`,
+      mountain: `<path d="M-11 8 L-3 -7 L2 1 L6 -4 L11 8 Z" fill="${fill}"/>`,
+      wheel: `<circle cx="0" cy="0" r="7.5" fill="none" stroke="${fill}" stroke-width="2"/><path d="M0 -7.5 V7.5 M-7.5 0 H7.5 M-5 -5 L5 5 M5 -5 L-5 5" stroke="${fill}" stroke-width="1.4"/>`,
+      ship: `<path d="M-9 3 H9 L6 8 H-6 Z M0 3 V-7 L8 2" fill="${fill}"/>`,
+      diamond: `<path d="M0 -8 L7 0 L0 8 L-7 0 Z" fill="${fill}"/>`,
+      arrow: `<path d="M-9 2 H5 L1 -3 M5 2 L1 7" fill="none" stroke="${fill}" stroke-width="2.3" stroke-linecap="round"/>`,
+      fish: `<path d="M-9 0 Q0 -7 7 0 Q0 7 -9 0 Z M7 0 L11 -4 V4 Z M-2 -1.2 H1" fill="${fill}"/>`,
+      heart: `<path d="M0 7 C-9 -2 -4 -9 0 -4 C4 -9 9 -2 0 7Z" fill="${fill}"/>`,
+      key: `<circle cx="-3" cy="-2" r="4" fill="none" stroke="${fill}" stroke-width="2"/><path d="M0.5 1 L8 8 M5.5 8 H8 V5.5" stroke="${fill}" stroke-width="2" stroke-linecap="round"/>`,
+      moon: `<path d="M3 -8 A8 8 0 1 0 3 8 A5.5 5.5 0 1 1 3 -8Z" fill="${fill}"/>`,
+      spiral: `<path d="M0 0 A2 2 0 1 1 -1.2 1.4 A4.2 4.2 0 1 0 3.4 -2.2 A6.2 6.2 0 1 1 -4 3" fill="none" stroke="${fill}" stroke-width="2" stroke-linecap="round"/>`,
+      bird: `<path d="M-9 3 Q-2 -7 7 -2 L2 2 L9 5 L0 4 Z" fill="${fill}"/>`,
+      dragon: `<path d="M-9 5 Q-2 -7 5 -2 Q9 1 6 5 Q1 2 -2 7 Z M5 -2 L8 -6 L6 0" fill="${fill}"/>`,
+      eagle: `<path d="M-11 2 Q-3 -9 0 -2 Q3 -9 11 2 Q3 0 0 5 Q-3 0 -11 2Z" fill="${fill}"/>`,
+      bridge: `<path d="M-10 5 V-2 Q0 -9 10 -2 V5 M-10 5 H10 M-4 5 V1 M4 5 V1" fill="none" stroke="${fill}" stroke-width="2.2" stroke-linecap="round"/>`,
+      bull: `<path d="M-8 2 Q-10 -6 -4 -2 L-2 -6 H2 L4 -2 Q10 -6 8 2 Q4 8 0 8 Q-4 8 -8 2Z" fill="${fill}"/>`,
+      rabbit: `<ellipse cx="0" cy="2" rx="5" ry="6" fill="${fill}"/><path d="M-3 -2 L-5 -10 L-1 -3 M3 -2 L5 -10 L1 -3" fill="${fill}"/>`,
+      snake: `<path d="M-10 4 Q-4 -4 0 2 T10 -2" fill="none" stroke="${fill}" stroke-width="2.4" stroke-linecap="round"/><circle cx="9" cy="-2" r="1.3" fill="${fill}"/>`,
+      horse: `<path d="M-6 7 L-4 -2 L0 -7 L3 -2 L7 2 L2 7 Z" fill="${fill}"/>`
+    };
+    return s[name] || '';
+  }
+  function stars(n, y) {
+    if (!n) return '';
+    const gap = n > 4 ? 8 : 10;
+    const w = (n - 1) * gap;
+    let o = '';
+    for (let i = 0; i < n; i++) {
+      const x = 40 - w / 2 + i * gap;
+      o += `<polygon points="${x},${y} ${x + 1.5},${y + 2.4} ${x + 4},${y + 2.6} ${x + 2},${y + 4.3} ${x + 2.6},${y + 7} ${x},${y + 5.4} ${x - 2.6},${y + 7} ${x - 2},${y + 4.3} ${x - 4},${y + 2.6} ${x - 1.5},${y + 2.4}" fill="#ffd76a" stroke="#8a5a00" stroke-width=".4"/>`;
+    }
+    return o;
+  }
+  function bands(spec, c1, c2, c3) {
+    const a = c1, b = c2, d = c3 || '#ffffff';
+    if (spec.pat === 'h' || spec.pat === 'hoop') {
+      const n = spec.pat === 'hoop' ? 8 : 6, h = 70 / n;
+      let o = '';
+      for (let i = 0; i < n; i++) o += `<rect x="8" y="${12 + i * h}" width="64" height="${h + 0.8}" fill="${i % 2 ? b : a}"/>`;
+      return o;
+    }
+    if (spec.pat === 'v') {
+      const cols = spec.c3 || spec.cols ? [a, d, b] : [a, b, a, b, a];
+      const w = 64 / cols.length;
+      return cols.map((c, i) => `<rect x="${8 + i * w}" y="12" width="${w + 0.8}" height="72" fill="${c}"/>`).join('');
+    }
+    if (spec.pat === 'thirds') {
+      return [a, d, b].map((c, i) => `<rect x="8" y="${12 + i * 24}" width="64" height="25" fill="${c}"/>`).join('');
+    }
+    if (spec.pat === 'sash') return `<rect x="8" y="12" width="64" height="72" fill="${a}"/><polygon points="8,12 36,12 8,52" fill="${b}"/><polygon points="72,84 44,84 72,44" fill="${b}"/>`;
+    if (spec.pat === 'half') return `<rect x="8" y="12" width="32" height="72" fill="${a}"/><rect x="40" y="12" width="32" height="72" fill="${b}"/>`;
+    return `<rect x="6" y="10" width="68" height="76" fill="${a}"/>`;
+  }
+
+  function badge(club, cls) {
+    const id = (club && club.id) || 'x';
+    const sp = specOf(id);
+    let c1 = (club && club.c1) || '#145c32';
+    let c2 = (club && club.c2) || '#ffffff';
+    if (sp.cols) { c1 = sp.cols[0]; c2 = sp.cols[2]; }
+    const c3 = sp.cols ? sp.cols[1] : sp.c3;
+    const init = String((club && club.curto) || '?').replace(/[^A-Za-z0-9]/g, '').slice(0, 3).toUpperCase();
+    const clip = 'bd' + (++seq) + id.replace(/[^a-z0-9]/gi, '');
+    const small = cls === 'sm';
+    const symFill = sp.pat === 'solid' ? (c2 === c1 ? '#ffffff' : c2) : '#ffffff';
+    const big = { star: 1.55, cross: 1.35, eagle: 1.15, lion: 1.05, rooster: 1.08, palm: 1.12, fish: 1.15 };
+    const sc = big[sp.sym] || 1;
+    const sym = sp.sym ? symbol(sp.sym, symFill) : '';
+    const name = (club && club.nome) || init;
+    if (small) {
+      return `<svg class="badge sm" viewBox="0 0 64 76" role="img" aria-label="${name}">
+        ${stars(Math.min(sp.stars, 5), 2)}
+        <defs><clipPath id="${clip}"><path d="${shape(sp.sh)}"/></clipPath></defs>
+        <g clip-path="url(#${clip})">${bands(sp, c1, c2, c3)}</g>
+        <path d="${shape(sp.sh)}" fill="none" stroke="${c2}" stroke-width="2.4"/>
+        <path d="${shape(sp.sh)}" fill="none" stroke="rgba(0,0,0,.45)" stroke-width="1"/>
+        ${sym ? `<g transform="translate(40 40) scale(.72)">${sym}</g>` : ''}
+        <text x="40" y="66" text-anchor="middle" font-size="${init.length > 2 ? 11 : 14}" font-family="Arial Black,Impact,sans-serif" fill="#fff" stroke="#111" stroke-width="1.6" paint-order="stroke">${init}</text>
+      </svg>`;
+    }
+    const ySym = sp.stars ? 40 : 42;
+    return `<svg class="badge" viewBox="0 0 80 92" role="img" aria-label="${name}">
+      ${stars(Math.min(sp.stars, 5), 2)}
+      <defs><clipPath id="${clip}"><path d="${shape(sp.sh)}"/></clipPath></defs>
+      <g clip-path="url(#${clip})">${bands(sp, c1, c2, c3)}<path d="${shape(sp.sh)}" fill="rgba(255,255,255,.08)"/></g>
+      <path d="${shape(sp.sh)}" fill="none" stroke="#f4e4b0" stroke-width="2.2"/>
+      <path d="${shape(sp.sh)}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1"/>
+      ${sym ? `<g transform="translate(40 ${ySym}) scale(${sc})">${sp.pat === 'solid' ? '' : '<circle r="12" fill="rgba(0,0,0,.28)"/>'}${sym}</g>` : ''}
+      <g>
+        <rect x="18" y="62" width="44" height="14" rx="3" fill="rgba(0,0,0,.55)"/>
+        <text x="40" y="73" text-anchor="middle" font-size="${init.length > 2 ? 11 : 13}" font-family="Arial Black,Impact,sans-serif" fill="#fff">${init}</text>
+      </g>
+    </svg>`;
+  }
+
+  const api = { badge, specOf, RAW };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.FFBadges = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
 <script>/* Fominha FC · Modo Carreira. Simulação determinística por semente. */
 (function (root) {
   const E = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.FFEngine;
+  const Badges = (typeof module !== 'undefined' && module.exports) ? require('./badges.js') : root.FFBadges;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const avg = a => a.reduce((s, x) => s + x, 0) / (a.length || 1);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -3508,7 +3892,103 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     const line = (tag ? tag + ' · ' : '') + k + ' ' + gf + ' a ' + ga + ' contra ' + clubOf(foe).nome;
     c.feed.unshift(line); if (c.feed.length > 6) c.feed.pop();
     noteForm(c, gf, ga);
+    buildReport(c, foe, gf, ga, tag);
     return line;
+  }
+  function scriptPens(rng, ourWin, c) {
+    const xi = bestXI(c.squad).filter(p => p.pos !== 'GOL');
+    const gk = (bestXI(c.squad).find(p => p.pos === 'GOL') || {}).nome || 'Goleiro';
+    const kicks = [];
+    let us = 0, them = 0;
+    const take = (side, i, ok) => {
+      const nome = side === 0 ? (xi[i % Math.max(1, xi.length)] || { nome: 'Titular' }).nome : person(rng);
+      if (ok) { if (side === 0) us++; else them++; }
+      kicks.push({ side, nome, ok, keeper: side === 0 ? 'Goleiro rival' : gk });
+    };
+    for (let i = 0; i < 5; i++) {
+      let ok0 = rng.chance(0.74);
+      let ok1 = rng.chance(0.68);
+      if (i === 4) {
+        const u = us + (ok0 ? 1 : 0);
+        if (ourWin && u <= them) ok0 = true;
+        if (!ourWin && us >= them + (ok1 ? 1 : 0)) ok0 = false;
+        const u2 = us + (ok0 ? 1 : 0);
+        if (ourWin && u2 <= them) ok1 = false;
+        if (!ourWin && them < u2) ok1 = true;
+        if (!ourWin && them + (ok1 ? 1 : 0) === u2) ok1 = true;
+      }
+      take(0, i, ok0);
+      if (i >= 4 && us > them && ourWin && us > them + 1) return kicks;
+      take(1, i, ok1);
+      if (i >= 4 && us !== them && (us > them) === !!ourWin) return kicks;
+    }
+    if (us === them || (us > them) !== !!ourWin) {
+      if (ourWin) { take(0, 5, true); take(1, 5, false); }
+      else { take(0, 5, false); take(1, 5, true); }
+    }
+    return kicks;
+  }
+  function buildReport(c, foeId, gf, ga, tag) {
+    const rng = R(c.seed, 'relato', c.year, String(c.round), foeId, gf, ga, tag || '');
+    const xi = bestXI(c.squad);
+    const pool = xi.filter(p => p.pos === 'ATA' || p.pos === 'MEI');
+    const atk = pool.length ? pool : xi;
+    const used = {};
+    const minute = () => {
+      let m = rng.int(1, 90), g = 0;
+      while (used[m] && g++ < 30) m = rng.int(1, 90);
+      used[m] = 1;
+      return m;
+    };
+    const goals = [];
+    const add = (n, side) => {
+      for (let i = 0; i < n; i++) {
+        const nome = side === 0 ? atk[rng.int(0, atk.length - 1)].nome : person(rng);
+        let assist = '';
+        if (rng.chance(0.62)) {
+          assist = side === 0 ? atk[rng.int(0, atk.length - 1)].nome : person(rng);
+          if (assist === nome) assist = '';
+        }
+        goals.push({ min: minute(), side, nome, assist });
+      }
+    };
+    add(gf, 0); add(ga, 1);
+    goals.sort((a, b) => a.min - b.min);
+    const cards = [];
+    const yc = rng.int(1, 4);
+    for (let i = 0; i < yc; i++) {
+      cards.push({ min: minute(), cor: 'amarelo', nome: rng.chance(0.55) ? xi[rng.int(0, xi.length - 1)].nome : person(rng) });
+    }
+    if (rng.chance(0.12)) cards.push({ min: minute(), cor: 'vermelho', nome: xi[rng.int(0, xi.length - 1)].nome });
+    const poss = clamp(50 + (gf - ga) * 4 + rng.int(-4, 4), 36, 68);
+    const shots = [gf + rng.int(2, 7), ga + rng.int(2, 6)];
+    const on = [clamp(gf + rng.int(0, 3), gf, shots[0]), clamp(ga + rng.int(0, 3), ga, shots[1])];
+    const motm = (gf >= ga ? atk[0] : { nome: person(rng) }).nome;
+    const ratings = xi.map(p => ({
+      nome: p.nome, pos: p.pos,
+      nota: Math.round(clamp(6.1 + (p.nome === motm ? 1.5 : 0) + (gf - ga) * 0.18 + rng.next() * 1.5, 5.1, 9.6) * 10) / 10
+    }));
+    const timeline = goals.map(g => ({ min: g.min, t: 'Gol de ' + g.nome + (g.assist ? ', assistência de ' + g.assist : '') }));
+    cards.forEach(cd => timeline.push({ min: cd.min, t: (cd.cor === 'vermelho' ? 'Vermelho' : 'Amarelo') + ' para ' + cd.nome }));
+    timeline.sort((a, b) => a.min - b.min);
+    const epic = gf + ga >= 3 && rng.chance(0.4) ? rng.pick(['bicicleta', 'cobertura', 'gol de placa', 'cavadinha']) : '';
+    let pens = null;
+    if (c._wasPens) {
+      pens = scriptPens(R(c.seed, 'penshow', c.year, String(c.round), foeId, tag || ''), gf > ga, c);
+      c._wasPens = false;
+    }
+    c.report = { foeId, gf, ga, tag: tag || '', goals, cards, poss, shots, on, motm, ratings, timeline, epic, pens, year: c.year };
+  }
+  function peekPens(c) {
+    const kind = c && (c._liveKind === 'lib' ? 'lib' : c._liveKind === 'copa' ? 'copa' : '');
+    if (!kind) return null;
+    const idx = kind === 'copa' ? c.copaRound : c.libRound;
+    const rng = R(c.seed, kind, 'pen', c.year, idx);
+    const ourWin = rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 220);
+    const kicks = scriptPens(R(c.seed, kind, 'penshow', c.year, idx), ourWin, c);
+    let us = 0, them = 0;
+    kicks.forEach(k => { if (k.ok) { if (k.side === 0) us++; else them++; } });
+    return { ourWin, kicks, score: [us, them] };
   }
   function simPair(c, div, h, a, key) {
     const rng = R(c.seed, 'j', c.year, div, c.round, h, a, key || 0);
@@ -3590,9 +4070,10 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       const sc = playGame(h, a, rng);
       gf = foe.home ? sc[0] : sc[1];
       ga = foe.home ? sc[1] : sc[0];
-      if (gf === ga) { if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 200)) gf++; else ga++; }
+      if (gf === ga) { c._wasPens = true; if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 200)) gf++; else ga++; }
     }
     if (gf === ga) {
+      c._wasPens = true;
       const rng = R(c.seed, kind, 'pen', c.year, idx);
       if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 220)) gf++; else ga++;
       c.feed.unshift('Decidido nos pênaltis.');
@@ -4048,35 +4529,100 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     c.timeline.push({ y: c.year + 1, t: 'Voltou ao ' + clubOf(c.clubId).nome + '.' });
   }
   const DECS = [
-    { id: 'base', t: 'A base pede passagem', d: 'O coordenador quer saber onde vai o pouco dinheiro.', opts: [
+    { id: 'base', art: 'base', t: 'A base pede passagem', d: 'O coordenador quer saber onde vai o pouco dinheiro.', opts: [
       { tx: 'Treinar a garotada', tag: 'g', train: BAL.goodTrain, budget: -6, fans: 3, trust: 2 },
       { tx: 'Meio-termo', tag: 'm', train: BAL.midTrain, budget: 2, trust: 1 },
       { tx: 'Medalhão emergencial', tag: 'b', train: 4, budget: -16, trust: -3, fans: 2 }
     ] },
-    { id: 'grupo', t: 'Clima no vestiário', d: 'O elenco discutiu depois do último resultado.', opts: [
+    { id: 'grupo', art: 'vestiario', t: 'Clima no vestiário', d: 'O elenco discutiu depois do último resultado.', opts: [
       { tx: 'Blindar o capitão', tag: 'g', trust: 5, fans: 2, train: 4 },
       { tx: 'Deixar quieto', tag: 'm', trust: 1 },
       { tx: 'Lavar roupa suja', tag: 'b', trust: -8, fans: 3, rep: 1 }
     ] },
-    { id: 'imprensa', t: 'Coletiva quente', d: 'Perguntam se a diretoria atrapalha.', opts: [
+    { id: 'imprensa', art: 'polemica', t: 'Coletiva quente', d: 'Perguntam se a diretoria atrapalha.', opts: [
       { tx: 'Responder com calma', tag: 'g', trust: 3, fans: 2, train: 4 },
       { tx: 'Desconversar', tag: 'm', trust: 0 },
       { tx: 'Cobrar a diretoria', tag: 'b', trust: -6, rep: 3 }
     ] },
-    { id: 'estilo', t: 'Semana de treino', d: 'Dá para afiar o que o seu técnico já faz melhor.', opts: [
+    { id: 'estilo', art: 'treino', t: 'Semana de treino', d: 'Dá para afiar o que o seu técnico já faz melhor.', opts: [
       { tx: 'Insistir no ponto forte', tag: 'g', focus: 1, train: 8 },
       { tx: 'Treino leve', tag: 'm', train: 2 },
       { tx: 'Mudar a filosofia', tag: 'b', focus: -1, low: 1, trust: -2 }
     ] },
-    { id: 'elenco', t: 'Proposta por um titular', d: 'Querem o seu melhor jogador. O caixa agradece, a torcida nem tanto.', opts: [
+    { id: 'elenco', art: 'proposta', t: 'Proposta por um titular', d: 'Querem o seu melhor jogador. O caixa agradece, a torcida nem tanto.', opts: [
       { tx: 'Renovar com o líder', tag: 'g', fans: 4, trust: 2, budget: -4, train: 6 },
       { tx: 'Segurar e pronto', tag: 'm', trust: 1 },
       { tx: 'Vender agora', tag: 'b', sell: 1, budget: 16, fans: -8, trust: -2 }
     ] },
-    { id: 'torcida', t: 'Arquibancada', d: 'A torcida cobrou o time na saída do estádio.', opts: [
+    { id: 'torcida', art: 'festa', t: 'Arquibancada', d: 'A torcida cobrou o time na saída do estádio.', opts: [
       { tx: 'Abrir um treino', tag: 'g', fans: 6, budget: -3, trust: 1, train: 6 },
       { tx: 'Nota oficial', tag: 'm', fans: 1 },
       { tx: 'Ignorar o barulho', tag: 'b', fans: -7, trust: -3 }
+    ] },
+    { id: 'lesao', art: 'lesao', t: 'Lesão no meio da semana', d: 'O titular sente a coxa no treino. O departamento médico espera uma resposta.', opts: [
+      { tx: 'Dosar a minutagem', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Jogar com dor', tag: 'm', fans: 2, trust: -1 },
+      { tx: 'Esconder do departamento', tag: 'b', trust: -6, fans: -2 }
+    ] },
+    { id: 'crise', art: 'crise', t: 'O craque quer sair', d: 'O camisa 10 pede para ouvir propostas. O vestiário já sabe.', opts: [
+      { tx: 'Ouvir e renovar', tag: 'g', train: 4, fans: 3, trust: 2, budget: -4 },
+      { tx: 'Prometer sem assinar', tag: 'm', trust: 1 },
+      { tx: 'Colocar no banco', tag: 'b', fans: -6, trust: -4, sell: 1 }
+    ] },
+    { id: 'vestiario', art: 'vestiario', t: 'Briga no vestiário', d: 'Dois titulares quase saíram no tapa depois do apito.', opts: [
+      { tx: 'Reunir o grupo', tag: 'g', train: 4, trust: 3, fans: 1 },
+      { tx: 'Multar os dois', tag: 'm', trust: 1, fans: -1 },
+      { tx: 'Escolher um lado', tag: 'b', trust: -7, fans: -3 }
+    ] },
+    { id: 'polemica', art: 'polemica', t: 'Polêmica na imprensa', d: 'Um áudio vazou. A coletiva de amanhã já está lotada.', opts: [
+      { tx: 'Falar com calma', tag: 'g', train: 4, trust: 2, rep: 1 },
+      { tx: 'Nota curta', tag: 'm', trust: 0 },
+      { tx: 'Atacar o repórter', tag: 'b', rep: 2, trust: -6, fans: -2 }
+    ] },
+    { id: 'protesto', art: 'protesto', t: 'Protesto na porta', d: 'Faixas e fumacê na saída do treino. A torcida quer uma resposta hoje.', opts: [
+      { tx: 'Ir até a grade', tag: 'g', train: 4, fans: 6, trust: 1 },
+      { tx: 'Mandar o capitão', tag: 'm', fans: 2 },
+      { tx: 'Sair pelo fundo', tag: 'b', fans: -8, trust: -3 }
+    ] },
+    { id: 'festa', art: 'festa', t: 'Festa fora de hora', d: 'O elenco comemorou demais numa terça. A foto já circula.', opts: [
+      { tx: 'Cobrar em campo', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Deixar passar', tag: 'm', fans: 1 },
+      { tx: 'Punir em público', tag: 'b', trust: -4, fans: 2 }
+    ] },
+    { id: 'ultimato', art: 'ultimato', t: 'Ultimato da diretoria', d: 'O presidente quer três vitórias ou o banco é discutido de novo.', opts: [
+      { tx: 'Assumir a meta', tag: 'g', train: 4, trust: 4, fans: 1 },
+      { tx: 'Pedir paciência', tag: 'm', trust: 1 },
+      { tx: 'Devolver a pressão', tag: 'b', trust: -8, rep: 2 }
+    ] },
+    { id: 'joia', art: 'joia', t: 'Joia da base', d: 'Um garoto de 17 destruiu o treino tático. A torcida ainda não viu.', opts: [
+      { tx: 'Colocar no banco', tag: 'g', train: 4, fans: 3, trust: 1 },
+      { tx: 'Esperar o próximo ano', tag: 'm', train: 2 },
+      { tx: 'Emprestar agora', tag: 'b', budget: 8, fans: -4, trust: -2 }
+    ] },
+    { id: 'provocacao', art: 'provocacao', t: 'Provocação do rival', d: 'O técnico do clássico disse que o seu time “joga com medo”.', opts: [
+      { tx: 'Responder no jogo', tag: 'g', train: 4, fans: 3, trust: 1 },
+      { tx: 'Ignorar o microfone', tag: 'm', trust: 1 },
+      { tx: 'Marcar entrevista', tag: 'b', fans: 2, trust: -4, rep: 1 }
+    ] },
+    { id: 'proposta_craque', art: 'proposta', t: 'Proposta pelo craque', d: 'Chegou uma oferta alta. O empresário já está no clube.', opts: [
+      { tx: 'Segurar o líder', tag: 'g', train: 4, fans: 4, budget: -4, trust: 2 },
+      { tx: 'Pedir mais', tag: 'm', budget: 4, fans: -1 },
+      { tx: 'Vender hoje', tag: 'b', sell: 1, budget: 18, fans: -8, trust: -2 }
+    ] },
+    { id: 'classico', art: 'classico', t: 'Semana de clássico', d: 'A cidade só fala do jogo. O treino de quinta vai lotar.', opts: [
+      { tx: 'Treino tático fechado', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Coletiva leve', tag: 'm', fans: 1 },
+      { tx: 'Prometer goleada', tag: 'b', fans: 3, trust: -3 }
+    ] },
+    { id: 'caixa', art: 'caixa', t: 'Caixa no vermelho', d: 'A folha atrasou dois dias. O capitão veio perguntar o que acontece.', opts: [
+      { tx: 'Cortar o que é extra', tag: 'g', train: 4, budget: 6, trust: 2 },
+      { tx: 'Segurar o salário', tag: 'm', budget: 4, trust: -2 },
+      { tx: 'Prometer o que não tem', tag: 'b', trust: -6, fans: -2 }
+    ] },
+    { id: 'patrocinio', art: 'patrocinio', t: 'Oferta de patrocínio', d: 'Uma marca quer a camisa. Pede o nome do técnico no comercial.', opts: [
+      { tx: 'Fechar e reforçar a base', tag: 'g', train: 4, budget: 10, fans: 1, trust: 2 },
+      { tx: 'Assinar sem aparecer', tag: 'm', budget: 4 },
+      { tx: 'Recusar por orgulho', tag: 'b', fans: 2, budget: -2, trust: -2 }
     ] }
   ];
   function makeDecision(c, slot) {
@@ -4085,7 +4631,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     let pick = DECS[r.int(0, DECS.length - 1)];
     for (let i = 0; i < 6 && used.indexOf(pick.id) >= 0; i++) pick = DECS[r.int(0, DECS.length - 1)];
     c._usedDec = used.concat(pick.id);
-    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot };
+    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot, art: pick.art || 'base' };
   }
   function applyOpt(c, opt) {
     if (!opt) return;
@@ -4284,6 +4830,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       relics: [], fichas: 0, stage: ko ? 3 : 0, history: new Array(Math.max(1, c.round)).fill(0).map(() => ({})),
       opponents: [{ nome: foe.nome, flag: '🏳️', baseStr: Math.round(oppStr), jit: { atk: 0, mid: 0, def: 0, gk: 0 }, scorers: npc.scorers, scorerW: npc.scorerW, gk: npc.gk }],
       careerOpp: opp, careerKo: ko, careerHome: home, careerLabel: label,
+      careerClubId: c.clubId, careerFoeId: foeId,
       coach: c.coach, status: 'playing', nrgPenalty: c.age >= 58 ? 1 : 0,
       goalsBy: {}, goalTypes: {}, cardLv: {}, cardLog: {}, epics: [], careerMatch: true,
       groupPts: 0, totalGF: 0, totalGA: 0, rewardRerolls: 0, shopRerolls: 0
@@ -4316,13 +4863,13 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       if (c.phase !== 'season') return { screen: screenFor(c), msg };
       if (cupDue(c) && c.copaRound >= 3) return { screen: 'carHub', msg: msg || 'Semifinal ou final no caminho.', live: true };
       if (libDue(c) && c.libRound >= 2) return { screen: 'carHub', msg: msg || 'Jogo grande da Libertadores.', live: true };
-      if (cupDue(c)) { msg = simCupGame(c, 'copa'); if (!jump) return { screen: 'carHub', msg }; continue; }
-      if (libDue(c)) { msg = simCupGame(c, 'lib'); if (!jump) return { screen: 'carHub', msg }; continue; }
+      if (cupDue(c)) { msg = simCupGame(c, 'copa'); if (!jump) return afterSingle(c, msg); continue; }
+      if (libDue(c)) { msg = simCupGame(c, 'lib'); if (!jump) return afterSingle(c, msg); continue; }
       if (c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
       if (isKey(c)) return { screen: 'carHub', msg: msg || keyBlurb(c), live: true };
       msg = simLeagueRound(c);
       if (maybeMid(c)) return { screen: screenFor(c), msg };
-      if (!jump) return { screen: 'carHub', msg };
+      if (!jump) return afterSingle(c, msg);
     }
     return { screen: 'carHub', msg };
   }
@@ -4438,6 +4985,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
   }
   function badge(id, cls) {
     const cl = clubOf(id);
+    if (Badges && Badges.badge) return Badges.badge(cl, cls);
     const letter = (cl.curto || '?').slice(0, 1);
     return `<svg class="badge ${cls || ''}" viewBox="0 0 64 72" aria-hidden="true"><path d="M32 4 58 14 v22 c0 18-12 28-26 32C18 64 6 54 6 36 V14 Z" fill="${cl.c1}" stroke="${cl.c2}" stroke-width="3"/><text x="32" y="42" text-anchor="middle" font-size="20" font-family="Arial Black,sans-serif" fill="${cl.c2}">${esc(letter)}</text></svg>`;
   }
@@ -4450,7 +4998,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     return `<div class="ctable">${rows.slice(from, from + lim).map((r, i) => {
       const pos = from + i;
       const z = pos < 4 ? 'up' : pos >= rows.length - 4 ? 'dn' : '';
-      return `<div class="ctr ${r.id === me ? 'me' : ''} ${z}"><span>${pos + 1}</span><span>${esc(r.nome)}</span><b>${r.pts}</b><small>${r.j}</small><small>${r.gp - r.gc}</small></div>`;
+      return `<div class="ctr ${r.id === me ? 'me' : ''} ${z}"><span>${pos + 1}</span><span class="tn">${badge(r.id, 'sm')}${esc(r.nome)}</span><b>${r.pts}</b><small>${r.j}</small><small>${r.gp - r.gc}</small></div>`;
     }).join('')}</div>`;
   }
   function coachBlock(c) {
@@ -4479,7 +5027,8 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       <div class="cclub">${badge(c.clubId)}<div><div class="eyebrow">${esc(divLabel(c))} · temporada ${c.year}</div><h2 class="ttl" style="margin:0">${esc(me.nome)}</h2><p class="sub" style="margin:2px 0 0">${esc(c.nome)} · ${c.age} anos · rep ${c.rep}</p></div></div>
       ${meter('Confiança', c.trust, '#7dffb3')}${meter('Torcida', c.fans, '#ffc83d')}${meter('Caixa', Math.min(100, c.budget), '#3aa0ff')}
       <div class="panel cfix hl"><div class="eyebrow g">${live ? 'Jogo decisivo' : 'Próximo'}</div><div class="bigfix">${foe ? badge(foe, 'sm') : ''}<div><b>${foe ? esc(clubOf(foe).nome) : 'Fim da temporada'}</b><small>${live ? 'Você entra em campo' : 'A tabela anda sozinha'} · rodada ${Math.min(c.rounds, c.round + 1)}</small></div></div>
-        ${(c.feed || []).slice(0, 3).map(t => `<div class="feedline">${esc(t)}</div>`).join('')}</div>
+        ${(c.feed || []).slice(0, 3).map(t => `<div class="feedline">${esc(t)}</div>`).join('')}
+        ${c.report ? '<button class="chip" data-act="carReport">Ver relato</button>' : ''}</div>
       <div class="panel"><div class="ph">Perto de você <span class="r">${p.i + 1}º · ${p.row ? p.row.pts : 0} pts</span></div>
         <div class="ctr h"><span>#</span><span>Clube</span><b>P</b><small>J</small><small>SG</small></div>
         ${tableHtml(p.table, c.clubId, win, from)}
@@ -4504,12 +5053,59 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       </div>
       <div class="mctrl"><button class="btn gold shine" data-act="carStart" ${d.left !== 0 ? 'disabled' : ''}>Assinar e começar</button></div>`;
   }
+  function eventArt(id) {
+    const sky = `<rect width="320" height="128" fill="#102418"/><rect width="320" height="78" fill="#16344c"/><path d="M0 78 H320 V128 H0 Z" fill="#1a6b32"/>`;
+    const crowd = `<g fill="#0c2418">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<circle cx="${16 + i * 32}" cy="70" r="7"/>`).join('')}</g>`;
+    const man = (x, col) => `<g transform="translate(${x} 46)"><circle cx="0" cy="0" r="8" fill="#f0c9a0"/><path d="M-10 14 h20 l-4 36 h-12 z" fill="${col}"/><path d="M-8 50 h6 l-2 18 h-6 z M2 50 h6 l2 18 h-6 z" fill="#1c1c1c"/></g>`;
+    const scenes = {
+      lesao: sky + man(150, '#e8e8e8') + `<rect x="168" y="58" width="36" height="10" rx="3" fill="#f2f2f2"/><path d="M186 40 v28 M172 54 h28" stroke="#c52626" stroke-width="4"/>`,
+      crise: sky + man(120, '#c52626') + man(190, '#111') + `<path d="M138 40 q20 -16 36 0" fill="none" stroke="#ffd76a" stroke-width="3"/>`,
+      vestiario: sky + man(110, '#fff') + man(160, '#111') + man(210, '#0d80bf') + `<path d="M128 28 l8 10 M176 24 l-6 12" stroke="#ff5a5f" stroke-width="3"/>`,
+      polemica: sky + `<rect x="118" y="36" width="84" height="54" rx="8" fill="#1c1c1c"/><circle cx="160" cy="58" r="10" fill="#ff5a5f"/><rect x="132" y="74" width="56" height="6" rx="2" fill="#fff"/>`,
+      protesto: sky + crowd + `<rect x="70" y="34" width="70" height="28" rx="3" fill="#fff"/><rect x="180" y="30" width="78" height="28" rx="3" fill="#ffd76a"/>` + man(40, '#c52626'),
+      festa: sky + man(100, '#ffd100') + man(160, '#006437') + man(220, '#c52626') + `<circle cx="70" cy="30" r="4" fill="#ffd76a"/><circle cx="250" cy="24" r="4" fill="#fff"/><circle cx="200" cy="18" r="3" fill="#c6ff3d"/>`,
+      ultimato: sky + `<rect x="126" y="28" width="68" height="78" rx="6" fill="#2a2112"/><rect x="140" y="40" width="40" height="6" fill="#ffd76a"/><rect x="146" y="54" width="28" height="40" fill="#111"/>`,
+      joia: sky + man(168, '#c6ff3d') + `<polygon points="168,18 172,28 184,28 174,34 178,46 168,38 158,46 162,34 152,28 164,28" fill="#ffd76a"/>`,
+      provocacao: sky + man(90, '#111') + man(220, '#c52626') + `<path d="M110 40 H200" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`,
+      proposta: sky + `<rect x="118" y="48" width="84" height="48" rx="6" fill="#145c32"/><text x="160" y="78" text-anchor="middle" font-size="18" font-family="Arial Black,sans-serif" fill="#ffd76a">$</text>`,
+      classico: sky + crowd + man(70, '#111') + man(250, '#fff') + `<circle cx="160" cy="64" r="14" fill="#fff" stroke="#111" stroke-width="2"/>`,
+      caixa: sky + `<rect x="124" y="40" width="72" height="52" rx="4" fill="#3a2a12"/><rect x="140" y="58" width="40" height="22" fill="#111"/><path d="M124 40 h72" stroke="#ffd76a" stroke-width="4"/>`,
+      patrocinio: sky + `<rect x="40" y="36" width="240" height="46" rx="8" fill="#fff"/><rect x="54" y="48" width="70" height="22" fill="#c52626"/><rect x="136" y="48" width="70" height="22" fill="#006437"/>`,
+      treino: sky + man(120, '#0d80bf') + man(170, '#0d80bf') + man(220, '#0d80bf') + `<circle cx="70" cy="70" r="8" fill="#fff"/>`,
+      base: sky + man(150, '#7dffb3') + man(200, '#7dffb3') + `<circle cx="90" cy="36" r="16" fill="#ffd76a"/>`
+    };
+    const body = scenes[id] || scenes.base;
+    return `<svg class="evart" viewBox="0 0 320 128" aria-hidden="true">${body}</svg>`;
+  }
   function viewDec(c) {
     const d = c.decision;
     if (!d) return viewHub(c);
     return `<div class="topbar"><span class="chip">Temporada ${c.year}</span><span class="sp"></span><span class="chip">${esc(divLabel(c))}</span></div>
-      <div class="eyebrow g">Decisão</div><h2 class="ttl">${esc(d.t)}</h2><p class="sub">${esc(d.d)}</p>
+      <div class="eventcard">${eventArt(d.art)}<div class="eyebrow g">Decisão</div><h2 class="ttl">${esc(d.t)}</h2><p class="sub">${esc(d.d)}</p></div>
       ${d.opts.map((o, i) => `<button class="optbig" data-act="carOpt" data-i="${i}"><b>${esc(o.tx)}</b><small>${esc(optHint(o))}</small></button>`).join('')}`;
+  }
+  function viewReport(c) {
+    const r = c.report;
+    if (!r) return viewHub(c);
+    const foe = clubOf(r.foeId);
+    const me = clubOf(c.clubId);
+    const goals = (r.goals || []).map(g => `<div class="gl"><span class="m">${g.min}'</span><span><b>${esc(g.nome)}</b>${g.assist ? `<small> assistência ${esc(g.assist)}</small>` : ''}</span><i>${g.side === 0 ? esc(me.curto) : esc(foe.curto)}</i></div>`).join('');
+    const cards = (r.cards || []).map(cd => `<div class="gl"><span class="m">${cd.min}'</span><span class="cardpill ${cd.cor === 'vermelho' ? 'red' : 'yel'}"></span><span>${esc(cd.nome)}</span></div>`).join('');
+    const time = (r.timeline || []).map(ev => `<div class="tl"><b>${ev.min}'</b><span>${esc(ev.t)}</span></div>`).join('');
+    const rates = (r.ratings || []).map(p => `<div class="rate"><span>${esc(p.pos)}</span><b>${esc(p.nome)}</b><em>${p.nota.toFixed(1)}</em></div>`).join('');
+    const pensBtn = r.pens && r.pens.length ? '<button class="btn sec" data-act="carPens">Ver pênaltis</button>' : '';
+    return `<div class="topbar"><button class="chip" data-act="carBackHub">Hub</button><span class="sp"></span><span class="chip">Relato</span></div>
+      <div class="report">
+        <div class="rscore">${badge(c.clubId, 'sm')}<div><b>${r.gf} × ${r.ga}</b><small>${esc(r.tag || 'Partida')}</small></div>${badge(r.foeId, 'sm')}</div>
+        <p class="sub">${esc(me.nome)} e ${esc(foe.nome)} · temporada ${r.year}</p>
+        <div class="panel"><div class="ph">Gols</div>${goals || '<p class="xs mut">Sem gols.</p>'}</div>
+        <div class="panel"><div class="ph">Cartões</div>${cards || '<p class="xs mut">Nenhum cartão.</p>'}</div>
+        <div class="panel stats3"><div><b>${r.poss}%</b><span>Posse</span></div><div><b>${r.shots[0]}–${r.shots[1]}</b><span>Finalizações</span></div><div><b>${r.on[0]}–${r.on[1]}</b><span>No gol</span></div></div>
+        <div class="panel"><div class="ph">Momentos</div><div class="timeline">${time}</div>${r.epic ? `<p class="epicline">Lance para guardar: ${esc(r.epic)}.</p>` : ''}</div>
+        <div class="panel motm"><div class="eyebrow g">Craque do jogo</div><h3>${esc(r.motm)}</h3><div class="rates">${rates}</div></div>
+        ${pensBtn}
+      </div>
+      <div class="mctrl"><button class="btn gold shine" data-act="carReportOk">Continuar</button></div>`;
   }
   function optHint(o) {
     const bits = [];
@@ -4606,6 +5202,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       return `<div class="topbar"><button class="chip" data-act="carBackHub">Hub</button><span class="sp"></span><span class="chip">${esc(divLabel(c))}</span></div><h2 class="ttl">Tabela</h2><div class="ctr h"><span>#</span><span>Clube</span><b>P</b><small>J</small><small>SG</small></div>${tableHtml(p.table, c.clubId)}`;
     }
     if (screen === 'carDec') return viewDec(c);
+    if (screen === 'carReport') return viewReport(c);
     if (screen === 'carInbox') return viewInbox(c);
     if (screen === 'carMentor') return viewMentor(c);
     if (screen === 'carFim') return viewFim(c);
@@ -4623,14 +5220,22 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     return `Fominha FC · ${d.titulo}\n${d.nome} · ${d.seasons} temporadas\nLigas ${t.D + t.C + t.B + t.A} · Copa ${t.copa} · Liberta ${t.lib}\n${(d.mentors || []).slice(0, 2).join(' | ')}`;
   }
 
+  function afterSingle(c, msg) {
+    if (c.phase === 'season' && c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
+    if (c.phase === 'season' && c.report) return { screen: 'carReport', msg: '' };
+    return { screen: screenFor(c), msg };
+  }
   function skipLive(c) {
     let msg = '';
     if (cupDue(c) && c.copaRound >= 3) msg = simCupGame(c, 'copa');
     else if (libDue(c) && c.libRound >= 2) msg = simCupGame(c, 'lib');
     else msg = simLeagueRound(c);
     if (maybeMid(c)) return { screen: screenFor(c), msg };
-    if (c.phase === 'season' && c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
-    return { screen: screenFor(c), msg };
+    return afterSingle(c, msg);
+  }
+  function sampleDecision(id) {
+    const pick = DECS.filter(d => d.id === id)[0] || DECS[0];
+    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot: 'meio', art: pick.art || 'base' };
   }
   function demo(which) {
     if (which === 'criar') return { screen: 'carCriar', extra: draftNew('FOMINHA') };
@@ -4674,6 +5279,7 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     view, draftNew, badge, clubOf, persist, loadStore, saveStore, shareText,
     rollMentor, mentorStat, rankedStats, applyGrowth, mentorText, lockMentor,
     negotiate, acceptOffer, rejectOffer, closeInbox, chooseDecision, ackSummary, retire, skipLive, demo,
+    peekPens, sampleDecision, eventArt,
     squadStr, bestXI, trainXI, roundRobin, table, myPlace, offerFit, buildOffers,
     startClubs, freshWorld, fixture, isKey
   };
@@ -4896,7 +5502,7 @@ function coachCardHtml(nome, slots, opts) {
 // ---------- telas ----------
 function render() {
   clearTimeout(G.timer); clearInterval(G.decT); clearInterval(G.spinT);
-  document.querySelectorAll('.tip,.sheet,.modal,.epicfx,.walkout').forEach(x => x.remove()); SIM.epic = null;
+  document.querySelectorAll('.tip,.sheet,.modal,.epicfx,.walkout,.penshoot').forEach(x => x.remove()); SIM.epic = null; G.penSkip = null; G.held = false;
   if (G.screen !== 'match' && window.FFAudio) FFAudio.crowdStop();
   window.scrollTo(0, 0);
   app.classList.toggle('career', String(G.screen || '').indexOf('car') === 0);
@@ -5169,6 +5775,8 @@ function pitchLines() {
 }
 function renderMatch() {
   const mine = G.run, m = G.match, run = m && m.pvp ? m.run : mine, sel0 = selOf(run), sel = { ...sel0, kit: myKit(run) }, op = m.opp, ok = oppKit(op), wx = E.WEATHER[m.weather] || E.WEATHER.sol;
+  const homeCrest = run.careerClubId && window.FFCareer ? FFCareer.badge(run.careerClubId, 'sm') : sel.flag;
+  const awayCrest = run.careerFoeId && window.FFCareer ? FFCareer.badge(run.careerFoeId, 'sm') : op.flag;
   let toks = '';
   const tc = c => lum(c) > 0.6 ? '#111' : '#fff';
   for (let i = 0; i < 7; i++) toks += `<div class="tok t0 ${i === 0 ? 'gk' : ''}" style="background:${i === 0 ? '#1f2937' : sel.kit[0]};border-color:${sel.kit[1]};color:${i === 0 ? '#fff' : tc(sel.kit[0])}">${NUMS[i]}</div>`;
@@ -5177,9 +5785,9 @@ function renderMatch() {
   app.innerHTML = `
   <div class="mc">
     <div class="sb">
-      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${sel.flag}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${sel.kit[0]}">${homeCrest}</div><div class="tn">${esc(sel.curto)}${m.pvp && G.cup && G.cup.role === 0 ? ' · você' : ''}</div></div>
       <div class="mid"><div class="score" id="sc">${m.score[0]}<i>:</i>${m.score[1]}</div><span class="clock"><span class="live"></span><span id="clk">${m.minute}'</span></span></div>
-      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${op.flag}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
+      <div class="tm"><div class="crest" style="--kc:${ok[0]}">${awayCrest}</div><div class="tn">${esc(oppShort(op))}${m.pvp && G.cup && G.cup.role === 1 ? ' · você' : ''}</div></div>
     </div>
     <div class="prog"><i id="prog" style="width:${Math.min(100, m.minute / 90 * 100)}%"></i></div>
     <div class="stagelbl"><span>${esc(run.careerLabel || E.STAGES[m.stage].nome)}</span>${run.coach ? `<span>${ic('coach')} ${esc(run.coach.nome)}</span>` : ''}<span title="${esc(wx.desc)} · ${esc(stadiumFor(run, m.stage, wx.id))}">${wx.icon} ${esc(wx.nome)}</span>${op.boss ? `<span class="bossr">${ic('bolt')} ${esc(op.regra)}</span>` : ''}</div>
@@ -5187,7 +5795,8 @@ function renderMatch() {
   <div class="momentum"><div class="mh"><span style="color:var(--lime)">▲ ${esc(sel.curto)}</span><span>Momentum</span><span style="color:#ff9a9d">${esc(oppShort(op))} ▼</span></div>
     <svg id="mom" viewBox="0 0 300 46" preserveAspectRatio="none" role="img" aria-label="Gráfico de pressão por minuto"></svg>
     <div class="mstats" id="mstats"></div></div>
-  <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball"></div></div><div class="wx" aria-hidden="true"></div></div>
+  <div class="stadium"><div class="stands" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="floods" aria-hidden="true"><b></b><b></b><b></b><b></b></div>
+  <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball">${ballSvg('pitch')}</div></div><div class="wx" aria-hidden="true"></div></div></div>
   <div class="fxbar" id="fxbar"></div>
   <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
@@ -5255,6 +5864,7 @@ function simFrame(now) {
   const dt = Math.min(0.05, (now - SIM.last) / 1000); SIM.last = now;
   const sp = G.speed, b = SIM.ball;
   if (!SIM.W) measure();
+  if (G.held) { SIM.last = now; requestAnimationFrame(simFrame); return; }
   if (SIM.holder && now > SIM.passAt && SIM.celebrate < 0) {
     const dir = SIM.poss === 0 ? 1 : -1;
     const mates = SIM.toks.filter(t => t.side === SIM.poss && t !== SIM.holder && t.i !== 0);
@@ -5365,9 +5975,11 @@ function goalFx(e) {
   fx.className = 'goalfx ' + (e.gtype === 'mao' ? 'mao' : mine ? '' : 'rival');
   const title = e.gtype === 'mao' ? '✋ LA MANO<br>DE DIOS' : mine ? (e.value > 1 ? `GOOOL!<br>+${e.value}` : 'GOOOL!') : 'GOL DELES';
   const sub = e.gtype === 'mao' ? 'O juiz valida o gol irregular!' : (e.label && mine && e.label !== 'GOOOL!' ? e.label + ' ' : '') + (e.scorer || '') + (e.sub ? ' · ' + e.sub : '');
-  fx.innerHTML = `<div class="gt">${title}<small>${esc(sub)}</small></div>`;
+  const hold = G.speed > 1;
+  fx.innerHTML = `<div class="gt">${title}<small>${esc(sub)}</small></div>${hold ? '<button class="tapgo" data-act="tapgo">Toque para continuar</button>' : ''}`;
+  if (hold) fx.classList.add('hold');
   document.body.appendChild(fx);
-  setTimeout(() => fx.remove(), 1700);
+  if (!hold) setTimeout(() => fx.remove(), 1700);
   const p = $('#pitch'); if (p) { p.classList.remove('flash', 'shake'); void p.offsetWidth; p.classList.add(mine ? 'flash' : 'shake'); }
   const sc = $('#sc'); if (sc) { sc.classList.remove('bump'); void sc.offsetWidth; sc.classList.add('bump'); }
   if (mine) celebrateFx([myKit(G.run)[0], myKit(G.run)[1], '#c6ff3d', '#ffffff', '#ffc83d']);
@@ -5430,16 +6042,23 @@ function tick() {
       else if (e.kind === 'end') FFAudio.whistle('full');
     }
     pushFeed(e);
+    let hold = false;
     if (e.epic) {
       if (e.kind === 'goal') { G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2.5); G.mst.shots[e.side]++; }
       else { G.mst.shots[e.side]++; G.mst.saves[1 - e.side]++; addMom(1 - e.side, e.min, 1.5); }
       wait = epicFx(e, sp) * sp;
+      if (sp > 1) hold = true;
     } else if (e.kind === 'goal') {
       G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2);
       if (e.gtype !== 'mao') G.mst.shots[e.side]++;
       shoot(e.side, 'goal');
-      setTimeout(() => { SIM.celebrate = e.side; goalFx(e); }, 250 / sp);
-      setTimeout(() => { SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(1 - e.side); }, PACE.goal / sp);
+      if (sp > 1) {
+        setTimeout(() => { if (G.screen === 'match') { SIM.celebrate = e.side; goalFx(e); } }, 160);
+        hold = true;
+      } else {
+        setTimeout(() => { SIM.celebrate = e.side; goalFx(e); }, 250 / sp);
+        setTimeout(() => { SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(1 - e.side); }, PACE.goal / sp);
+      }
       wait = PACE.goal;
     } else if (e.kind === 'lance') {
       const k = resultKind(e); shoot(e.side, k);
@@ -5449,9 +6068,11 @@ function tick() {
     } else if (e.kind === 'card') wait = PACE.card;
     else if (e.kind === 'half') { SIM.ball.x = 50; SIM.ball.y = 50; wait = PACE.info; }
     else wait = PACE.info;
+    if ((e.kind === 'counter' || e.kind === 'combo') && sp > 1) hold = true;
     const sc = $('#sc'); if (sc) sc.innerHTML = `${G.shownScore[0]}<i>:</i>${G.shownScore[1]}`;
     setClock(e.min);
     updateFx(); drawMomentum(); drawStats();
+    if (hold) { G.held = true; return; }
   }
   G.timer = setTimeout(tick, wait / sp);
 }
@@ -5464,6 +6085,7 @@ function showDecision() {
   document.body.appendChild(box);
   paintDecision();
   showTip('decision');
+  if (G.speed > 1) return;
   const C = 2 * Math.PI * 18;
   let left = DEC_SECS * 10;
   G.decT = setInterval(() => {
@@ -5487,7 +6109,7 @@ function paintDecision() {
   const beat = opp && Object.keys(E.BEATS).find(k => E.BEATS[k] === opp);
   inn.innerHTML = `<div class="grab"></div>
     <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${G.shownScore[0]} x ${G.shownScore[1]}</div><div class="t">Energia ${nrgPips(Math.max(0, left), m.nrgMax || 3)}</div></div>
-    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div></div>
+    ${G.speed > 1 ? '<div class="tapnote">Toque para continuar</div>' : `<div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div>`}</div>
     <div class="dctx">Toque pra marcar. Dá pra jogar várias se a energia alcançar. Sem escolha, a carta fica guardada.</div>
     ${opp ? `<p class="xs">Rival está em <b>${esc(E.STYLE_NAME[opp])}</b>. ${beat ? esc(E.STYLE_NAME[beat]) + ' dá CONTRA-GOLPE!' : ''}</p>` : ''}
     <div class="dcards">${run.cards.map(c => {
@@ -5517,10 +6139,11 @@ function useCard(c) {
 }
 function flashBanner(e) {
   const d = document.createElement('div');
-  d.className = 'banner ' + (e.kind === 'combo' ? 'combo' : 'golpe');
-  d.innerHTML = `<b>${e.kind === 'combo' ? 'COMBO' : 'CONTRA-GOLPE!'}</b><span>${esc(e.text)}</span>`;
+  const hold = G.speed > 1;
+  d.className = 'banner ' + (e.kind === 'combo' ? 'combo' : 'golpe') + (hold ? ' hold' : '');
+  d.innerHTML = `<b>${e.kind === 'combo' ? 'COMBO' : 'CONTRA-GOLPE!'}</b><span>${esc(e.text)}</span>${hold ? '<button class="tapgo" data-act="tapgo">Toque para continuar</button>' : ''}`;
   document.body.appendChild(d);
-  setTimeout(() => d.remove(), 1700);
+  if (!hold) setTimeout(() => d.remove(), 1700);
 }
 function showWalkout() {
   const run = G.run, m = G.match; if (!run || !m || RM()) return;
@@ -5539,12 +6162,85 @@ function endMatch() {
     const outcome = gf > ga ? 'W' : gf < ga ? 'L' : 'D';
     G.careerPending = { gf, ga };
     G.result = { outcome, gf, ga, pens: null, fichas: [], ganho: 0, why: [`Placar do jogo decisivo: ${gf} a ${ga}.`], groupMsg: '', reward: false, shop: false, status: 'playing', stage: m.stage, mGoals: (m.goals || []).slice(), epics: (m.epics || []).slice(), weather: m.weather, used: (m.used || []).slice(), career: true };
+    if (G.run.careerKo && gf === ga && window.FFCareer && FFCareer.peekPens) {
+      const peek = FFCareer.peekPens(G.career);
+      if (peek) {
+        G.result.outcome = peek.ourWin ? 'W' : 'L';
+        G.result.pens = { kicks: peek.kicks, score: peek.score, win: peek.ourWin };
+        const foe = G.run.careerFoeId ? FFCareer.clubOf(G.run.careerFoeId).curto : oppShort(m.opp);
+        return showShootout({ kicks: peek.kicks, leftName: selOf(G.run).curto, rightName: foe, onDone: () => go('result') });
+      }
+    }
     return go('result');
   }
   G.result = E.finishMatch(G.run, G.match);
   if (G.run && G.run.cupRole != null && G.run.status === 'eliminated' && G.run.stage < 6) { finalizeRun(); return go('caiu'); }
   if (G.run.status !== 'playing') finalizeRun();
+  if (G.result.pens && G.result.pens.kicks && G.result.pens.kicks.length) {
+    return showShootout({ kicks: G.result.pens.kicks, leftName: selOf(G.run).curto, rightName: oppShort(G.match.opp), onDone: () => go('result') });
+  }
   go('result');
+}
+function showShootout(opts) {
+  document.querySelectorAll('.penshoot').forEach(x => x.remove());
+  const kicks = opts.kicks || [];
+  const box = document.createElement('div');
+  box.className = 'penshoot';
+  box.innerHTML = `<div class="penstage">
+    <div class="penhead"><b>${esc(opts.leftName || 'Nós')}</b><span id="pensc">0 × 0</span><b>${esc(opts.rightName || 'Eles')}</b></div>
+    <div class="pendots" id="pendots"></div>
+    <div class="penpitch"><div class="pengoal"></div><div class="penkeeper" id="penk"></div><div class="penball" id="penb"></div><div class="pentaker" id="pent"></div></div>
+    <div class="penwho" id="penwho"></div>
+    <p class="xs mut" id="pensudden"></p>
+    <button class="btn sec" data-act="penskip">Pular cobranças</button>
+  </div>`;
+  document.body.appendChild(box);
+  let i = 0, us = 0, them = 0, timer = null, dead = false;
+  const dots = [[], []];
+  const paint = () => {
+    const sc = $('#pensc'), dd = $('#pendots');
+    if (sc) sc.textContent = us + ' × ' + them;
+    if (dd) dd.innerHTML = `<span>${dots[0].map(ok => ok ? '●' : '○').join(' ')}</span><i></i><span>${dots[1].map(ok => ok ? '●' : '○').join(' ')}</span>`;
+    const sud = $('#pensudden');
+    if (sud) sud.textContent = dots[0].length > 5 && dots[0].length === dots[1].length ? 'Morte súbita' : '';
+  };
+  const finish = () => { dead = true; clearTimeout(timer); box.remove(); G.penSkip = null; if (opts.onDone) opts.onDone(); };
+  G.penSkip = finish;
+  const showKick = (k) => {
+    const who = $('#penwho'), ball = $('#penb'), taker = $('#pent'), keeper = $('#penk');
+    if (who) who.innerHTML = `<b>${esc(k.nome)}</b><small>${k.side === 0 ? esc(opts.leftName || '') : esc(opts.rightName || '')} · ${esc(k.keeper || 'goleiro na trave')}</small>`;
+    if (keeper) keeper.className = 'penkeeper';
+    if (taker) taker.className = 'pentaker ' + (k.side === 0 ? 'l' : 'r');
+    if (ball) { ball.className = 'penball'; void ball.offsetWidth; ball.classList.add('go', k.ok ? 'in' : 'miss'); }
+    if (taker) { void taker.offsetWidth; taker.classList.add('go'); }
+    if (keeper) keeper.classList.add(k.ok ? 'beat' : 'save');
+  };
+  const step = () => {
+    if (dead) return;
+    if (opts.pauseAt != null && i >= opts.pauseAt) { paint(); return; }
+    if (i >= kicks.length) { timer = setTimeout(finish, 640); return; }
+    const k = kicks[i++];
+    showKick(k);
+    timer = setTimeout(() => {
+      if (dead) return;
+      if (k.ok) { if (k.side === 0) us++; else them++; }
+      dots[k.side].push(!!k.ok);
+      paint();
+      timer = setTimeout(step, 380);
+    }, 720);
+  };
+  if (opts.pauseAt > 0) {
+    while (i < opts.pauseAt && i < kicks.length) {
+      const k = kicks[i++];
+      if (k.ok) { if (k.side === 0) us++; else them++; }
+      dots[k.side].push(!!k.ok);
+    }
+    paint();
+    if (i < kicks.length) showKick(kicks[i]);
+    return;
+  }
+  paint();
+  step();
 }
 
 // ---------- resultado ----------
@@ -6059,12 +6755,32 @@ function epicPos(id, k) {
   const xy = bez(P.segs[i], t);
   return { x: xy[0], y: xy[1], h: P.lift * Math.sin(Math.PI * t) * (i === n - 1 || n === 1 ? 1 : .6) };
 }
+function epicScene(id) {
+  const sky = `<defs><linearGradient id="esky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#07121c"/><stop offset="1" stop-color="#12301c"/></linearGradient><radialGradient id="eflood" cx="50%" cy="0%" r="70%"><stop offset="0" stop-color="rgba(255,244,200,.55)"/><stop offset="1" stop-color="rgba(255,244,200,0)"/></radialGradient></defs>
+    <rect width="390" height="280" fill="url(#esky)"/><rect width="390" height="120" fill="url(#eflood)"/>
+    <g fill="#0a2014">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(i => `<circle cx="${18 + i * 32}" cy="${48 + (i % 3) * 10}" r="7" fill="${i % 2 ? '#c52626' : '#f2f2f2'}"/>`).join('')}</g>
+    <path d="M20 150 Q195 120 370 150 L370 250 L20 250 Z" fill="#176b32"/><path d="M20 168 H370" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
+    <rect x="300" y="118" width="78" height="46" fill="none" stroke="#fff" stroke-width="3"/><rect x="300" y="132" width="78" height="18" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2"/>`;
+  const figs = {
+    bicicleta: `<g transform="translate(168 150) rotate(-78)"><ellipse cx="0" cy="18" rx="16" ry="7" fill="rgba(0,0,0,.35)"/><circle cx="0" cy="-6" r="9" fill="#f0c9a0"/><path d="M-8 2 h22 l6 28 h-16 z" fill="#c52626"/><path d="M-2 28 l-16 18 M8 28 l18 8" stroke="#111" stroke-width="5" stroke-linecap="round"/><circle cx="28" cy="-8" r="8" fill="#fff" stroke="#111"/></g>`,
+    cobertura: `<g transform="translate(150 168)"><circle cx="0" cy="-8" r="9" fill="#f0c9a0"/><path d="M-12 0 h20 l8 34 h-18 z" fill="#fff"/><path d="M-4 34 l-8 22 M8 34 l14 16" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><g transform="translate(250 176)"><circle cx="0" cy="0" r="8" fill="#ffd76a"/><path d="M-14 8 h22 l-4 28 h-14 z" fill="#111"/></g><circle cx="230" cy="92" r="9" fill="#fff" stroke="#111"/><path d="M170 150 Q210 70 230 92" fill="none" stroke="#ffd76a" stroke-width="2" stroke-dasharray="4 3"/>`,
+    olimpico: `<g transform="translate(70 150)"><circle cx="0" cy="0" r="8" fill="#f0c9a0"/><path d="M-10 8 h18 l4 30 h-16 z" fill="#0d80bf"/></g><path d="M80 140 Q200 40 330 150" fill="none" stroke="#ffd76a" stroke-width="3"/><circle cx="330" cy="150" r="8" fill="#fff" stroke="#111"/>`,
+    calcanhar: `<g transform="translate(210 160) scale(-1 1)"><circle cx="0" cy="-6" r="9" fill="#f0c9a0"/><path d="M-8 4 h20 l4 30 h-16 z" fill="#006437"/><path d="M6 32 l16 8" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><circle cx="168" cy="188" r="8" fill="#fff" stroke="#111"/>`,
+    golaco: `<g transform="translate(120 156)"><circle cx="0" cy="-4" r="9" fill="#f0c9a0"/><path d="M-10 6 h20 l6 32 h-16 z" fill="#ffd100"/></g><path d="M140 150 Q220 80 340 140" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="340" cy="140" r="8" fill="#fff"/>`,
+    goleiro: `<g transform="translate(80 160)"><circle cx="0" cy="0" r="9" fill="#f0c9a0"/><path d="M-14 8 h24 l-2 32 h-16 z" fill="#facc15"/></g><path d="M90 150 H340" stroke="#ffd76a" stroke-width="2" stroke-dasharray="6 4"/><circle cx="330" cy="148" r="8" fill="#fff"/>`,
+    penalti: `<g transform="translate(250 168)"><circle cx="0" cy="-10" r="9" fill="#f0c9a0"/><path d="M-16 0 h28 l-6 30 h-16 z" fill="#111"/><path d="M8 -6 l22 -16" stroke="#111" stroke-width="5" stroke-linecap="round"/></g><circle cx="210" cy="150" r="8" fill="#fff" stroke="#111"/>`,
+    placa: `<text x="40" y="150" font-size="54" font-family="Arial Black,sans-serif" fill="#ffd76a">4×0</text>`,
+    hattrick: `<g transform="translate(180 150)"><circle cx="0" cy="0" r="9" fill="#f0c9a0"/><path d="M-12 10 h24 l2 32 h-22 z" fill="#c52626"/></g><text x="40" y="70" font-size="28" font-family="Arial Black,sans-serif" fill="#ffd76a">3º</text>`,
+    virada: `<text x="36" y="90" font-size="42" font-family="Arial Black,sans-serif" fill="#fff">90+2</text><circle cx="250" cy="160" r="10" fill="#fff"/>`
+  };
+  return `<div class="escene" aria-hidden="true"><svg viewBox="0 0 390 280">${sky}${figs[id] || figs.golaco}<g stroke="#ffd76a" stroke-width="2" fill="none" opacity=".8"><path d="M40 40 l18 6 M60 28 l8 16 M330 36 l-16 10"/></g></svg></div>`;
+}
 function epicFx(e, sp) {
   const ep = e.epic, P = EPIC_PATHS[ep.id] || EPIC_PATHS.hattrick, rm = RM(), mine = e.side === 0 || P.save;
   const slow = 1 / Math.min(sp, 1.5), DUR = 1700 * slow, END = P.segs[P.segs.length - 1][2];
   const pz = $('#pz');
   const box = document.createElement('div'); box.className = 'epicfx' + (rm ? ' rm' : ''); box.setAttribute('role', 'status');
-  box.innerHTML = `<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="eflash"></div>
+  box.innerHTML = `${epicScene(ep.id)}<i class="lb t"></i><i class="lb b"></i><div class="rec">● REPLAY · CÂMERA LENTA</div><div class="eflash"></div>
     <div class="ebox"><div class="ek">⚡ LANCE ÉPICO</div><div class="ei">${ep.icon}</div><div class="en">${esc(ep.nome.toUpperCase())}!</div><div class="es">${esc(ep.scorer || '')} · ${ep.min}' · ${ep.score ? ep.score[0] + ' x ' + ep.score[1] : ''}</div><div class="ef">📻 “${esc(ep.frase)}”</div></div>`;
   document.body.appendChild(box);
   if (pz && !rm) { pz.style.transformOrigin = `${END[0]}% ${END[1]}%`; pz.classList.add('ez'); }
@@ -6082,10 +6798,16 @@ function epicFx(e, sp) {
   }, rm ? 100 : DUR + 60);
   const total = rm ? 2600 : DUR + 2600 * slow;
   setTimeout(() => {
-    box.classList.add('out'); setTimeout(() => box.remove(), 350);
+    if (!document.body.contains(box)) return;
     if (pz) pz.classList.remove('ez');
-    SIM.epic = null; SIM.trailEls.forEach(t => t.classList.remove('hot')); if (SIM.ballEl) SIM.ballEl.classList.remove('hot');
-    SIM.celebrate = -1; SIM.ball.x = 50; SIM.ball.y = 50; setPoss(e.kind === 'goal' ? 1 - e.side : 0);
+    SIM.epic = null; if (SIM.trailEls) SIM.trailEls.forEach(t => t.classList.remove('hot')); if (SIM.ballEl) SIM.ballEl.classList.remove('hot');
+    if (G.speed > 1) {
+      box.classList.add('hold', 'hit');
+      if (!box.querySelector('.tapgo')) box.insertAdjacentHTML('beforeend', '<button class="tapgo" data-act="tapgo">Toque para continuar</button>');
+      return;
+    }
+    box.classList.add('out'); setTimeout(() => box.remove(), 350);
+    SIM.celebrate = -1; if (SIM.ball) { SIM.ball.x = 50; SIM.ball.y = 50; } setPoss(e.kind === 'goal' ? 1 - e.side : 0);
   }, total);
   if (!G.seenEpic) { G.seenEpic = true; }
   return total + 250;
@@ -6448,7 +7170,12 @@ function endPvp() {
   G.result = { outcome, gf, ga, pens: res.pens, fichas: outcome === 'W' ? [{ label: 'Vitória na final ao vivo', v: 3 }] : [], ganho: outcome === 'W' ? 3 : 0, why: [outcome === 'W' ? 'A final ao vivo ficou com você. Os dois viram o mesmo jogo.' : 'A final ao vivo ficou com o seu amigo. Os dois viram o mesmo jogo.'], groupMsg: '', reward: false, shop: false, status: G.run.status, stage: 6, mGoals: m.goals.slice(), epics: m.epics.slice(), weather: m.weather };
   if (outcome === 'W') G.run.fichas += 3;
   if (G.cup.friend) G.cup.friend.phase = 'fim';
-  finalizeRun(); cupPublish(); go('result');
+  finalizeRun(); cupPublish();
+  if (res.pens && res.pens.kicks && res.pens.kicks.length) {
+    const kicks = res.pens.kicks.map(k => ({ side: k.side === role ? 0 : 1, nome: k.nome, ok: k.ok, coach: k.coach, keeper: 'goleiro' }));
+    return showShootout({ kicks, leftName: selOf(G.run).curto, rightName: oppName, onDone: () => go('result') });
+  }
+  go('result');
 }
 function friendRole() {
   const f = G.cup && G.cup.friend;
@@ -6757,7 +7484,7 @@ function somSheet() {
   const s = A.settings();
   const m = document.createElement('div'); m.className = 'modal somm';
   m.innerHTML = `<div class="box sombox"><div class="eyebrow g">Som do estádio</div><h3 class="ttl" style="margin-top:4px">Arquibancada</h3>
-    <p class="sub">Apito, torcida e fogos saem do próprio navegador. Nenhum arquivo de áudio.</p>
+    <p class="sub">Apito, torcida e chute usam gravações livres. Se o áudio não carregar, o jogo volta ao som do navegador.</p>
     <button class="btn ${s.on ? '' : 'sec'}" data-act="somOn">${s.on ? 'Som ligado' : 'Som desligado'}</button>
     <label class="somlab">Volume<input id="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></label>
     <button class="btn sec" data-x="1">Fechar</button></div>`;
@@ -6769,6 +7496,35 @@ function somSheet() {
 function syncCarName() {
   const el = document.getElementById('carName');
   if (el && G.carDraft) G.carDraft.nome = el.value.slice(0, 24);
+}
+function patchDraft() {
+  const d = G.carDraft;
+  if (!d) return;
+  const chip = app.querySelector('.topbar .chip:last-child');
+  if (chip) chip.textContent = d.left + ' pontos';
+  app.querySelectorAll('.panel .ph .r').forEach(r => {
+    if (r.textContent.indexOf('60 a 78') === 0) r.textContent = '60 a 78 · ' + d.left + ' para distribuir';
+  });
+  app.querySelectorAll('.prow').forEach(row => {
+    const minus = row.querySelector('[data-act=carMinus]');
+    const plus = row.querySelector('[data-act=carPlus]');
+    if (!minus) return;
+    const a = minus.dataset.a;
+    const b = row.querySelector('b');
+    if (b) b.textContent = d.nums[a];
+    minus.disabled = d.nums[a] <= 60;
+    if (plus) plus.disabled = d.nums[a] >= 78 || d.left <= 0;
+  });
+  const start = app.querySelector('[data-act=carStart]');
+  if (start) start.disabled = d.left !== 0;
+}
+function releaseHold() {
+  G.held = false;
+  document.querySelectorAll('.goalfx,.epicfx.hold,.banner.hold').forEach(x => x.remove());
+  const pz = $('#pz'); if (pz) pz.classList.remove('ez');
+  SIM.epic = null; SIM.celebrate = -1;
+  if (SIM.ball) { SIM.ball.x = 50; SIM.ball.y = 50; }
+  if (G.screen === 'match') tick();
 }
 function carGo(res) {
   if (!res) return;
@@ -6868,8 +7624,8 @@ function onClick(ev) {
     case 'carNew': G.carSlot = +el.dataset.i || 0; G.carDraft = FFCareer.draftNew(G.pendingSeed || 'FOMINHA'); go('carCriar'); break;
     case 'carCont': { const st = FFCareer.loadStore(); G.career = st.slots[+el.dataset.i]; if (G.career) { G.career.slot = +el.dataset.i; go(FFCareer.screenFor(G.career)); } break; }
     case 'carMuseu': G.carExtra = FFCareer.loadStore(); go('carMuseu'); break;
-    case 'carPlus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.left > 0 && d.nums[attr] < 78) { d.nums[attr]++; d.left--; render(); } break; }
-    case 'carMinus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.nums[attr] > 60) { d.nums[attr]--; d.left++; render(); } break; }
+    case 'carPlus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.left > 0 && d.nums[attr] < 78) { d.nums[attr]++; d.left--; patchDraft(); } break; }
+    case 'carMinus': syncCarName(); { const d = G.carDraft, attr = el.dataset.a; if (d && d.nums[attr] > 60) { d.nums[attr]--; d.left++; patchDraft(); } break; }
     case 'carClub': if (G.carDraft) { G.carDraft.clubId = el.dataset.id; render(); } break;
     case 'carStart': {
       syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
@@ -6885,7 +7641,12 @@ function onClick(ev) {
     case 'carBackHub': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
     case 'carHome': go('carHome'); break;
     case 'carOpt': FFCareer.chooseDecision(G.career, +el.dataset.i); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
-    case 'carAccept': FFCareer.acceptOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
+    case 'carAccept': {
+      FFCareer.acceptOffer(G.career, el.dataset.id);
+      if (FFCareer.closeInbox(G.career)) { FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); }
+      else { FFCareer.persist(G.career); render(); toast('Escolha um clube ou encerre a carreira.'); }
+      break;
+    }
     case 'carReject': FFCareer.rejectOffer(G.career, el.dataset.id); FFCareer.persist(G.career); render(); break;
     case 'carNeg': FFCareer.negotiate(G.career, el.dataset.id); render(); break;
     case 'carInboxOk': if (FFCareer.closeInbox(G.career)) { FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); } else toast('Escolha um clube ou encerre a carreira.'); break;
@@ -6893,6 +7654,15 @@ function onClick(ev) {
     case 'carAck': FFCareer.ackSummary(G.career); FFCareer.persist(G.career); go(FFCareer.screenFor(G.career)); break;
     case 'carRetire': FFCareer.retire(G.career, 'pedido'); go('carDoc'); break;
     case 'carShare': { const d = G.career && (G.career.doc || G.career); copyText(FFCareer.shareText(d)).then(ok => toast(ok ? 'Retrospectiva copiada!' : 'Não deu pra copiar')); break; }
+    case 'carReport': go('carReport'); break;
+    case 'carReportOk': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
+    case 'carPens': {
+      const r = G.career && G.career.report;
+      if (r && r.pens) showShootout({ kicks: r.pens, leftName: FFCareer.clubOf(G.career.clubId).curto, rightName: FFCareer.clubOf(r.foeId).curto });
+      break;
+    }
+    case 'tapgo': releaseHold(); break;
+    case 'penskip': if (G.penSkip) G.penSkip(); break;
   }
 }
 // expõe para testes/screenshot
@@ -6951,6 +7721,41 @@ function previewCards(which) {
 function previewCareer(which) {
   window.__noTips = true;
   if (which === 'som') { G.screen = 'home'; render(); somSheet(); return; }
+  if (which === 'relato') {
+    const d = FFCareer.demo('hub');
+    G.career = d.career;
+    if (G.career && G.career.phase === 'season') FFCareer.skipLive(G.career);
+    G.screen = 'carReport'; render(); return;
+  }
+  if (which === 'penaltis') {
+    G.screen = 'home'; render();
+    showShootout({
+      pauseAt: 2, leftName: 'FLA', rightName: 'VAS',
+      kicks: [
+        { side: 0, nome: 'Pedro Alves', ok: true, keeper: 'Carlos Souza' },
+        { side: 1, nome: 'Lucas Ribeiro', ok: true, keeper: 'João Silva' },
+        { side: 0, nome: 'Caio Mendes', ok: false, keeper: 'Carlos Souza' },
+        { side: 1, nome: 'Diego Costa', ok: true, keeper: 'João Silva' },
+        { side: 0, nome: 'André Lima', ok: true, keeper: 'Carlos Souza' }
+      ]
+    });
+    return;
+  }
+  if (which === 'overlay' || which === 'epic2') {
+    const run = E.newRun('EPIC3', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(80, 'Patrick').slots));
+    G.run = run; G.match = E.createMatch(run); G.speed = 3; G.screen = 'match'; G.shownScore = [1, 0];
+    render(); clearTimeout(G.timer); SIM.on = false; G.held = true;
+    const id = which === 'epic2' ? 'cobertura' : 'bicicleta';
+    const nome = id === 'cobertura' ? 'Gol de Cobertura' : 'Gol de Bicicleta';
+    epicFx({ epic: { id, nome, icon: id === 'cobertura' ? '🌈' : '🚲', scorer: 'Rafael Silva', min: 41, frase: nome.toUpperCase() + '! PODE PARAR O JOGO!', score: [1, 0] }, side: 0, kind: 'goal', min: 41 }, 3);
+    return;
+  }
+  if (which === 'lesao' || which === 'protesto' || which === 'joia') {
+    const d = FFCareer.demo('decisao');
+    G.career = d.career;
+    G.career.decision = FFCareer.sampleDecision(which);
+    G.screen = 'carDec'; render(); return;
+  }
   const d = FFCareer.demo(which === 'acesso' ? 'fogos' : which);
   G.career = d.career || null;
   G.carDraft = which === 'criar' ? d.extra : G.carDraft;
