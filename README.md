@@ -25,9 +25,17 @@ Os testes de unidade rodam no Node, sem navegador:
 npm test
 ```
 
-Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js`, `test/meta.test.js`, `test/bracket.test.js` e `test/live.test.js`.
+Isso executa `test/sim.test.js`, `test/coach.test.js`, `test/relics.test.js`, `test/epic.test.js`, `test/meta.test.js`, `test/bracket.test.js`, `test/live.test.js` e `test/cards.test.js`.
 
 `node test/realtime.test.js` abre dois clientes no Supabase (chave publishable) e confere o broadcast da final ao vivo. `node test/duel-screens.js` grava as telas do duelo em `docs/screens/duel/`.
+
+## Cartas do técnico
+
+Cada partida tem **3 de energia** (4 se o Estrategista for 90+). A carta mostra o tipo pela cor (ataque, defesa, tática, especial), o custo, a duração e o efeito em número. Dá para jogar mais de uma no mesmo momento, se a energia alcançar.
+
+Pressão ganha da Posse, Posse ganha do Contra-ataque e Contra-ataque ganha da Pressão: isso aparece como **CONTRA-GOLPE**. Pares certos (Blitz, Bombardeio Aéreo e outros) viram combo. Pegar a mesma carta de novo sobe ela de Nv1 a Nv3.
+
+Os números de algumas cartas foram afinados para a taxa de vitória do nível 1 continuar na faixa de antes. O texto da carta é o número que o jogo usa.
 
 ## Duelo ao vivo
 

@@ -108,11 +108,54 @@ function futCard(p, opts) {
   return `<div class="fut ${t} ${opts.size || ''}" title="${esc(p.nome)} · ${p.pos} ${p.rating}"><span class="r">${p.rating}</span><span class="ps">${p.pos}</span>${shirt(k[0], k[1])}
     ${opts.star ? `<span class="star">🌟</span>` : ''}<span class="nm">${esc(p.nome)}</span><span class="tt">${p.traits.split('').filter(Boolean).map(x => `<i>${TRAIT[x]}</i>`).join('')}</span></div>`;
 }
+function cardSvg(id) {
+  const col = E.CARD_TYPES[E.CARDS[id].tipo].cor;
+  const g = {
+    pressao: `<path d="M14 46 L32 6 L27 28 H46 L18 58 L24 34 H8 Z" fill="${col}"/>`,
+    casinha: `<path d="M8 30 L32 10 L56 30 V54 H8 Z" fill="${col}"/><rect x="26" y="36" width="12" height="18" fill="#0c1424"/>`,
+    contra: `<path d="M8 40 H28 L36 18 L44 40 H56 L40 54 Z" fill="${col}"/>`,
+    chuveirinho: `<circle cx="22" cy="18" r="8" fill="${col}"/><path d="M14 34 h8 M30 34 h8 M18 46 h8 M34 46 h6" stroke="${col}" stroke-width="4"/>`,
+    craque: `<polygon points="32,6 38,24 56,24 42,36 48,54 32,42 16,54 22,36 8,24 26,24" fill="${col}"/>`,
+    paredao: `<rect x="10" y="16" width="44" height="36" rx="4" fill="${col}"/><path d="M10 28 H54 M10 40 H54 M24 16 V52 M40 16 V52" stroke="#0c1424" stroke-width="2"/>`,
+    submagica: `<path d="M18 18 A14 14 0 1 1 14 36" fill="none" stroke="${col}" stroke-width="4"/><path d="M44 46 A14 14 0 1 1 50 28" fill="none" stroke="${col}" stroke-width="4"/>`,
+    catimba: `<circle cx="32" cy="28" r="14" fill="${col}"/><path d="M22 48 Q32 58 42 48" stroke="${col}" stroke-width="4" fill="none"/>`,
+    longe: `<circle cx="18" cy="44" r="8" fill="${col}"/><path d="M26 40 L52 14" stroke="${col}" stroke-width="4"/><path d="M40 14 H52 V26" fill="${col}"/>`,
+    peixinho: `<ellipse cx="34" cy="34" rx="18" ry="10" fill="${col}"/><polygon points="14,34 4,24 4,44" fill="${col}"/>`,
+    toque: `<circle cx="18" cy="40" r="7" fill="${col}"/><circle cx="34" cy="24" r="7" fill="${col}"/><circle cx="50" cy="40" r="7" fill="${col}"/>`,
+    bolaparada: `<circle cx="32" cy="36" r="14" fill="none" stroke="${col}" stroke-width="4"/><path d="M32 8 V18 M32 54 V48" stroke="${col}" stroke-width="4"/>`,
+    linha: `<path d="M8 44 H56 M16 44 L28 16 H40 L52 44" fill="none" stroke="${col}" stroke-width="4"/>`,
+    grito: `<path d="M12 24 H28 L46 12 V52 L28 40 H12 Z" fill="${col}"/><path d="M50 24 Q58 32 50 40" fill="none" stroke="${col}" stroke-width="3"/>`
+  };
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${g[id] || ''}</svg>`;
+}
+function nrgPips(left, max) {
+  let s = '';
+  for (let i = 0; i < max; i++) s += `<i class="${i < left ? 'on' : ''}"></i>`;
+  return `<span class="pips" title="Energia do técnico">${s}</span>`;
+}
+function cardFace(id, run, opts) {
+  opts = opts || {};
+  const c = E.CARDS[id], t = E.CARD_TYPES[c.tipo];
+  const lv = opts.lv || E.cardLevel(run || G.run, id);
+  const hints = run ? E.comboHints(run, id) : [];
+  const tag = opts.btn === false ? 'div' : 'button';
+  return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
+    <i class="cost">⚡${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${cardSvg(id)}</span>
+    <b>${esc(c.nome)}</b><small>${t.emoji} ${t.nome}${lv > 1 ? ' · Nv' + lv : ''}</small><em>${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
+    ${hints.length ? `<div class="hintline">Combo: ${esc(hints.join(', '))}</div>` : ''}</${tag}>`;
+}
+function chanceBars(id) {
+  if (!G.match || !E.CARDS[id]) return '';
+  const p = E.previewCard(G.match, id);
+  const row = (lbl, a, b, them) => `<div class="cbar ${them ? 'them' : ''}"><span>${lbl}</span><i><b style="width:${Math.round(a * 100)}%"></b><b class="n" style="width:${Math.round(b * 100)}%"></b></i><small>${Math.round(a * 100)}% → ${Math.round(b * 100)}%</small></div>`;
+  return `<div class="prev">${row('Seu gol', p.you0, p.you1)}${row('Gol deles', p.them0, p.them1, true)}</div>`;
+}
 function itemHtml(kind, id, opts) {
   opts = opts || {};
-  const d = kind === 'card' ? E.CARDS[id] : E.RELICS[id];
+  if (kind === 'card') return cardFace(id, G.run, { act: 'info', btn: true });
+  const d = E.RELICS[id];
   return `<button class="item ${kind} ${d.rar} ${opts.cls || ''}" style="--rc:${rc(d.rar)}" data-act="info" data-k="${kind}" data-id="${id}" aria-label="${esc(d.nome)}: ver detalhes">
-    <span class="med">${d.icon}</span><div class="in">${esc(d.nome)}</div><div class="rr">${kind === 'card' ? 'Carta' : 'Relíquia'} · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
+    <span class="med">${d.icon}</span><div class="in">${esc(d.nome)}</div><div class="rr">Relíquia · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
 }
 function invPanels(run, desc) {
   const cards = run.cards.map(c => itemHtml('card', c, { desc })).join('') + (run.cards.length < E.MAX_CARDS ? `<div class="item empty">vaga de carta</div>` : '');
@@ -188,7 +231,7 @@ function go(screen) {
 const TIPS = {
   coach: { n: 1, t: 'Monte seu técnico', p: 'Cada sorteio traz um técnico real. Toque em UMA qualidade dele pra preencher esse atributo do seu técnico. Quanto maior a nota, mais ela ajuda o time.' },
   hub: { n: 2, t: 'Caminho da Copa', p: 'São 3 jogos de grupo (precisa de 4 pontos) e 4 mata-matas até a final. Compare as barras com o rival e toque nas cartas e relíquias pra ver o que fazem.' },
-  decision: { n: 3, t: 'Momento decisivo', p: 'O jogo pausou. Use uma carta agora (cada uma vale 1 vez por jogo) ou guarde pra depois. O relógio só corre quando você fechar esta dica.', top: true },
+  decision: { n: 3, t: 'Energia do técnico', p: 'Você tem 3 de energia (4 se o Estrategista for 90+). Dá pra jogar mais de uma carta se a energia alcançar. Pressão ganha da Posse, Posse ganha do Contra-ataque, Contra-ataque ganha da Pressão: isso é CONTRA-GOLPE. Pares certos viram combo.', top: true },
   reward: { n: 4, t: 'Abra o pacote', p: 'Depois de cada vitória você abre um pacote e escolhe 1 de 3. A cor mostra a raridade: prata, azul, roxo e ouro.' },
   nav: { nv: 1, t: 'Novidades na Copa!', p: 'Use a barra de baixo: Desafios (sequência, missões, Técnico Lendário, bolão), Álbum de figurinhas, Galeria de técnicos e Perfil com divisões e cosméticos. Nas partidas, fique de olho nos LANCES ÉPICOS e no clima.' },
   desafios: { nv: 1, t: 'Volte todo dia', p: 'Jogar o Desafio do dia mantém sua sequência 🔥. As 3 missões trocam à meia-noite e dão Fominhas 🪙 e cosméticos. Toda semana tem um Técnico Lendário novo na final.' },
@@ -247,7 +290,7 @@ function howtoModal() {
     <li><div><b>Escolha a seleção e monte o técnico.</b> São 6 sorteios de técnicos reais. Em cada um, você pega uma qualidade (nota de 55 a 95).</div></li>
     <li><div><b>Fase de grupos:</b> 3 jogos. Vitória vale 3 pontos e empate vale 1. Precisa de <b>${E.GROUP_PTS_NEEDED} pontos</b>.</div></li>
     <li><div><b>Mata-mata:</b> oitavas, quartas, semi e final contra <b>A Mão Divina</b>. Empate vai pros pênaltis. Perdeu, acabou.</div></li>
-    <li><div><b>Na partida</b> o jogo pausa em até 3 momentos (4 com técnico estrategista 90+). Use uma carta ou guarde.</div></li>
+    <li><div><b>Na partida</b> o jogo pausa em 3 momentos. Cada carta custa energia (3 por jogo, 4 com Estrategista 90+). Dá pra gastar mais de uma no mesmo momento.</div></li>
     <li><div><b>Depois de vencer</b> você abre um pacote: 1 de 3 entre jogador, carta ou relíquia. No Vestiário (jogos 2, 4 e 6) dá pra comprar com Fichas.</div></li>
     <li><div><b>Pontos:</b> 100 por vitória, 40 por empate, 15 por gol, 10 por saldo e +250 pelo título, tudo vezes o multiplicador do nível.</div></li></ol>
     <button class="btn" data-x="1">Bora!</button></div>`;
@@ -581,16 +624,20 @@ function updateFx() {
   const m = G.match, f = m.fx, run = G.run, min = m.minute, bar = $('#fxbar');
   if (!bar) return;
   const c = [];
-  if (min <= f.pressaoUntil) c.push(`⚡ Pressão alta até ${f.pressaoUntil}'`);
-  if (min <= f.casinhaUntil) c.push(`🔒 Casinha fechada até ${f.casinhaUntil}'`);
+  c.push(nrgPips(m.nrgLeft == null ? 3 : m.nrgLeft, m.nrgMax || 3));
+  if (m.fxOpp && m.fxOpp.style && min <= m.fxOpp.styleUntil) c.push(`Rival: ${E.STYLE_NAME[m.fxOpp.style]}`);
+  if (min <= f.pressaoUntil) c.push(`⚡ Pressão até ${f.pressaoUntil}'`);
+  if (min <= f.casinhaUntil) c.push(f.casinhaUntil > 120 ? '🔒 Casinha até o fim' : `🔒 Casinha até ${f.casinhaUntil}'`);
   if (min <= f.chuvaUntil) c.push(`🌧️ Chuveirinho até ${f.chuvaUntil}'`);
-  if (min <= f.longeUntil) c.push(`🚀 Chute de longe até ${f.longeUntil}'`);
-  if (f.craque) c.push('⭐ Craque decide armado');
+  if (min <= f.longeUntil) c.push(`🚀 Longe até ${f.longeUntil}'`);
+  if (min <= f.contraUntil) c.push(`⚡ Contra-ataque até ${f.contraUntil}'`);
+  if (min <= f.toqueUntil) c.push(`🎯 Posse até ${f.toqueUntil}'`);
+  if (min <= f.paredaoUntil) c.push(`🛡️ Paredão até ${f.paredaoUntil}'`);
+  if (f.craque) c.push('⭐ Craque armado');
   if (f.peixinho) c.push('🐟 Peixinho armado');
-  if (f.paredao) c.push('🛡️ Paredão armado');
-  if (f.sub) c.push(`🔄 Sangue novo +${Math.round(f.sub * 10) / 10}`);
+  if (f.sub) c.push(`🔄 Reserva +${Math.round(f.sub * 10) / 10}`);
   if (f.paredaoMult > 1) c.push(`🧱 +${Math.round((f.paredaoMult - 1) * 100)}% força`);
-  if (f.fatigue) c.push(`😮‍💨 Cansaço −${m.weather === 'calor' ? 6 : 4} meio`);
+  if (f.fadigaUntil >= min && !f.blitz) c.push(`😮‍💨 Cansaço −${Math.round((f.fadigaPct || 0) * 100)}%`);
   if (m.weather !== 'sol') c.push(`${E.WEATHER[m.weather].icon} ${E.WEATHER[m.weather].nome}`);
   bar.innerHTML = c.map(x => `<span class="chip c">${x}</span>`).join('') + run.relics.map(r => `<button class="chip" style="min-height:30px;padding:3px 8px" data-act="info" data-k="relic" data-id="${r}" title="${esc(E.RELICS[r].nome)}">${E.RELICS[r].icon}</button>`).join('');
 }
@@ -600,6 +647,8 @@ function feedClass(e) {
   if (e.epic) return ['epic' + (e.kind === 'goal' ? ' goal' + e.side : ''), '⚡ ' + e.epic.nome.toUpperCase(), e.kind === 'goal' ? 'ball' : 'shield'];
   if (e.kind === 'goal') return ['goal' + e.side, e.gtype === 'mao' ? 'MÃO!' : e.side === 0 ? 'GOL' : 'GOL DELES', 'ball'];
   if (e.kind === 'card') return ['card', 'CARTA', 'card'];
+  if (e.kind === 'counter') return ['card', 'CONTRA-GOLPE', 'bolt'];
+  if (e.kind === 'combo') return ['card', 'COMBO', 'star'];
   if (e.kind === 'coach' || e.coach || /estilo |Prancheta de /.test(all)) return ['coach', 'TÉCNICO', 'coach'];
   if (RELIC_RX.test(all)) return ['relic', 'RELÍQUIA', 'gem'];
   if (e.kind === 'ambient') return ['amb', '', ''];
@@ -679,6 +728,7 @@ function tick() {
     pushFeed({ min: it.min, kind: 'build', text: narr('build' + it.side, it.side, it.who) }); wait = PACE.build;
   } else {
     const e = it.e;
+    if (e.kind === 'counter' || e.kind === 'combo') flashBanner(e);
     pushFeed(e);
     if (e.epic) {
       if (e.kind === 'goal') { G.shownScore[e.side] += e.value; G.goalMarks.push({ side: e.side, min: e.min }); addMom(e.side, e.min, 2.5); G.mst.shots[e.side]++; }
@@ -708,25 +758,13 @@ function tick() {
 const DEC_SECS = 20;
 function showDecision() {
   if (G.match && G.match.pvp) return showPvpDecision();
-  const m = G.match, run = G.run;
-  const pl = E.playableCards(m);
+  G.hand = [];
   const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
-  const lead = m.score[0] - m.score[1];
-  const ctx = lead > 0 ? ['Você está na frente. Segura ou mata o jogo?', 'var(--lime)'] : lead < 0 ? ['Você está atrás. Hora de arriscar!', '#ff9a9d'] : ['Jogo empatado. Quem decide?', 'var(--gold)'];
-  const est = E.coachStars(run, 'est');
-  const C = 2 * Math.PI * 18;
-  box.innerHTML = `<div class="inner" role="dialog" aria-label="Momento decisivo"><div class="grab"></div>
-  <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${G.shownScore[0]} x ${G.shownScore[1]}</div><div class="t">Momento decisivo</div></div>
-    <div class="dtimer" title="Se o tempo acabar, você guarda as cartas"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div></div>
-  <div class="dctx" style="border-left:3px solid ${ctx[1]}">${ctx[0]}${est > 0 ? `<br><span style="color:#8fcbff">${ic('coach')} Prancheta de ${esc(E.coachSrc(run, 'est'))}: cartas mais fortes.</span>` : ''}</div>
-  <div class="dcards">${run.cards.map((c, i) => {
-    const d = E.CARDS[c], used = pl.indexOf(c) < 0;
-    return `<button class="pcard ${used ? 'used' : ''}" style="--rc:${rc(d.rar)};animation-delay:${i * 0.07}s" ${used ? 'disabled' : `data-act="usecard" data-c="${c}"`}>
-      <span class="med">${d.icon}</span><span><span class="rr">Carta · ${E.RARITIES[d.rar].nome}</span><div class="in">${esc(d.nome)}</div><div class="id">${esc(d.desc)}</div><span class="use">${used ? 'JÁ USADA NESTE JOGO' : 'TOQUE PARA USAR AGORA'}</span></span></button>`;
-  }).join('')}</div>
-  <button class="btn sec" style="margin-top:12px" data-act="usecard" data-c="">${ic('arrow')} Guardar e seguir</button></div>`;
+  box.innerHTML = `<div class="inner" id="dinn" role="dialog" aria-label="Momento decisivo"></div>`;
   document.body.appendChild(box);
+  paintDecision();
   showTip('decision');
+  const C = 2 * Math.PI * 18;
   let left = DEC_SECS * 10;
   G.decT = setInterval(() => {
     if (!document.body.contains(box)) { clearInterval(G.decT); return; }
@@ -735,16 +773,54 @@ function showDecision() {
     const r = $('#dring'), s = $('#dsec');
     if (r) r.setAttribute('stroke-dashoffset', String(C * (1 - left / (DEC_SECS * 10))));
     if (s) s.textContent = Math.ceil(left / 10);
-    if (left <= 0) { clearInterval(G.decT); useCard(''); toast('Tempo esgotado: cartas guardadas'); }
+    if (left <= 0) { clearInterval(G.decT); useCard(G.hand.length ? G.hand.slice() : ''); toast(G.hand.length ? 'Tempo esgotado: cartas escolhidas entram' : 'Tempo esgotado: cartas guardadas'); }
   }, 100);
+}
+function paintDecision() {
+  const inn = $('#dinn'); if (!inn || !G.match) return;
+  const m = G.match, run = G.run, spent = (G.hand || []).reduce((s, id) => s + E.CARDS[id].cost, 0);
+  const left = m.nrgLeft - spent;
+  const focus = G.hand.length ? G.hand[G.hand.length - 1] : (run.cards.find(c => m.used.indexOf(c) < 0) || run.cards[0]);
+  const d = focus && E.CARDS[focus];
+  const t = d && E.CARD_TYPES[d.tipo];
+  const opp = m.fxOpp && m.fxOpp.style && m.minute <= m.fxOpp.styleUntil ? m.fxOpp.style : null;
+  const beat = opp && Object.keys(E.BEATS).find(k => E.BEATS[k] === opp);
+  inn.innerHTML = `<div class="grab"></div>
+    <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${G.shownScore[0]} x ${G.shownScore[1]}</div><div class="t">Energia ${nrgPips(Math.max(0, left), m.nrgMax || 3)}</div></div>
+    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}" stroke-dashoffset="0"/></svg><b id="dsec">${DEC_SECS}</b></div></div>
+    <div class="dctx">Toque pra marcar. Dá pra jogar várias se a energia alcançar. Sem escolha, a carta fica guardada.</div>
+    ${opp ? `<p class="xs">Rival está em <b>${esc(E.STYLE_NAME[opp])}</b>. ${beat ? esc(E.STYLE_NAME[beat]) + ' dá CONTRA-GOLPE!' : ''}</p>` : ''}
+    <div class="dcards">${run.cards.map(c => {
+      const on = G.hand.indexOf(c) >= 0, used = m.used.indexOf(c) >= 0, afford = !used && (on || E.CARDS[c].cost <= left);
+      return cardFace(c, run, { act: afford ? 'queue' : '', on, dim: !afford, btn: true });
+    }).join('')}</div>
+    ${d ? `<p class="small"><b>${t.emoji} ${esc(d.nome)}</b> · ${esc(E.cardText(focus, E.cardLevel(run, focus)))}</p><p class="xs" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>${chanceBars(focus)}` : ''}
+    <button class="btn shine" style="margin-top:8px" data-act="usecard" data-c="go">${G.hand.length ? 'Jogar ' + G.hand.length + ' carta' + (G.hand.length > 1 ? 's' : '') : 'Escolha uma carta'}</button>
+    <button class="btn sec" style="margin-top:8px" data-act="usecard" data-c="">${ic('arrow')} Guardar e seguir</button>`;
+}
+function toggleHand(id) {
+  G.hand = G.hand || [];
+  const i = G.hand.indexOf(id);
+  if (i >= 0) G.hand.splice(i, 1);
+  else G.hand.push(id);
+  paintDecision();
 }
 function useCard(c) {
   clearInterval(G.decT);
   const d = $('#decision'); if (d) d.remove();
   document.querySelectorAll('.tip').forEach(x => x.remove());
-  const evs = E.playCard(G.match, c || null);
+  const ids = c === 'go' ? (G.hand || []).slice() : (Array.isArray(c) ? c : (c ? [c] : []));
+  const evs = E.playCards(G.match, ids);
   evs.forEach(e => G.queue.push({ t: 'event', e }));
+  G.hand = [];
   G.timer = setTimeout(tick, 300 / G.speed);
+}
+function flashBanner(e) {
+  const d = document.createElement('div');
+  d.className = 'banner ' + (e.kind === 'combo' ? 'combo' : 'golpe');
+  d.innerHTML = `<b>${e.kind === 'combo' ? 'COMBO' : 'CONTRA-GOLPE!'}</b><span>${esc(e.text)}</span>`;
+  document.body.appendChild(d);
+  setTimeout(() => d.remove(), 1700);
 }
 function endMatch() {
   SIM.on = false;
@@ -811,9 +887,21 @@ function offerHtml(it, i, act, price, flip) {
       <div class="od">${p.pos}${p.traits ? ' · ' + p.traits.split('').map(t => TRAIT_FULL[t]).join(', ') : ''}</div>
       <span class="up ${diff > 0 ? 'p' : 'n'}">${diff > 0 ? '▲ +' + diff : '▼ ' + diff} vs ${esc(worst.nome)} (${worst.rating})</span></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
   }
-  const d = it.type === 'card' ? E.CARDS[it.id] : E.RELICS[it.id];
+  if (it.type === 'card') {
+    const d = E.CARDS[it.id], t = E.CARD_TYPES[d.tipo];
+    const owned = G.run.cards.indexOf(it.id) >= 0;
+    const lv = E.cardLevel(G.run, it.id);
+    const showLv = owned ? Math.min(3, lv + 1) : 1;
+    return `<div class="offer cardoffer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${t.cor}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
+      <div class="cslot">${cardFace(it.id, G.run, { btn: false, lv: showLv })}</div>
+      <div><div class="ot">${t.emoji} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ⚡${d.cost}</div>
+      <div class="on">${esc(d.nome)}</div>
+      <div class="od">${esc(E.cardText(it.id, showLv))}</div>
+      <div class="xs" style="color:var(--gold);margin-top:4px">Melhor quando: ${esc(d.tip)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
+  }
+  const d = E.RELICS[it.id];
   return `<div class="offer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${rc(d.rar)}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
-    <span class="med">${d.icon}</span><div><div class="ot">${it.type === 'card' ? 'Carta' : 'Relíquia'} · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
+    <span class="med">${d.icon}</span><div><div class="ot">Relíquia · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
 }
 function renderReward() {
   const run = G.run;
@@ -840,7 +928,7 @@ function askTarget(it, done) {
   const m = document.createElement('div'); m.className = 'modal';
   let title, list;
   if (it.type === 'player') { title = `Quem sai pra entrar ${esc(it.player.nome)} (${it.player.rating})?`; list = opts.map(i => { const p = run.players[i]; return `<div class="opt" data-t="${i}">${futCard(p, { size: 'sm', kit: selOf(run).kit })}<div><b>${esc(p.nome)}</b><div class="xs mut">${p.pos} · nota ${p.rating}</div></div><span style="margin-left:auto;color:var(--lime);font-weight:900">+${it.player.rating - p.rating}</span></div>`; }); }
-  else if (it.type === 'card') { title = `Mão cheia (${E.MAX_CARDS}). Qual carta sai?`; list = opts.map(c => `<div class="opt" data-t="${c}"><span style="font-size:24px">${E.CARDS[c].icon}</span><div><b>${esc(E.CARDS[c].nome)}</b><div class="xs mut">${esc(E.CARDS[c].desc)}</div></div></div>`); }
+  else if (it.type === 'card') { title = `Mão cheia (${E.MAX_CARDS}). Qual carta sai?`; list = opts.map(c => `<div class="opt" data-t="${c}">${cardFace(c, run, { btn: false })}<div class="xs mut" style="margin-top:4px">${esc(E.cardText(c, E.cardLevel(run, c)))}</div></div>`); }
   else { title = `Relíquias cheias (${E.MAX_RELICS}). Qual sai?`; list = opts.map(r => `<div class="opt" data-t="${r}"><span style="font-size:24px">${E.RELICS[r].icon}</span><div><b>${esc(E.RELICS[r].nome)}</b><div class="xs mut">${esc(E.RELICS[r].desc)}</div></div></div>`); }
   m.innerHTML = `<div class="box"><h3>${title}</h3>${list.join('')}<button class="btn sec" style="margin-top:8px" data-x="1">Cancelar</button></div>`;
   m.addEventListener('click', ev => {
@@ -850,7 +938,11 @@ function askTarget(it, done) {
   });
   document.body.appendChild(m);
 }
-function describeTake(it) { return it.type === 'player' ? `${it.player.nome} chegou!` : (it.type === 'card' ? E.CARDS[it.id].nome : E.RELICS[it.id].nome) + ' é sua!'; }
+function describeTake(it) {
+  if (it.type === 'player') return `${it.player.nome} chegou!`;
+  if (it.type === 'card') { const lv = E.cardLevel(G.run, it.id); return E.CARDS[it.id].nome + (lv > 1 ? ` agora é Nv${lv}!` : ' é sua!'); }
+  return E.RELICS[it.id].nome + ' é sua!';
+}
 function takeReward(i) {
   const it = G.offers[i];
   askTarget(it, t => {
@@ -1039,7 +1131,21 @@ async function shareCard() {
 // ---------- info (toque) ----------
 function showInfo(k, id) {
   let rar = 'comum', icon = '', nome = '', tipo = '', desc = '';
-  if (k === 'card') { const d = E.CARDS[id]; rar = d.rar; icon = d.icon; nome = d.nome; tipo = 'Carta · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Cada carta pode ser usada 1 vez por jogo, num momento decisivo.'; }
+  if (k === 'card') {
+    const d = E.CARDS[id], t = E.CARD_TYPES[d.tipo], lv = E.cardLevel(G.run, id);
+    const m = document.createElement('div'); m.className = 'modal';
+    const hints = G.run ? E.comboHints(G.run, id) : [];
+    m.innerHTML = `<div class="box info" style="--rc:${t.cor}"><div style="max-width:220px;margin:0 auto 10px">${cardFace(id, G.run, { btn: false })}</div>
+      <p class="d"><b>${t.emoji} ${t.nome}</b> · custa ${d.cost} · ${esc(d.dur)} · Nv${lv}</p>
+      <p class="d">${esc(E.cardText(id, lv))}</p>
+      <p class="d" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>
+      ${d.style ? `<p class="xs">Estilo ${E.STYLE_NAME[d.style]}. ${E.BEATS[d.style] ? 'Ganha de ' + E.STYLE_NAME[E.BEATS[d.style]] + '.' : ''}</p>` : ''}
+      ${hints.length ? `<p class="hintline">Combo com o que você tem: ${esc(hints.join(', '))}</p>` : ''}
+      <button class="btn sec" data-x="1">Fechar</button></div>`;
+    m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
+    document.body.appendChild(m);
+    return;
+  }
   else if (k === 'relic') { const d = E.RELICS[id]; rar = d.rar; icon = d.icon; nome = d.nome; tipo = 'Relíquia · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Relíquias funcionam sozinhas, o tempo todo.'; }
   else return;
   const m = document.createElement('div'); m.className = 'modal';
@@ -1481,21 +1587,14 @@ function resumeFinal(final) {
 }
 function showPvpDecision() {
   if (drainPendingLock()) return;
-  const m = G.match, role = G.cup.role, mine = role === 0 ? m.run : m.away;
-  G.pvpPick = [undefined, undefined]; G.pvpLocked = false;
+  const m = G.match, role = G.cup.role;
+  G.pvpPick = [undefined, undefined]; G.pvpLocked = false; G.pvpHand = [];
   const box = document.createElement('div'); box.className = 'sheet'; box.id = 'decision';
-  const secs = 12, C = 2 * Math.PI * 18;
-  const cards = mine.cards || [];
-  const playable = E.pvpCards(m, role);
-  const needMe = m.awaitingSides[role];
-  box.innerHTML = `<div class="inner" role="dialog" aria-label="Carta da final"><div class="grab"></div>
-    <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${m.score[0]} x ${m.score[1]}</div><div class="t">Final ao vivo</div></div>
-    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="dsec">${secs}</b></div></div>
-    <div class="dctx" style="border-left:3px solid var(--gold)">Os dois escolhem ao mesmo tempo. Quem não escolher a tempo guarda a carta. <span id="fpick">Amigo escolhendo...</span></div>
-    ${needMe ? `<div class="dcards">${cards.map((c, i) => { const d = E.CARDS[c], used = playable.indexOf(c) < 0; return `<button class="pcard ${used ? 'used' : ''}" style="--rc:${rc(d.rar)};animation-delay:${i * 0.07}s" ${used ? 'disabled' : `data-act="pvpcard" data-c="${c}"`}><span class="med">${d.icon}</span><span><span class="rr">Carta · ${E.RARITIES[d.rar].nome}</span><div class="in">${esc(d.nome)}</div><div class="id">${esc(d.desc)}</div><span class="use">${used ? 'JÁ USADA' : 'TOQUE PARA USAR'}</span></span></button>`; }).join('')}</div>
-    <button class="btn sec" style="margin-top:12px" data-act="pvpcard" data-c="">${ic('arrow')} Guardar e seguir</button>` : `<p class="small">Você não tem carta neste minuto. Esperando o amigo.</p>`}</div>`;
+  box.innerHTML = `<div class="inner" id="dinn" role="dialog" aria-label="Carta da final"></div>`;
   document.body.appendChild(box);
-  if (!needMe) { G.pvpPick[role] = null; if (window.FFNet) FFNet.send({ t: 'card', min: m.minute, side: role, card: null }); maybeSendLock(); }
+  paintPvp();
+  if (!m.awaitingSides[role]) { G.pvpPick[role] = null; if (window.FFNet) FFNet.send({ t: 'card', min: m.minute, side: role, card: null }); maybeSendLock(); }
+  const secs = 12, C = 2 * Math.PI * 18;
   let left = secs * 10;
   G.decT = setInterval(() => {
     if (!document.body.contains(box)) { clearInterval(G.decT); return; }
@@ -1506,16 +1605,46 @@ function showPvpDecision() {
     if (left <= 0) { clearInterval(G.decT); pvpTimeout(); }
   }, 100);
 }
+function paintPvp() {
+  const inn = $('#dinn'); if (!inn || !G.match || !G.cup) return;
+  const m = G.match, role = G.cup.role, mine = role === 0 ? m.run : m.away;
+  const bag = role === 0 ? m.used : m.usedAway;
+  const pool = m.nrgLeft != null && role === 0 ? m.nrgLeft : (role === 1 ? m.nrgAway : 3);
+  const max = role === 0 ? (m.nrgMax || 3) : (m.nrgMaxAway || 3);
+  const spent = (G.pvpHand || []).reduce((s, id) => s + E.CARDS[id].cost, 0);
+  const left = pool - spent;
+  const focus = (G.pvpHand && G.pvpHand[0]) || (mine.cards || [])[0];
+  inn.innerHTML = `<div class="grab"></div>
+    <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${m.score[0]} x ${m.score[1]}</div><div class="t">Final · ${nrgPips(Math.max(0, left), max)}</div></div>
+    <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}"/></svg><b id="dsec">12</b></div></div>
+    <div class="dctx" style="border-left:3px solid var(--gold)">Os dois escolhem ao mesmo tempo. Sem escolha, a carta fica guardada. <span id="fpick">Amigo escolhendo...</span></div>
+    ${(mine.cards || []).map(c => {
+      const on = (G.pvpHand || []).indexOf(c) >= 0, used = bag.indexOf(c) >= 0, afford = !used && (on || E.CARDS[c].cost <= left);
+      return cardFace(c, mine, { act: afford && m.awaitingSides[role] ? 'pvpcard' : '', on, dim: !afford, btn: true });
+    }).join('')}
+    ${focus ? chanceBars(focus) : ''}
+    <button class="btn shine" style="margin-top:8px" data-act="pvpcard" data-c="go">Confirmar</button>
+    <button class="btn sec" style="margin-top:8px" data-act="pvpcard" data-c="">Guardar e seguir</button>`;
+  paintFriendPick();
+}
 function paintFriendPick() {
   const el = $('#fpick'); if (!el || !G.cup) return;
   const side = 1 - G.cup.role, card = G.pvpPick && G.pvpPick[side];
-  el.textContent = card === undefined ? 'Amigo escolhendo...' : card ? ('Amigo: ' + E.CARDS[card].nome) : 'Amigo guardou a carta.';
+  const nome = card == null || card === '' ? '' : (Array.isArray(card) ? card.map(id => E.CARDS[id] ? E.CARDS[id].nome : id).join(' + ') : (E.CARDS[card] ? E.CARDS[card].nome : ''));
+  el.textContent = card === undefined ? 'Amigo escolhendo...' : nome ? ('Amigo: ' + nome) : 'Amigo guardou a carta.';
 }
 function pvpChoose(card) {
   if (!G.match || !G.match.awaiting || G.pvpPick[G.cup.role] !== undefined) return;
-  G.pvpPick[G.cup.role] = card || null;
-  if (window.FFNet) FFNet.send({ t: 'card', min: G.match.minute, side: G.cup.role, card: card || null });
-  const btn = document.querySelector('#decision .dcards'); if (btn) btn.style.opacity = '.55';
+  if (card !== 'go' && card !== '') {
+    G.pvpHand = G.pvpHand || [];
+    const i = G.pvpHand.indexOf(card);
+    if (i >= 0) G.pvpHand.splice(i, 1); else G.pvpHand.push(card);
+    paintPvp();
+    return;
+  }
+  const ids = card === 'go' ? (G.pvpHand || []).slice() : [];
+  G.pvpPick[G.cup.role] = ids.length ? ids : null;
+  if (window.FFNet) FFNet.send({ t: 'card', min: G.match.minute, side: G.cup.role, card: ids.length ? ids : null });
   maybeSendLock();
 }
 function cupAuthority() {
@@ -1906,6 +2035,7 @@ function onClick(ev) {
     case 'cupBack': go(G.run && G.run.stage >= 3 && !G.cup.koSeen ? 'chave' : 'hub'); break;
     case 'cupBoard': if (G.cup) { G.cup.mode = G.run && G.run.stage >= 3 ? 'ko' : 'start'; G.screen = 'chave'; render(); } break;
     case 'cupRetry': cupRetry(); break;
+    case 'queue': toggleHand(el.dataset.c); break;
     case 'pvpcard': pvpChoose(el.dataset.c || ''); break;
     case 'duelLink': { const d = { v: 1, s: G.run.seed, l: G.run.level, a: M.duelSide(G.run, G.store.coachName || 'Fominha', G.verdict.points) }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Duelo no Fominha FC! Fiz ${fmtN(G.verdict.points)} pts na Copa ${G.run.seed}. Duvido você me passar: ${url}`).then(ok => toast(ok ? 'Link do duelo copiado! Manda no grupo ⚔️' : 'Não deu pra copiar o link')); break; }
     case 'duelReturn': { const R = G.metaRes.duel; const d = { v: 1, s: G.run.seed, l: G.run.level, a: R.me, b: R.them }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Respondi teu duelo no Fominha FC: ${fmtN(R.me.p)} x ${fmtN(R.them.p)}. Confere: ${url}`).then(ok => toast(ok ? 'Resposta copiada! Devolve pro amigo ⚔️' : 'Não deu pra copiar')); break; }
@@ -1941,7 +2071,59 @@ function onClick(ev) {
   }
 }
 // expõe para testes/screenshot
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel };
+function previewCards(which) {
+  window.__noTips = true;
+  const run = E.newRun('CARDS1', 1, 'bra82', E.makeCoach('Patrick', E.flatCoach(82, 'Patrick').slots));
+  run.fichas = 20;
+  G.store.coachName = 'Patrick';
+  G.cup = null;
+  const openMatch = (cards, hand) => {
+    run.cards = cards;
+    G.run = run;
+    G.match = E.createMatch(run);
+    G.match.minute = 23; G.match.score = [0, 1]; G.match.awaiting = true;
+    G.shownScore = [0, 1]; G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
+    G.screen = 'match'; render();
+    clearTimeout(G.timer); SIM.on = false;
+    showDecision();
+    G.hand = hand.slice();
+    paintDecision();
+  };
+  if (which === 'momento') { openMatch(['pressao', 'chuveirinho', 'casinha', 'toque'], ['chuveirinho']); return; }
+  if (which === 'golpe') {
+    openMatch(['pressao', 'contra', 'toque', 'casinha'], ['pressao']);
+    G.match.fxOpp.style = 'posse'; G.match.fxOpp.styleUntil = 90; G.match.fxOpp.styleCard = 'toque';
+    paintDecision();
+    flashBanner({ kind: 'counter', text: 'CONTRA-GOLPE! Pressão Alta quebra Posse e ganha +10% de chance de gol por 10 min.' });
+    return;
+  }
+  if (which === 'combo') {
+    run.relics = ['cabeca_ouro'];
+    openMatch(['pressao', 'submagica', 'chuveirinho', 'grito'], ['pressao']);
+    flashBanner({ kind: 'combo', text: 'Blitz! A pressão segue e o cansaço não chega.' });
+    return;
+  }
+  if (which === 'info') {
+    run.cards = ['craque', 'pressao', 'paredao', 'catimba'];
+    run.cardLv = { craque: 2 };
+    G.run = run; G.screen = 'hub'; render();
+    showInfo('card', 'craque');
+    return;
+  }
+  if (which === 'pacote') {
+    run.cards = ['casinha', 'submagica'];
+    run.cardLv = {};
+    G.run = run;
+    G.offers = [{ type: 'card', id: 'pressao' }, { type: 'card', id: 'craque' }, { type: 'card', id: 'chuveirinho' }];
+    G.packOpen = true; G.screen = 'reward'; render();
+    return;
+  }
+  if (which === 'nivel') {
+    run.cardLv = { pressao: 3, craque: 2 };
+    openMatch(['pressao', 'craque', 'casinha', 'grito'], ['pressao']);
+  }
+}
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards };
 document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);

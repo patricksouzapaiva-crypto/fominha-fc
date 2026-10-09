@@ -41,10 +41,19 @@ function playRun(seed, level, R, strat, coachSpec) {
   while (run.status === 'playing' && guard++ < 20) {
     const m = E.createMatch(run);
     const ev = E.simulateRest(m, mm => {
-      const pl = E.playableCards(mm);
-      if (!pl.length) return null;
-      if (strat === 'smart') return R.next() < 0.8 ? R.pick(pl) : null;
-      return R.next() < 0.5 ? R.pick(pl) : null;
+      const ids = [];
+      const room = () => {
+        const spent = ids.reduce((s, id) => s + E.CARDS[id].cost, 0);
+        return E.playableCards(mm).filter(c => ids.indexOf(c) < 0 && E.CARDS[c].cost <= mm.nrgLeft - spent);
+      };
+      let g = 0;
+      while (g++ < 4) {
+        const pl = room();
+        if (!pl.length) break;
+        if (R.next() >= (strat === 'smart' ? 0.8 : 0.5)) break;
+        ids.push(R.pick(pl));
+      }
+      return ids;
     });
     stats.cardsUsed += ev.filter(e => e.kind === 'card').length;
     stats.bossMao += ev.filter(e => e.gtype === 'mao').length;

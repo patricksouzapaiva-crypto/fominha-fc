@@ -12,7 +12,8 @@
       relics: (run.relics || []).slice(),
       coach: run.coach ? { nome: run.coach.nome, slots: JSON.parse(JSON.stringify(run.coach.slots)) } : null,
       level: run.level || 1,
-      fichas: run.fichas || 0
+      fichas: run.fichas || 0,
+      cardLv: run.cardLv || {}
     };
   }
   function unpackSquad(sq, seed) {
@@ -24,15 +25,20 @@
     run.fichas = sq.fichas || 0;
     run.stage = 6;
     run.cardLog = {};
+    run.cardLv = sq.cardLv || {};
     return run;
   }
   function aiCard(m, side) {
     const cards = E.pvpCards(m, side);
     if (!cards.length) return null;
     const losing = m.score[side] < m.score[1 - side];
+    const opp = side === 0 ? m.fxAway : m.fx;
+    const style = opp && opp.style && m.minute <= opp.styleUntil ? opp.style : null;
+    const beat = style && Object.keys(E.BEATS).find(s => E.BEATS[s] === style);
+    if (beat) { const hit = cards.find(id => E.CARDS[id].style === beat); if (hit) return hit; }
     const prefer = losing
-      ? ['pressao', 'craque', 'peixinho', 'chuveirinho', 'longe', 'submagica', 'paredao', 'casinha']
-      : ['casinha', 'paredao', 'craque', 'pressao', 'peixinho', 'longe', 'chuveirinho', 'submagica'];
+      ? ['pressao', 'grito', 'craque', 'peixinho', 'chuveirinho', 'longe', 'contra', 'submagica', 'paredao', 'casinha', 'toque', 'linha', 'bolaparada', 'catimba']
+      : ['casinha', 'paredao', 'linha', 'catimba', 'contra', 'craque', 'pressao', 'grito', 'peixinho', 'longe', 'chuveirinho', 'toque', 'bolaparada', 'submagica'];
     return prefer.find(c => cards.indexOf(c) >= 0) || null;
   }
   // choices: lista na ordem das pausas, { c0, c1 } ou null pra guardar. Sem escolha = guarda.
