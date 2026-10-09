@@ -1,6 +1,7 @@
 /* Fominha FC · Modo Carreira. Simulação determinística por semente. */
 (function (root) {
   const E = (typeof module !== 'undefined' && module.exports) ? require('./engine.js') : root.FFEngine;
+  const Badges = (typeof module !== 'undefined' && module.exports) ? require('./badges.js') : root.FFBadges;
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const avg = a => a.reduce((s, x) => s + x, 0) / (a.length || 1);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
@@ -344,7 +345,103 @@
     const line = (tag ? tag + ' · ' : '') + k + ' ' + gf + ' a ' + ga + ' contra ' + clubOf(foe).nome;
     c.feed.unshift(line); if (c.feed.length > 6) c.feed.pop();
     noteForm(c, gf, ga);
+    buildReport(c, foe, gf, ga, tag);
     return line;
+  }
+  function scriptPens(rng, ourWin, c) {
+    const xi = bestXI(c.squad).filter(p => p.pos !== 'GOL');
+    const gk = (bestXI(c.squad).find(p => p.pos === 'GOL') || {}).nome || 'Goleiro';
+    const kicks = [];
+    let us = 0, them = 0;
+    const take = (side, i, ok) => {
+      const nome = side === 0 ? (xi[i % Math.max(1, xi.length)] || { nome: 'Titular' }).nome : person(rng);
+      if (ok) { if (side === 0) us++; else them++; }
+      kicks.push({ side, nome, ok, keeper: side === 0 ? 'Goleiro rival' : gk });
+    };
+    for (let i = 0; i < 5; i++) {
+      let ok0 = rng.chance(0.74);
+      let ok1 = rng.chance(0.68);
+      if (i === 4) {
+        const u = us + (ok0 ? 1 : 0);
+        if (ourWin && u <= them) ok0 = true;
+        if (!ourWin && us >= them + (ok1 ? 1 : 0)) ok0 = false;
+        const u2 = us + (ok0 ? 1 : 0);
+        if (ourWin && u2 <= them) ok1 = false;
+        if (!ourWin && them < u2) ok1 = true;
+        if (!ourWin && them + (ok1 ? 1 : 0) === u2) ok1 = true;
+      }
+      take(0, i, ok0);
+      if (i >= 4 && us > them && ourWin && us > them + 1) return kicks;
+      take(1, i, ok1);
+      if (i >= 4 && us !== them && (us > them) === !!ourWin) return kicks;
+    }
+    if (us === them || (us > them) !== !!ourWin) {
+      if (ourWin) { take(0, 5, true); take(1, 5, false); }
+      else { take(0, 5, false); take(1, 5, true); }
+    }
+    return kicks;
+  }
+  function buildReport(c, foeId, gf, ga, tag) {
+    const rng = R(c.seed, 'relato', c.year, String(c.round), foeId, gf, ga, tag || '');
+    const xi = bestXI(c.squad);
+    const pool = xi.filter(p => p.pos === 'ATA' || p.pos === 'MEI');
+    const atk = pool.length ? pool : xi;
+    const used = {};
+    const minute = () => {
+      let m = rng.int(1, 90), g = 0;
+      while (used[m] && g++ < 30) m = rng.int(1, 90);
+      used[m] = 1;
+      return m;
+    };
+    const goals = [];
+    const add = (n, side) => {
+      for (let i = 0; i < n; i++) {
+        const nome = side === 0 ? atk[rng.int(0, atk.length - 1)].nome : person(rng);
+        let assist = '';
+        if (rng.chance(0.62)) {
+          assist = side === 0 ? atk[rng.int(0, atk.length - 1)].nome : person(rng);
+          if (assist === nome) assist = '';
+        }
+        goals.push({ min: minute(), side, nome, assist });
+      }
+    };
+    add(gf, 0); add(ga, 1);
+    goals.sort((a, b) => a.min - b.min);
+    const cards = [];
+    const yc = rng.int(1, 4);
+    for (let i = 0; i < yc; i++) {
+      cards.push({ min: minute(), cor: 'amarelo', nome: rng.chance(0.55) ? xi[rng.int(0, xi.length - 1)].nome : person(rng) });
+    }
+    if (rng.chance(0.12)) cards.push({ min: minute(), cor: 'vermelho', nome: xi[rng.int(0, xi.length - 1)].nome });
+    const poss = clamp(50 + (gf - ga) * 4 + rng.int(-4, 4), 36, 68);
+    const shots = [gf + rng.int(2, 7), ga + rng.int(2, 6)];
+    const on = [clamp(gf + rng.int(0, 3), gf, shots[0]), clamp(ga + rng.int(0, 3), ga, shots[1])];
+    const motm = (gf >= ga ? atk[0] : { nome: person(rng) }).nome;
+    const ratings = xi.map(p => ({
+      nome: p.nome, pos: p.pos,
+      nota: Math.round(clamp(6.1 + (p.nome === motm ? 1.5 : 0) + (gf - ga) * 0.18 + rng.next() * 1.5, 5.1, 9.6) * 10) / 10
+    }));
+    const timeline = goals.map(g => ({ min: g.min, t: 'Gol de ' + g.nome + (g.assist ? ', assistência de ' + g.assist : '') }));
+    cards.forEach(cd => timeline.push({ min: cd.min, t: (cd.cor === 'vermelho' ? 'Vermelho' : 'Amarelo') + ' para ' + cd.nome }));
+    timeline.sort((a, b) => a.min - b.min);
+    const epic = gf + ga >= 3 && rng.chance(0.4) ? rng.pick(['bicicleta', 'cobertura', 'gol de placa', 'cavadinha']) : '';
+    let pens = null;
+    if (c._wasPens) {
+      pens = scriptPens(R(c.seed, 'penshow', c.year, String(c.round), foeId, tag || ''), gf > ga, c);
+      c._wasPens = false;
+    }
+    c.report = { foeId, gf, ga, tag: tag || '', goals, cards, poss, shots, on, motm, ratings, timeline, epic, pens, year: c.year };
+  }
+  function peekPens(c) {
+    const kind = c && (c._liveKind === 'lib' ? 'lib' : c._liveKind === 'copa' ? 'copa' : '');
+    if (!kind) return null;
+    const idx = kind === 'copa' ? c.copaRound : c.libRound;
+    const rng = R(c.seed, kind, 'pen', c.year, idx);
+    const ourWin = rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 220);
+    const kicks = scriptPens(R(c.seed, kind, 'penshow', c.year, idx), ourWin, c);
+    let us = 0, them = 0;
+    kicks.forEach(k => { if (k.ok) { if (k.side === 0) us++; else them++; } });
+    return { ourWin, kicks, score: [us, them] };
   }
   function simPair(c, div, h, a, key) {
     const rng = R(c.seed, 'j', c.year, div, c.round, h, a, key || 0);
@@ -426,9 +523,10 @@
       const sc = playGame(h, a, rng);
       gf = foe.home ? sc[0] : sc[1];
       ga = foe.home ? sc[1] : sc[0];
-      if (gf === ga) { if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 200)) gf++; else ga++; }
+      if (gf === ga) { c._wasPens = true; if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 200)) gf++; else ga++; }
     }
     if (gf === ga) {
+      c._wasPens = true;
       const rng = R(c.seed, kind, 'pen', c.year, idx);
       if (rng.chance(0.5 + (c.coach.slots.mot.rating - 70) / 220)) gf++; else ga++;
       c.feed.unshift('Decidido nos pênaltis.');
@@ -884,35 +982,100 @@
     c.timeline.push({ y: c.year + 1, t: 'Voltou ao ' + clubOf(c.clubId).nome + '.' });
   }
   const DECS = [
-    { id: 'base', t: 'A base pede passagem', d: 'O coordenador quer saber onde vai o pouco dinheiro.', opts: [
+    { id: 'base', art: 'base', t: 'A base pede passagem', d: 'O coordenador quer saber onde vai o pouco dinheiro.', opts: [
       { tx: 'Treinar a garotada', tag: 'g', train: BAL.goodTrain, budget: -6, fans: 3, trust: 2 },
       { tx: 'Meio-termo', tag: 'm', train: BAL.midTrain, budget: 2, trust: 1 },
       { tx: 'Medalhão emergencial', tag: 'b', train: 4, budget: -16, trust: -3, fans: 2 }
     ] },
-    { id: 'grupo', t: 'Clima no vestiário', d: 'O elenco discutiu depois do último resultado.', opts: [
+    { id: 'grupo', art: 'vestiario', t: 'Clima no vestiário', d: 'O elenco discutiu depois do último resultado.', opts: [
       { tx: 'Blindar o capitão', tag: 'g', trust: 5, fans: 2, train: 4 },
       { tx: 'Deixar quieto', tag: 'm', trust: 1 },
       { tx: 'Lavar roupa suja', tag: 'b', trust: -8, fans: 3, rep: 1 }
     ] },
-    { id: 'imprensa', t: 'Coletiva quente', d: 'Perguntam se a diretoria atrapalha.', opts: [
+    { id: 'imprensa', art: 'polemica', t: 'Coletiva quente', d: 'Perguntam se a diretoria atrapalha.', opts: [
       { tx: 'Responder com calma', tag: 'g', trust: 3, fans: 2, train: 4 },
       { tx: 'Desconversar', tag: 'm', trust: 0 },
       { tx: 'Cobrar a diretoria', tag: 'b', trust: -6, rep: 3 }
     ] },
-    { id: 'estilo', t: 'Semana de treino', d: 'Dá para afiar o que o seu técnico já faz melhor.', opts: [
+    { id: 'estilo', art: 'treino', t: 'Semana de treino', d: 'Dá para afiar o que o seu técnico já faz melhor.', opts: [
       { tx: 'Insistir no ponto forte', tag: 'g', focus: 1, train: 8 },
       { tx: 'Treino leve', tag: 'm', train: 2 },
       { tx: 'Mudar a filosofia', tag: 'b', focus: -1, low: 1, trust: -2 }
     ] },
-    { id: 'elenco', t: 'Proposta por um titular', d: 'Querem o seu melhor jogador. O caixa agradece, a torcida nem tanto.', opts: [
+    { id: 'elenco', art: 'proposta', t: 'Proposta por um titular', d: 'Querem o seu melhor jogador. O caixa agradece, a torcida nem tanto.', opts: [
       { tx: 'Renovar com o líder', tag: 'g', fans: 4, trust: 2, budget: -4, train: 6 },
       { tx: 'Segurar e pronto', tag: 'm', trust: 1 },
       { tx: 'Vender agora', tag: 'b', sell: 1, budget: 16, fans: -8, trust: -2 }
     ] },
-    { id: 'torcida', t: 'Arquibancada', d: 'A torcida cobrou o time na saída do estádio.', opts: [
+    { id: 'torcida', art: 'festa', t: 'Arquibancada', d: 'A torcida cobrou o time na saída do estádio.', opts: [
       { tx: 'Abrir um treino', tag: 'g', fans: 6, budget: -3, trust: 1, train: 6 },
       { tx: 'Nota oficial', tag: 'm', fans: 1 },
       { tx: 'Ignorar o barulho', tag: 'b', fans: -7, trust: -3 }
+    ] },
+    { id: 'lesao', art: 'lesao', t: 'Lesão no meio da semana', d: 'O titular sente a coxa no treino. O departamento médico espera uma resposta.', opts: [
+      { tx: 'Dosar a minutagem', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Jogar com dor', tag: 'm', fans: 2, trust: -1 },
+      { tx: 'Esconder do departamento', tag: 'b', trust: -6, fans: -2 }
+    ] },
+    { id: 'crise', art: 'crise', t: 'O craque quer sair', d: 'O camisa 10 pede para ouvir propostas. O vestiário já sabe.', opts: [
+      { tx: 'Ouvir e renovar', tag: 'g', train: 4, fans: 3, trust: 2, budget: -4 },
+      { tx: 'Prometer sem assinar', tag: 'm', trust: 1 },
+      { tx: 'Colocar no banco', tag: 'b', fans: -6, trust: -4, sell: 1 }
+    ] },
+    { id: 'vestiario', art: 'vestiario', t: 'Briga no vestiário', d: 'Dois titulares quase saíram no tapa depois do apito.', opts: [
+      { tx: 'Reunir o grupo', tag: 'g', train: 4, trust: 3, fans: 1 },
+      { tx: 'Multar os dois', tag: 'm', trust: 1, fans: -1 },
+      { tx: 'Escolher um lado', tag: 'b', trust: -7, fans: -3 }
+    ] },
+    { id: 'polemica', art: 'polemica', t: 'Polêmica na imprensa', d: 'Um áudio vazou. A coletiva de amanhã já está lotada.', opts: [
+      { tx: 'Falar com calma', tag: 'g', train: 4, trust: 2, rep: 1 },
+      { tx: 'Nota curta', tag: 'm', trust: 0 },
+      { tx: 'Atacar o repórter', tag: 'b', rep: 2, trust: -6, fans: -2 }
+    ] },
+    { id: 'protesto', art: 'protesto', t: 'Protesto na porta', d: 'Faixas e fumacê na saída do treino. A torcida quer uma resposta hoje.', opts: [
+      { tx: 'Ir até a grade', tag: 'g', train: 4, fans: 6, trust: 1 },
+      { tx: 'Mandar o capitão', tag: 'm', fans: 2 },
+      { tx: 'Sair pelo fundo', tag: 'b', fans: -8, trust: -3 }
+    ] },
+    { id: 'festa', art: 'festa', t: 'Festa fora de hora', d: 'O elenco comemorou demais numa terça. A foto já circula.', opts: [
+      { tx: 'Cobrar em campo', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Deixar passar', tag: 'm', fans: 1 },
+      { tx: 'Punir em público', tag: 'b', trust: -4, fans: 2 }
+    ] },
+    { id: 'ultimato', art: 'ultimato', t: 'Ultimato da diretoria', d: 'O presidente quer três vitórias ou o banco é discutido de novo.', opts: [
+      { tx: 'Assumir a meta', tag: 'g', train: 4, trust: 4, fans: 1 },
+      { tx: 'Pedir paciência', tag: 'm', trust: 1 },
+      { tx: 'Devolver a pressão', tag: 'b', trust: -8, rep: 2 }
+    ] },
+    { id: 'joia', art: 'joia', t: 'Joia da base', d: 'Um garoto de 17 destruiu o treino tático. A torcida ainda não viu.', opts: [
+      { tx: 'Colocar no banco', tag: 'g', train: 4, fans: 3, trust: 1 },
+      { tx: 'Esperar o próximo ano', tag: 'm', train: 2 },
+      { tx: 'Emprestar agora', tag: 'b', budget: 8, fans: -4, trust: -2 }
+    ] },
+    { id: 'provocacao', art: 'provocacao', t: 'Provocação do rival', d: 'O técnico do clássico disse que o seu time “joga com medo”.', opts: [
+      { tx: 'Responder no jogo', tag: 'g', train: 4, fans: 3, trust: 1 },
+      { tx: 'Ignorar o microfone', tag: 'm', trust: 1 },
+      { tx: 'Marcar entrevista', tag: 'b', fans: 2, trust: -4, rep: 1 }
+    ] },
+    { id: 'proposta_craque', art: 'proposta', t: 'Proposta pelo craque', d: 'Chegou uma oferta alta. O empresário já está no clube.', opts: [
+      { tx: 'Segurar o líder', tag: 'g', train: 4, fans: 4, budget: -4, trust: 2 },
+      { tx: 'Pedir mais', tag: 'm', budget: 4, fans: -1 },
+      { tx: 'Vender hoje', tag: 'b', sell: 1, budget: 18, fans: -8, trust: -2 }
+    ] },
+    { id: 'classico', art: 'classico', t: 'Semana de clássico', d: 'A cidade só fala do jogo. O treino de quinta vai lotar.', opts: [
+      { tx: 'Treino tático fechado', tag: 'g', train: 4, trust: 2, fans: 1 },
+      { tx: 'Coletiva leve', tag: 'm', fans: 1 },
+      { tx: 'Prometer goleada', tag: 'b', fans: 3, trust: -3 }
+    ] },
+    { id: 'caixa', art: 'caixa', t: 'Caixa no vermelho', d: 'A folha atrasou dois dias. O capitão veio perguntar o que acontece.', opts: [
+      { tx: 'Cortar o que é extra', tag: 'g', train: 4, budget: 6, trust: 2 },
+      { tx: 'Segurar o salário', tag: 'm', budget: 4, trust: -2 },
+      { tx: 'Prometer o que não tem', tag: 'b', trust: -6, fans: -2 }
+    ] },
+    { id: 'patrocinio', art: 'patrocinio', t: 'Oferta de patrocínio', d: 'Uma marca quer a camisa. Pede o nome do técnico no comercial.', opts: [
+      { tx: 'Fechar e reforçar a base', tag: 'g', train: 4, budget: 10, fans: 1, trust: 2 },
+      { tx: 'Assinar sem aparecer', tag: 'm', budget: 4 },
+      { tx: 'Recusar por orgulho', tag: 'b', fans: 2, budget: -2, trust: -2 }
     ] }
   ];
   function makeDecision(c, slot) {
@@ -921,7 +1084,7 @@
     let pick = DECS[r.int(0, DECS.length - 1)];
     for (let i = 0; i < 6 && used.indexOf(pick.id) >= 0; i++) pick = DECS[r.int(0, DECS.length - 1)];
     c._usedDec = used.concat(pick.id);
-    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot };
+    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot, art: pick.art || 'base' };
   }
   function applyOpt(c, opt) {
     if (!opt) return;
@@ -1120,6 +1283,7 @@
       relics: [], fichas: 0, stage: ko ? 3 : 0, history: new Array(Math.max(1, c.round)).fill(0).map(() => ({})),
       opponents: [{ nome: foe.nome, flag: '🏳️', baseStr: Math.round(oppStr), jit: { atk: 0, mid: 0, def: 0, gk: 0 }, scorers: npc.scorers, scorerW: npc.scorerW, gk: npc.gk }],
       careerOpp: opp, careerKo: ko, careerHome: home, careerLabel: label,
+      careerClubId: c.clubId, careerFoeId: foeId,
       coach: c.coach, status: 'playing', nrgPenalty: c.age >= 58 ? 1 : 0,
       goalsBy: {}, goalTypes: {}, cardLv: {}, cardLog: {}, epics: [], careerMatch: true,
       groupPts: 0, totalGF: 0, totalGA: 0, rewardRerolls: 0, shopRerolls: 0
@@ -1152,13 +1316,13 @@
       if (c.phase !== 'season') return { screen: screenFor(c), msg };
       if (cupDue(c) && c.copaRound >= 3) return { screen: 'carHub', msg: msg || 'Semifinal ou final no caminho.', live: true };
       if (libDue(c) && c.libRound >= 2) return { screen: 'carHub', msg: msg || 'Jogo grande da Libertadores.', live: true };
-      if (cupDue(c)) { msg = simCupGame(c, 'copa'); if (!jump) return { screen: 'carHub', msg }; continue; }
-      if (libDue(c)) { msg = simCupGame(c, 'lib'); if (!jump) return { screen: 'carHub', msg }; continue; }
+      if (cupDue(c)) { msg = simCupGame(c, 'copa'); if (!jump) return afterSingle(c, msg); continue; }
+      if (libDue(c)) { msg = simCupGame(c, 'lib'); if (!jump) return afterSingle(c, msg); continue; }
       if (c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
       if (isKey(c)) return { screen: 'carHub', msg: msg || keyBlurb(c), live: true };
       msg = simLeagueRound(c);
       if (maybeMid(c)) return { screen: screenFor(c), msg };
-      if (!jump) return { screen: 'carHub', msg };
+      if (!jump) return afterSingle(c, msg);
     }
     return { screen: 'carHub', msg };
   }
@@ -1274,6 +1438,7 @@
   }
   function badge(id, cls) {
     const cl = clubOf(id);
+    if (Badges && Badges.badge) return Badges.badge(cl, cls);
     const letter = (cl.curto || '?').slice(0, 1);
     return `<svg class="badge ${cls || ''}" viewBox="0 0 64 72" aria-hidden="true"><path d="M32 4 58 14 v22 c0 18-12 28-26 32C18 64 6 54 6 36 V14 Z" fill="${cl.c1}" stroke="${cl.c2}" stroke-width="3"/><text x="32" y="42" text-anchor="middle" font-size="20" font-family="Arial Black,sans-serif" fill="${cl.c2}">${esc(letter)}</text></svg>`;
   }
@@ -1286,7 +1451,7 @@
     return `<div class="ctable">${rows.slice(from, from + lim).map((r, i) => {
       const pos = from + i;
       const z = pos < 4 ? 'up' : pos >= rows.length - 4 ? 'dn' : '';
-      return `<div class="ctr ${r.id === me ? 'me' : ''} ${z}"><span>${pos + 1}</span><span>${esc(r.nome)}</span><b>${r.pts}</b><small>${r.j}</small><small>${r.gp - r.gc}</small></div>`;
+      return `<div class="ctr ${r.id === me ? 'me' : ''} ${z}"><span>${pos + 1}</span><span class="tn">${badge(r.id, 'sm')}${esc(r.nome)}</span><b>${r.pts}</b><small>${r.j}</small><small>${r.gp - r.gc}</small></div>`;
     }).join('')}</div>`;
   }
   function coachBlock(c) {
@@ -1315,7 +1480,8 @@
       <div class="cclub">${badge(c.clubId)}<div><div class="eyebrow">${esc(divLabel(c))} · temporada ${c.year}</div><h2 class="ttl" style="margin:0">${esc(me.nome)}</h2><p class="sub" style="margin:2px 0 0">${esc(c.nome)} · ${c.age} anos · rep ${c.rep}</p></div></div>
       ${meter('Confiança', c.trust, '#7dffb3')}${meter('Torcida', c.fans, '#ffc83d')}${meter('Caixa', Math.min(100, c.budget), '#3aa0ff')}
       <div class="panel cfix hl"><div class="eyebrow g">${live ? 'Jogo decisivo' : 'Próximo'}</div><div class="bigfix">${foe ? badge(foe, 'sm') : ''}<div><b>${foe ? esc(clubOf(foe).nome) : 'Fim da temporada'}</b><small>${live ? 'Você entra em campo' : 'A tabela anda sozinha'} · rodada ${Math.min(c.rounds, c.round + 1)}</small></div></div>
-        ${(c.feed || []).slice(0, 3).map(t => `<div class="feedline">${esc(t)}</div>`).join('')}</div>
+        ${(c.feed || []).slice(0, 3).map(t => `<div class="feedline">${esc(t)}</div>`).join('')}
+        ${c.report ? '<button class="chip" data-act="carReport">Ver relato</button>' : ''}</div>
       <div class="panel"><div class="ph">Perto de você <span class="r">${p.i + 1}º · ${p.row ? p.row.pts : 0} pts</span></div>
         <div class="ctr h"><span>#</span><span>Clube</span><b>P</b><small>J</small><small>SG</small></div>
         ${tableHtml(p.table, c.clubId, win, from)}
@@ -1340,12 +1506,59 @@
       </div>
       <div class="mctrl"><button class="btn gold shine" data-act="carStart" ${d.left !== 0 ? 'disabled' : ''}>Assinar e começar</button></div>`;
   }
+  function eventArt(id) {
+    const sky = `<rect width="320" height="128" fill="#102418"/><rect width="320" height="78" fill="#16344c"/><path d="M0 78 H320 V128 H0 Z" fill="#1a6b32"/>`;
+    const crowd = `<g fill="#0c2418">${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<circle cx="${16 + i * 32}" cy="70" r="7"/>`).join('')}</g>`;
+    const man = (x, col) => `<g transform="translate(${x} 46)"><circle cx="0" cy="0" r="8" fill="#f0c9a0"/><path d="M-10 14 h20 l-4 36 h-12 z" fill="${col}"/><path d="M-8 50 h6 l-2 18 h-6 z M2 50 h6 l2 18 h-6 z" fill="#1c1c1c"/></g>`;
+    const scenes = {
+      lesao: sky + man(150, '#e8e8e8') + `<rect x="168" y="58" width="36" height="10" rx="3" fill="#f2f2f2"/><path d="M186 40 v28 M172 54 h28" stroke="#c52626" stroke-width="4"/>`,
+      crise: sky + man(120, '#c52626') + man(190, '#111') + `<path d="M138 40 q20 -16 36 0" fill="none" stroke="#ffd76a" stroke-width="3"/>`,
+      vestiario: sky + man(110, '#fff') + man(160, '#111') + man(210, '#0d80bf') + `<path d="M128 28 l8 10 M176 24 l-6 12" stroke="#ff5a5f" stroke-width="3"/>`,
+      polemica: sky + `<rect x="118" y="36" width="84" height="54" rx="8" fill="#1c1c1c"/><circle cx="160" cy="58" r="10" fill="#ff5a5f"/><rect x="132" y="74" width="56" height="6" rx="2" fill="#fff"/>`,
+      protesto: sky + crowd + `<rect x="70" y="34" width="70" height="28" rx="3" fill="#fff"/><rect x="180" y="30" width="78" height="28" rx="3" fill="#ffd76a"/>` + man(40, '#c52626'),
+      festa: sky + man(100, '#ffd100') + man(160, '#006437') + man(220, '#c52626') + `<circle cx="70" cy="30" r="4" fill="#ffd76a"/><circle cx="250" cy="24" r="4" fill="#fff"/><circle cx="200" cy="18" r="3" fill="#c6ff3d"/>`,
+      ultimato: sky + `<rect x="126" y="28" width="68" height="78" rx="6" fill="#2a2112"/><rect x="140" y="40" width="40" height="6" fill="#ffd76a"/><rect x="146" y="54" width="28" height="40" fill="#111"/>`,
+      joia: sky + man(168, '#c6ff3d') + `<polygon points="168,18 172,28 184,28 174,34 178,46 168,38 158,46 162,34 152,28 164,28" fill="#ffd76a"/>`,
+      provocacao: sky + man(90, '#111') + man(220, '#c52626') + `<path d="M110 40 H200" stroke="#fff" stroke-width="3" stroke-dasharray="6 4"/>`,
+      proposta: sky + `<rect x="118" y="48" width="84" height="48" rx="6" fill="#145c32"/><text x="160" y="78" text-anchor="middle" font-size="18" font-family="Arial Black,sans-serif" fill="#ffd76a">$</text>`,
+      classico: sky + crowd + man(70, '#111') + man(250, '#fff') + `<circle cx="160" cy="64" r="14" fill="#fff" stroke="#111" stroke-width="2"/>`,
+      caixa: sky + `<rect x="124" y="40" width="72" height="52" rx="4" fill="#3a2a12"/><rect x="140" y="58" width="40" height="22" fill="#111"/><path d="M124 40 h72" stroke="#ffd76a" stroke-width="4"/>`,
+      patrocinio: sky + `<rect x="40" y="36" width="240" height="46" rx="8" fill="#fff"/><rect x="54" y="48" width="70" height="22" fill="#c52626"/><rect x="136" y="48" width="70" height="22" fill="#006437"/>`,
+      treino: sky + man(120, '#0d80bf') + man(170, '#0d80bf') + man(220, '#0d80bf') + `<circle cx="70" cy="70" r="8" fill="#fff"/>`,
+      base: sky + man(150, '#7dffb3') + man(200, '#7dffb3') + `<circle cx="90" cy="36" r="16" fill="#ffd76a"/>`
+    };
+    const body = scenes[id] || scenes.base;
+    return `<svg class="evart" viewBox="0 0 320 128" aria-hidden="true">${body}</svg>`;
+  }
   function viewDec(c) {
     const d = c.decision;
     if (!d) return viewHub(c);
     return `<div class="topbar"><span class="chip">Temporada ${c.year}</span><span class="sp"></span><span class="chip">${esc(divLabel(c))}</span></div>
-      <div class="eyebrow g">Decisão</div><h2 class="ttl">${esc(d.t)}</h2><p class="sub">${esc(d.d)}</p>
+      <div class="eventcard">${eventArt(d.art)}<div class="eyebrow g">Decisão</div><h2 class="ttl">${esc(d.t)}</h2><p class="sub">${esc(d.d)}</p></div>
       ${d.opts.map((o, i) => `<button class="optbig" data-act="carOpt" data-i="${i}"><b>${esc(o.tx)}</b><small>${esc(optHint(o))}</small></button>`).join('')}`;
+  }
+  function viewReport(c) {
+    const r = c.report;
+    if (!r) return viewHub(c);
+    const foe = clubOf(r.foeId);
+    const me = clubOf(c.clubId);
+    const goals = (r.goals || []).map(g => `<div class="gl"><span class="m">${g.min}'</span><span><b>${esc(g.nome)}</b>${g.assist ? `<small> assistência ${esc(g.assist)}</small>` : ''}</span><i>${g.side === 0 ? esc(me.curto) : esc(foe.curto)}</i></div>`).join('');
+    const cards = (r.cards || []).map(cd => `<div class="gl"><span class="m">${cd.min}'</span><span class="cardpill ${cd.cor === 'vermelho' ? 'red' : 'yel'}"></span><span>${esc(cd.nome)}</span></div>`).join('');
+    const time = (r.timeline || []).map(ev => `<div class="tl"><b>${ev.min}'</b><span>${esc(ev.t)}</span></div>`).join('');
+    const rates = (r.ratings || []).map(p => `<div class="rate"><span>${esc(p.pos)}</span><b>${esc(p.nome)}</b><em>${p.nota.toFixed(1)}</em></div>`).join('');
+    const pensBtn = r.pens && r.pens.length ? '<button class="btn sec" data-act="carPens">Ver pênaltis</button>' : '';
+    return `<div class="topbar"><button class="chip" data-act="carBackHub">Hub</button><span class="sp"></span><span class="chip">Relato</span></div>
+      <div class="report">
+        <div class="rscore">${badge(c.clubId, 'sm')}<div><b>${r.gf} × ${r.ga}</b><small>${esc(r.tag || 'Partida')}</small></div>${badge(r.foeId, 'sm')}</div>
+        <p class="sub">${esc(me.nome)} e ${esc(foe.nome)} · temporada ${r.year}</p>
+        <div class="panel"><div class="ph">Gols</div>${goals || '<p class="xs mut">Sem gols.</p>'}</div>
+        <div class="panel"><div class="ph">Cartões</div>${cards || '<p class="xs mut">Nenhum cartão.</p>'}</div>
+        <div class="panel stats3"><div><b>${r.poss}%</b><span>Posse</span></div><div><b>${r.shots[0]}–${r.shots[1]}</b><span>Finalizações</span></div><div><b>${r.on[0]}–${r.on[1]}</b><span>No gol</span></div></div>
+        <div class="panel"><div class="ph">Momentos</div><div class="timeline">${time}</div>${r.epic ? `<p class="epicline">Lance para guardar: ${esc(r.epic)}.</p>` : ''}</div>
+        <div class="panel motm"><div class="eyebrow g">Craque do jogo</div><h3>${esc(r.motm)}</h3><div class="rates">${rates}</div></div>
+        ${pensBtn}
+      </div>
+      <div class="mctrl"><button class="btn gold shine" data-act="carReportOk">Continuar</button></div>`;
   }
   function optHint(o) {
     const bits = [];
@@ -1442,6 +1655,7 @@
       return `<div class="topbar"><button class="chip" data-act="carBackHub">Hub</button><span class="sp"></span><span class="chip">${esc(divLabel(c))}</span></div><h2 class="ttl">Tabela</h2><div class="ctr h"><span>#</span><span>Clube</span><b>P</b><small>J</small><small>SG</small></div>${tableHtml(p.table, c.clubId)}`;
     }
     if (screen === 'carDec') return viewDec(c);
+    if (screen === 'carReport') return viewReport(c);
     if (screen === 'carInbox') return viewInbox(c);
     if (screen === 'carMentor') return viewMentor(c);
     if (screen === 'carFim') return viewFim(c);
@@ -1459,14 +1673,22 @@
     return `Fominha FC · ${d.titulo}\n${d.nome} · ${d.seasons} temporadas\nLigas ${t.D + t.C + t.B + t.A} · Copa ${t.copa} · Liberta ${t.lib}\n${(d.mentors || []).slice(0, 2).join(' | ')}`;
   }
 
+  function afterSingle(c, msg) {
+    if (c.phase === 'season' && c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
+    if (c.phase === 'season' && c.report) return { screen: 'carReport', msg: '' };
+    return { screen: screenFor(c), msg };
+  }
   function skipLive(c) {
     let msg = '';
     if (cupDue(c) && c.copaRound >= 3) msg = simCupGame(c, 'copa');
     else if (libDue(c) && c.libRound >= 2) msg = simCupGame(c, 'lib');
     else msg = simLeagueRound(c);
     if (maybeMid(c)) return { screen: screenFor(c), msg };
-    if (c.phase === 'season' && c.round >= c.rounds) { endSeason(c); return { screen: screenFor(c), msg }; }
-    return { screen: screenFor(c), msg };
+    return afterSingle(c, msg);
+  }
+  function sampleDecision(id) {
+    const pick = DECS.filter(d => d.id === id)[0] || DECS[0];
+    return { id: pick.id, t: pick.t, d: pick.d, opts: pick.opts, slot: 'meio', art: pick.art || 'base' };
   }
   function demo(which) {
     if (which === 'criar') return { screen: 'carCriar', extra: draftNew('FOMINHA') };
@@ -1510,6 +1732,7 @@
     view, draftNew, badge, clubOf, persist, loadStore, saveStore, shareText,
     rollMentor, mentorStat, rankedStats, applyGrowth, mentorText, lockMentor,
     negotiate, acceptOffer, rejectOffer, closeInbox, chooseDecision, ackSummary, retire, skipLive, demo,
+    peekPens, sampleDecision, eventArt,
     squadStr, bestXI, trainXI, roundRobin, table, myPlace, offerFit, buildOffers,
     startClubs, freshWorld, fixture, isKey
   };

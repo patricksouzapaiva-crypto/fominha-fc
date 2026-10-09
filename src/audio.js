@@ -1,4 +1,4 @@
-/* Fominha FC · som procedural. Só Web Audio API, sem arquivos. */
+/* Fominha FC · amostras livres, com fallback procedural se o arquivo não carregar. */
 (function (root) {
   const KEY = 'ffsom';
   let AC = null, master = null, noiseBuf = null, crowd = null, crowdGain = null, unlocked = false;
@@ -67,6 +67,53 @@
   function chord(freqs, dur, peak) {
     freqs.forEach((f, i) => tone(f, dur, 'triangle', (peak || 0.12) * (1 - i * 0.15), i * 0.045));
   }
+  const FILES = {
+    click: 'click.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg', whistle: 'whistle.ogg',
+    'whistle-long': 'whistle-long.ogg', kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
+    crowd: 'crowd.ogg', chant: 'chant.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg'
+  };
+  const bufs = {};
+  let loading = false;
+  function sampleBase() {
+    try {
+      if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
+      const u = location.href.split('#')[0].split('?')[0];
+      return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/snd/';
+    } catch (e) { return ''; }
+  }
+  function loadSamples() {
+    const base = sampleBase();
+    if (!base || !AC || loading || typeof fetch !== 'function') return;
+    loading = true;
+    Object.keys(FILES).forEach(name => {
+      fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
+        if (!ab) return null;
+        return AC.decodeAudioData(ab);
+      }).then(buf => { if (buf) bufs[name] = buf; }).catch(() => {});
+    });
+  }
+  function playBuf(name, gain, loop) {
+    const buf = bufs[name];
+    const c = live();
+    if (!c || !buf) return null;
+    const s = c.createBufferSource();
+    s.buffer = buf;
+    s.loop = !!loop;
+    const g = c.createGain();
+    g.gain.value = gain == null ? 0.8 : gain;
+    s.connect(g); g.connect(master);
+    s.start();
+    return { src: s, gain: g };
+  }
+  function duckCrowd(to, back, sec) {
+    if (!crowdGain || !AC) return;
+    const t = AC.currentTime;
+    const now = crowdGain.gain.value;
+    crowdGain.gain.cancelScheduledValues(t);
+    crowdGain.gain.setValueAtTime(now, t);
+    crowdGain.gain.linearRampToValueAtTime(to, t + 0.06);
+    crowdGain.gain.linearRampToValueAtTime(back, t + sec);
+  }
 
   const FFAudio = {
     settings() { return { on: settings.on, vol: settings.vol }; },
@@ -76,35 +123,50 @@
       const c = ctx(); if (!c) return;
       if (c.state === 'suspended') c.resume();
       unlocked = true;
+      loadSamples();
     },
-    click() { tone(640, 0.04, 'sine', 0.045); },
+    click() { if (!playBuf('click', 0.55)) tone(640, 0.04, 'sine', 0.045); },
     flip() { noise(0.07, 0.12, { f: 1800, q: 0.6 }); tone(420, 0.05, 'square', 0.04); },
     pack() { noise(0.25, 0.14, { f: 900, q: 0.5 }); tone(520, 0.12, 'sawtooth', 0.05); tone(780, 0.16, 'triangle', 0.07, 0.08); },
-    playCard() { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); },
+    playCard() { if (!playBuf('card', 0.6)) { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); } },
     energy() { tone(880, 0.04, 'sine', 0.06); },
     counter() { tone(196, 0.12, 'sawtooth', 0.1); tone(392, 0.14, 'square', 0.05, 0.04); },
     combo() { chord([523, 659, 784], 0.16, 0.1); },
     level() { chord([523, 659, 784, 1046], 0.22, 0.11); },
     record() { chord([392, 494, 587, 784], 0.38, 0.12); },
     whistle(kind) {
+      const file = kind === 'full' ? 'whistle-long' : 'whistle';
+      if (playBuf(file, 0.7)) return;
       const hi = kind === 'full' ? 2100 : kind === 'card' ? 1700 : 1900;
       tone(hi, kind === 'full' ? 0.28 : 0.16, 'sine', 0.09);
       tone(hi * 1.01, kind === 'full' ? 0.28 : 0.12, 'triangle', 0.04, 0.02);
     },
-    net() { noise(0.12, 0.16, { f: 600, q: 0.8 }); },
+    net() { if (!playBuf('net', 0.75)) noise(0.12, 0.16, { f: 600, q: 0.8 }); },
     post() {
+      if (playBuf('post', 0.7)) { FFAudio.uuh(); return; }
       tone(240, 0.18, 'square', 0.08);
       tone(180, 0.22, 'sawtooth', 0.06, 0.02);
       noise(0.15, 0.1, { f: 1400, q: 2 });
       FFAudio.uuh();
     },
-    uuh() { noise(0.45, 0.1, { f: 500, q: 0.6 }); },
-    goal() { FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 }); },
-    concede() { FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05); },
+    uuh() { if (!playBuf('groan', 0.55)) noise(0.45, 0.1, { f: 500, q: 0.6 }); },
+    goal() {
+      duckCrowd(0.05, 0.12, 1.6);
+      if (playBuf('roar', 0.85)) { playBuf('net', 0.7); return; }
+      FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 });
+    },
+    concede() {
+      if (playBuf('boo', 0.7)) return;
+      FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05);
+    },
     stinger() { chord([349, 440, 523], 0.28, 0.1); },
-    fanfare() { chord([523, 659, 784, 1046], 0.42, 0.12); },
+    fanfare() { if (!playBuf('fanfare', 0.65)) chord([523, 659, 784, 1046], 0.42, 0.12); },
     crowdStart() {
       const c = live(); if (!c || crowd) return;
+      if (bufs.crowd) {
+        const played = playBuf('crowd', 0.22, true);
+        if (played) { crowd = played.src; crowdGain = played.gain; return; }
+      }
       const s = c.createBufferSource();
       s.buffer = noiseBuf; s.loop = true;
       const bp = c.createBiquadFilter();
@@ -123,7 +185,8 @@
       crowdGain.gain.cancelScheduledValues(t);
       crowdGain.gain.setValueAtTime(Math.max(0.02, crowdGain.gain.value), t);
       crowdGain.gain.linearRampToValueAtTime(peak, t + 0.12);
-      crowdGain.gain.linearRampToValueAtTime(0.022, t + 1.1);
+      crowdGain.gain.linearRampToValueAtTime(bufs.crowd ? 0.22 : 0.022, t + 1.1);
+      if (bufs.chant && peak > 0.12) playBuf('chant', 0.35);
     },
     crowdStop() {
       if (crowd) { try { crowd.stop(); } catch (e) { /* já parou */ } }
