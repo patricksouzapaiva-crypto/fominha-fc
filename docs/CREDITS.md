@@ -19,3 +19,5 @@ As amostras ficam em `assets/snd/`, em mono, 22050 Hz, Ogg Vorbis. O jogo baixa 
 | `fanfare.ogg` | título e mentor | Kenney, Interface Sounds, `confirmation_001.ogg` | CC0 |
 
 Os impactos e os sons de interface da Kenney foram gerados no GameSynth (Tsugi) e publicados por ele em CC0. Não são gravação de campo de uma bola. A vaia é um coro de vozes em CC0, não uma arquibancada de estádio. O apito é de instrumento, publicado como apito de árbitro pela SFXMint.
+
+Ilustrações dos lances épicos: arte original gerada para o projeto Fominha FC. Os arquivos ficam em `assets/epic/` e só são pedidos quando um lance épico vai aparecer ou quando a tela de resultado monta o card. Se a imagem não carregar, o replay volta para o desenho em SVG.

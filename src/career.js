@@ -381,6 +381,63 @@
     }
     return kicks;
   }
+  // Ilustração por id. Trocar o arquivo em assets/epic/ não muda a simulação.
+  // O pênalti defendido usa penalti.webp. A goleada histórica (placa) usa goleada.webp.
+  const EPIC_ART = {
+    bicicleta: ['bicicleta.webp', '42%', '34%'],
+    cobertura: ['cobertura.webp', '46%', '42%'],
+    golaco: ['golaco.webp', '58%', '40%'],
+    olimpico: ['olimpico.webp', '48%', '46%'],
+    penalti: ['penalti.webp', '45%', '46%'],
+    calcanhar: ['calcanhar.webp', '42%', '52%'],
+    goleiro: ['goleiro.webp', '50%', '42%'],
+    hattrick: ['hattrick.webp', '50%', '55%'],
+    virada: ['virada.webp', '46%', '48%'],
+    placa: ['goleada.webp', '48%', '38%'],
+    goleada: ['goleada.webp', '48%', '38%'],
+    'gol de placa': ['goleada.webp', '48%', '38%'],
+    cavadinha: ['cobertura.webp', '46%', '42%']
+  };
+  const EPIC_NOME = {
+    bicicleta: 'Gol de Bicicleta', cobertura: 'Gol de Cobertura', golaco: 'Golaço no Ângulo',
+    olimpico: 'Gol Olímpico', penalti: 'Pênalti Defendido', calcanhar: 'Gol de Calcanhar',
+    goleiro: 'Gol do Goleiro', hattrick: 'Hat-trick', virada: 'Virada no Fim', placa: 'Goleada Histórica'
+  };
+  const EPIC_CANON = { 'gol de placa': 'placa', cavadinha: 'cobertura', goleada: 'placa' };
+  function epicFile(id) { const a = EPIC_ART[id]; return a ? a[0] : ''; }
+  function epicFocus(id) {
+    const a = EPIC_ART[id] || EPIC_ART[EPIC_CANON[id]];
+    return { x: a ? a[1] : '50%', y: a ? a[2] : '42%' };
+  }
+  function canonEpic(id) { return EPIC_CANON[id] || id; }
+  function pushHighlight(c, item) {
+    c.highlights = c.highlights || [];
+    if (c.highlights.some(h => h.id === item.id && h.year === item.year && h.min === item.min && h.scorer === item.scorer)) return;
+    c.highlights.unshift(item);
+    if (c.highlights.length > 8) c.highlights.length = 8;
+  }
+  function rememberHighlight(c, rawId, goals, gf, ga) {
+    const id = canonEpic(rawId);
+    if (!epicFile(id)) return;
+    const g = (goals || []).filter(x => x.side === 0)[0] || (goals || [])[0] || {};
+    pushHighlight(c, { id, nome: EPIC_NOME[id] || rawId, scorer: g.nome || '', min: g.min || 0, score: [gf, ga], year: c.year });
+  }
+  function noteEpics(c, list) {
+    (list || []).forEach(e => {
+      if (!e || !epicFile(e.id)) return;
+      pushHighlight(c, { id: e.id, nome: e.nome || EPIC_NOME[e.id] || e.id, scorer: e.scorer || '', min: e.min || 0, score: e.score || null, year: c.year });
+    });
+  }
+  function highlightFigures(list) {
+    if (!list || !list.length) return '';
+    return `<div class="ephighs">${list.slice(0, 4).map(h => {
+      const file = epicFile(h.id);
+      const f = epicFocus(h.id);
+      const src = file ? 'assets/epic/' + file : '';
+      const meta = [h.scorer || '', h.min ? h.min + "'" : '', h.score ? h.score[0] + ' x ' + h.score[1] : ''].filter(Boolean).join(' · ');
+      return `<figure class="ephigh">${src ? `<img alt="" loading="lazy" src="${src}" style="object-position:${f.x} ${f.y}" onerror="this.remove()">` : ''}<figcaption><b>${esc(h.nome || h.id)}</b>${meta ? `<small>${esc(meta)}</small>` : ''}</figcaption></figure>`;
+    }).join('')}</div>`;
+  }
   function buildReport(c, foeId, gf, ga, tag) {
     const rng = R(c.seed, 'relato', c.year, String(c.round), foeId, gf, ga, tag || '');
     const xi = bestXI(c.squad);
@@ -431,6 +488,7 @@
       c._wasPens = false;
     }
     c.report = { foeId, gf, ga, tag: tag || '', goals, cards, poss, shots, on, motm, ratings, timeline, epic, pens, year: c.year };
+    if (epic) rememberHighlight(c, epic, goals, gf, ga);
   }
   function peekPens(c) {
     const kind = c && (c._liveKind === 'lib' ? 'lib' : c._liveKind === 'copa' ? 'copa' : '');
@@ -1239,6 +1297,7 @@
     return {
       nome: c.nome, age: c.age, seasons: c.seasons, seed: c.seed, titulo, frase,
       titles: c.titles, mentors, timeline: c.timeline.slice(), clubs: c.clubs.slice(),
+      highlights: (c.highlights || []).slice(),
       peak: c.peak, reachedA: c.reachedA, rep: c.rep, sacked: !!c.sacked, year: c.year
     };
   }
@@ -1554,7 +1613,7 @@
         <div class="panel"><div class="ph">Gols</div>${goals || '<p class="xs mut">Sem gols.</p>'}</div>
         <div class="panel"><div class="ph">Cartões</div>${cards || '<p class="xs mut">Nenhum cartão.</p>'}</div>
         <div class="panel stats3"><div><b>${r.poss}%</b><span>Posse</span></div><div><b>${r.shots[0]}–${r.shots[1]}</b><span>Finalizações</span></div><div><b>${r.on[0]}–${r.on[1]}</b><span>No gol</span></div></div>
-        <div class="panel"><div class="ph">Momentos</div><div class="timeline">${time}</div>${r.epic ? `<p class="epicline">Lance para guardar: ${esc(r.epic)}.</p>` : ''}</div>
+        <div class="panel"><div class="ph">Momentos</div><div class="timeline">${time}</div>${r.epic ? `<p class="epicline">Lance para guardar.</p>${highlightFigures([{ id: canonEpic(r.epic), nome: EPIC_NOME[canonEpic(r.epic)] || r.epic, scorer: ((r.goals || []).find(g => g.side === 0) || {}).nome || '', min: ((r.goals || []).find(g => g.side === 0) || {}).min || 0, score: [r.gf, r.ga] }])}` : ''}</div>
         <div class="panel motm"><div class="eyebrow g">Craque do jogo</div><h3>${esc(r.motm)}</h3><div class="rates">${rates}</div></div>
         ${pensBtn}
       </div>
@@ -1626,6 +1685,7 @@
         <p class="sub">${esc(d.nome)} · ${d.seasons} temporadas · ${d.age} anos</p>
         <p>${esc(d.frase)}</p>
         <div class="statsrow"><div class="stat"><b>${t.D + t.C + t.B + t.A}</b><span>Títulos de liga</span></div><div class="stat"><b>${t.copa}</b><span>Copa</span></div><div class="stat"><b>${t.lib}</b><span>Liberta</span></div></div>
+        ${(d.highlights || []).length ? `<div class="panel"><div class="ph">Lances do documentário</div>${highlightFigures(d.highlights)}</div>` : ''}
         ${(d.mentors || []).map(m => `<p class="mentorline">${esc(m)}</p>`).join('')}
         <div class="timeline">${(d.timeline || []).map(ev => `<div><b>${ev.y}</b><span>${esc(ev.t)}</span></div>`).join('')}</div>
       </div>
@@ -1636,7 +1696,7 @@
     return `<div class="topbar"><button class="chip" data-act="carHome">Carreira</button><span class="sp"></span><span class="chip">Museu</span></div>
       <h2 class="ttl">Museu da Carreira</h2><p class="sub">Títulos, mentores e os bancos por onde você passou.</p>
       ${c && !c.done ? coachBlock(c) : ''}
-      ${items.length ? items.map(d => `<article class="panel"><div class="ph">${esc(d.nome)} <span class="r">${esc(d.titulo)}</span></div><p class="small">${esc(d.frase)}</p><p class="xs mut">${(d.mentors || []).slice(0, 3).map(esc).join(' · ') || 'Sem mentor'}</p></article>`).join('') : '<div class="empty">O museu abre quando uma carreira termina.</div>'}
+      ${items.length ? items.map(d => `<article class="panel"><div class="ph">${esc(d.nome)} <span class="r">${esc(d.titulo)}</span></div><p class="small">${esc(d.frase)}</p>${highlightFigures(d.highlights)}<p class="xs mut">${(d.mentors || []).slice(0, 3).map(esc).join(' · ') || 'Sem mentor'}</p></article>`).join('') : '<div class="empty">O museu abre quando uma carreira termina.</div>'}
       ${c && c.timeline ? `<div class="panel"><div class="ph">Linha do tempo</div><div class="timeline">${c.timeline.map(ev => `<div><b>${ev.y}</b><span>${esc(ev.t)}</span></div>`).join('')}</div></div>` : ''}`;
   }
   function viewHome(st) {
@@ -1732,7 +1792,7 @@
     view, draftNew, badge, clubOf, persist, loadStore, saveStore, shareText,
     rollMentor, mentorStat, rankedStats, applyGrowth, mentorText, lockMentor,
     negotiate, acceptOffer, rejectOffer, closeInbox, chooseDecision, ackSummary, retire, skipLive, demo,
-    peekPens, sampleDecision, eventArt,
+    peekPens, sampleDecision, eventArt, epicFile, epicFocus, noteEpics,
     squadStr, bestXI, trainXI, roundRobin, table, myPlace, offerFit, buildOffers,
     startClubs, freshWorld, fixture, isKey
   };
