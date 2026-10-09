@@ -33,7 +33,7 @@ No início, **Modo Carreira** abre uma carreira de até 20 temporadas, ao lado d
 
 A pirâmide tem 20 clubes por série. Os quatro primeiros sobem, os quatro últimos caem. Proposta de clube grande não entrega o elenco inteiro: o time herdado fica perto do que você já tinha. Mentor sai a cada cinco temporadas e acelera um atributo. Demissão existe quando a confiança chega no chão, e dá para assinar em outro banco.
 
-O som usa gravações livres (apito, torcida, chute, rede). A licença de cada arquivo está em `docs/CREDITS.md`. Se o arquivo não carregar, o jogo volta ao som gerado no navegador. O botão **Som** liga, desliga e muda o volume. A preferência fica no aparelho.
+O som usa só gravações com licença livre (música, torcida, apito, chute e rede). A fonte e a licença de cada arquivo estão em `docs/CREDITS.md`. O controle de mudo e volume fica no menu e na partida. A preferência fica no aparelho, e a música só entra depois do primeiro toque.
 
 `node test/career.test.js` imprime a tabela de equilíbrio: subida Série D→A, taças, demissões e o quanto o mentor adianta o atributo.
 

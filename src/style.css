@@ -71,7 +71,8 @@ button.chip:active{transform:scale(.96)}
 .panel.hl{border-color:rgba(198,255,61,.35);background:linear-gradient(180deg,rgba(198,255,61,.09),rgba(255,255,255,.02))}
 
 /* ---------- home ---------- */
-.hero{text-align:center;padding:18px 0 4px;position:relative}
+.menuhead{display:flex;justify-content:flex-end;align-items:center;min-height:44px}
+.hero{text-align:center;padding:6px 0 4px;position:relative}
 .logo{display:flex;align-items:center;justify-content:center;gap:10px}
 .ballwrap{position:relative;width:84px;height:94px;flex:0 0 auto}
 .fball.logo{position:absolute;left:0;top:0;width:84px;height:84px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));user-select:none;animation:ballhop 2.4s cubic-bezier(.45,0,.55,1) infinite;transform-origin:50% 50%}
@@ -291,7 +292,15 @@ button.chip:active{transform:scale(.96)}
 .fxbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .fxbar .chip{min-height:28px;padding:3px 9px;font-size:11.5px}
 .fxbar .chip.c{border-color:rgba(255,200,61,.5);color:var(--gold)}
-.feedhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px}
+.feedhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px;gap:8px;flex-wrap:wrap}
+.sndrow{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.row .snddock{flex:0 0 auto}
+.snddock{display:flex;align-items:center;gap:6px}
+.snddock .sndbtn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--tx);border-radius:999px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;padding:0}
+.snddock .sndbtn .svg{width:20px;height:20px}
+.snddock input[type=range]{width:78px;accent-color:var(--lime)}
+.snddock.off .sndbtn{color:var(--mut)}
+.sombox .snddock{margin:8px 0 12px}
 .feed{max-height:290px;overflow-y:auto;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--line);padding:4px}
 .fe{display:grid;grid-template-columns:34px 24px 1fr;gap:6px;align-items:start;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px;animation:fein .35s ease-out}
 @keyframes fein{from{opacity:0;transform:translateY(-6px)}}

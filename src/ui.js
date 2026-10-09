@@ -50,7 +50,9 @@ const ICON = {
   pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
   arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
   swap: '<path d="M4 8h14l-4-4M20 16H6l4 4"/>',
-  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5 6.5-5s5.7 1.5 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 15c2 .6 3.2 2.2 3.6 5"/>'
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5 6.5-5s5.7 1.5 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 15c2 .6 3.2 2.2 3.6 5"/>',
+  vol: '<path d="M4 10v4h3l4 4V6L7 10zM15.5 9.2a3.6 3.6 0 0 1 0 5.6M18 7a6.5 6.5 0 0 1 0 10"/>',
+  mute: '<path d="M4 10v4h3l4 4V6L7 10zM16 10l5 5M21 10l-5 5"/>'
 };
 const FILLED = { play: 1, fast: 1, pause: 1 };
 function ic(n, cls) { return `<svg class="svg ${FILLED[n] ? 'f' : ''} ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true">${ICON[n] || ''}</svg>`; }
@@ -262,6 +264,7 @@ function rankHtml(list, hlTs) {
 function renderHome() {
   const st = G.store, lv = Math.min(st.level || 1, st.unlocked), di = dailyInfo(), ds = dailySeed(), now = new Date();
   app.innerHTML = `
+  <div class="menuhead">${sndDockHtml()}</div>
   <div class="hero"><div class="logo">${logoSvg()}<div class="wm">Fominha<span>FUTEBOL CLUBE</span></div></div>
     <div class="modetag">${ic('bolt')} COPA RELÂMPAGO</div>
     <p class="tagline">7 jogos. Perdeu, acabou. Monte combos absurdos com cartas, relíquias e um técnico lendário.</p></div>
@@ -287,7 +290,7 @@ function renderHome() {
     <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button>
     <button class="btn sec" style="margin-top:8px" data-act="carOpen">Modo Carreira <small>20 temporadas, da Série D à elite</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
-  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button><button class="btn ghost" data-act="som">Som</button></div>`;
+  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button></div>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
   if (!ligaAnimModal()) showTip('nav');
 }
@@ -509,7 +512,7 @@ function renderMatch() {
   <div class="stadium"><div class="stands" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="floods" aria-hidden="true"><b></b><b></b><b></b><b></b></div>
   <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball">${ballSvg('pitch')}</div></div><div class="wx" aria-hidden="true"></div></div></div>
   <div class="fxbar" id="fxbar"></div>
-  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
+  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span><div class="sndrow">${sndDockHtml()}${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div></div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
   G.queue = []; G.shownScore = m.score.slice();
   G.mom = Array.from({ length: 30 }, () => [0, 0]); G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
@@ -747,7 +750,8 @@ function tick() {
     if (e.kind === 'counter' || e.kind === 'combo') { flashBanner(e); if (window.FFAudio) { if (e.kind === 'combo') FFAudio.combo(); else FFAudio.counter(); } }
     if (window.FFAudio) {
       if (e.kind === 'goal') { if (e.side === 0) FFAudio.goal(); else FFAudio.concede(); }
-      else if (e.kind === 'lance' && /TRAVE|travessão/.test(e.text || '')) FFAudio.post();
+      else if (e.kind === 'lance' && /TRAVE|travessão/i.test(e.text || '')) FFAudio.post();
+      else if (e.kind === 'lance') { FFAudio.kick(); if (/fora|cima|bloqueia|Fraquinho|Defesa|espelma|milagre/i.test(e.text || '')) FFAudio.uuh(); }
       else if (e.kind === 'card') FFAudio.playCard();
       else if (e.kind === 'half') FFAudio.whistle('half');
       else if (e.kind === 'end') FFAudio.whistle('full');
@@ -2166,6 +2170,10 @@ function renderCareer() {
   const C = window.FFCareer; if (!C) return;
   const extra = G.screen === 'carCriar' ? G.carDraft : G.screen === 'carMuseu' ? (G.carExtra || C.loadStore()) : G.screen === 'carHome' ? C.loadStore() : G.carExtra;
   app.innerHTML = C.view(G.screen, G.career, extra);
+  if (G.screen === 'carHome') {
+    const bar = app.querySelector('.topbar');
+    if (bar && !bar.querySelector('.snddock')) bar.insertAdjacentHTML('beforeend', sndDockHtml());
+  }
   app.classList.toggle('hasdock', !!app.querySelector('.mctrl'));
   if (G.screen === 'carFim' && G.career && G.career.summary && G.career.summary.fire && !RM()) {
     setTimeout(() => confettiBurst(['#ffc83d', '#c6ff3d', '#fff', '#ff5a5f'], 42), 180);
@@ -2189,19 +2197,36 @@ function renderCareer() {
     }
   }
 }
+function sndDockHtml() {
+  const s = window.FFAudio ? FFAudio.settings() : { on: true, vol: 0.25 };
+  const on = s.on && s.vol > 0.001;
+  return `<div class="snddock ${on ? '' : 'off'}"><button type="button" class="sndbtn" data-act="somToggle" aria-pressed="${on ? 'true' : 'false'}" aria-label="${on ? 'Silenciar' : 'Ligar o som'}">${ic(on ? 'vol' : 'mute')}</button><input data-act="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></div>`;
+}
+function paintSnd() {
+  const s = window.FFAudio ? FFAudio.settings() : { on: true, vol: 0.25 };
+  const on = s.on && s.vol > 0.001;
+  document.querySelectorAll('.snddock').forEach(dock => {
+    dock.classList.toggle('off', !on);
+    const btn = dock.querySelector('[data-act=somToggle]');
+    if (btn) {
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'Silenciar' : 'Ligar o som');
+      btn.innerHTML = ic(on ? 'vol' : 'mute');
+    }
+    const range = dock.querySelector('[data-act=somVol]');
+    if (range && range !== document.activeElement) range.value = String(Math.round(s.vol * 100));
+  });
+}
 function somSheet() {
   const A = window.FFAudio; if (!A) return;
   document.querySelectorAll('.modal.somm').forEach(x => x.remove());
   const s = A.settings();
   const m = document.createElement('div'); m.className = 'modal somm';
   m.innerHTML = `<div class="box sombox"><div class="eyebrow g">Som do estádio</div><h3 class="ttl" style="margin-top:4px">Arquibancada</h3>
-    <p class="sub">Apito, torcida e chute usam gravações livres. Se o áudio não carregar, o jogo volta ao som do navegador.</p>
-    <button class="btn ${s.on ? '' : 'sec'}" data-act="somOn">${s.on ? 'Som ligado' : 'Som desligado'}</button>
-    <label class="somlab">Volume<input id="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></label>
+    <p class="sub">Música, torcida, apito, chute e rede são gravações. O volume fica neste aparelho e a música só entra depois do primeiro toque.</p>
+    ${sndDockHtml()}
     <button class="btn sec" data-x="1">Fechar</button></div>`;
   m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
-  const range = m.querySelector('#somVol');
-  range.addEventListener('input', ev => { A.unlock(); A.setVol(ev.target.value / 100); A.click(); });
   document.body.appendChild(m);
 }
 function syncCarName() {
@@ -2262,8 +2287,13 @@ function onClick(ev) {
   const a = el.dataset.act;
   if (window.FFAudio) {
     FFAudio.unlock();
-    const ownSound = { speed: 1, somVol: 1, carStart: 1, carMentorOk: 1, somOn: 1 };
-    if (a === 'usecard' || a === 'carOpt' || a === 'carLive') FFAudio.playCard();
+    const ownSound = { speed: 1, somVol: 1, somToggle: 1, somOn: 1, carMentorOk: 1 };
+    const backActs = { home: 1, carHome: 1, carBackHub: 1, leaveShop: 1 };
+    const confirmActs = { start: 1, daily: 1, play: 1, carStart: 1, carAccept: 1, afterResult: 1, cdone: 1, bgo: 1 };
+    if (a === 'usecard' || a === 'carOpt' || a === 'carLive' || a === 'takeReward') FFAudio.playCard();
+    else if (a === 'openPack') FFAudio.pack();
+    else if (backActs[a]) FFAudio.back();
+    else if (confirmActs[a]) FFAudio.confirm();
     else if (!ownSound[a]) FFAudio.click();
   }
   if (navigator.vibrate && !RM()) try { navigator.vibrate(8); } catch (er) { /* sem vibração */ }
@@ -2330,7 +2360,22 @@ function onClick(ev) {
     case 'tipok': G.store.tips[el.dataset.k] = 1; saveStore(); el.closest('.tip').remove(); break;
     case 'tipskip': G.store.tipsOff = true; saveStore(); document.querySelectorAll('.tip').forEach(x => x.remove()); break;
     case 'som': somSheet(); break;
-    case 'somOn': { const A = window.FFAudio; if (!A) break; A.setOn(!A.settings().on); if (A.settings().on) { A.unlock(); A.whistle('kick'); } somSheet(); break; }
+    case 'somToggle': {
+      const A = window.FFAudio; if (!A) break;
+      const s = A.settings();
+      const sounding = s.on && s.vol > 0.001;
+      if (sounding) A.setOn(false);
+      else {
+        if (s.vol <= 0.001) A.setVol(0.25);
+        A.setOn(true);
+        A.musicStart();
+        if (G.screen === 'match') A.crowdStart();
+        A.confirm();
+      }
+      paintSnd();
+      break;
+    }
+    case 'somOn': { const A = window.FFAudio; if (!A) break; A.setOn(!A.settings().on); if (A.settings().on) { A.unlock(); A.musicStart(); A.confirm(); } somSheet(); break; }
     case 'carOpen': G.screen = 'carHome'; render(); break;
     case 'carNew': G.carSlot = +el.dataset.i || 0; G.carDraft = FFCareer.draftNew(G.pendingSeed || 'FOMINHA'); go('carCriar'); break;
     case 'carCont': { const st = FFCareer.loadStore(); G.career = st.slots[+el.dataset.i]; if (G.career) { G.career.slot = +el.dataset.i; go(FFCareer.screenFor(G.career)); } break; }
@@ -2341,7 +2386,7 @@ function onClick(ev) {
     case 'carStart': {
       syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
       G.career = FFCareer.create({ seed: d.seed, nome: d.nome || 'Professor', nums: d.nums, clubId: d.clubId, slot: G.carSlot || 0, policy: 'play' });
-      FFCareer.persist(G.career); if (window.FFAudio) FFAudio.whistle('kick'); go('carHub'); break;
+      FFCareer.persist(G.career); go('carHub'); break;
     }
     case 'carJump': carGo(FFCareer.pump(G.career, 'jump')); break;
     case 'carOne': carGo(FFCareer.pump(G.career, 'one')); break;
@@ -2485,7 +2530,19 @@ function previewCareer(which) {
   G.screen = d.screen; render();
 }
 window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet };
-document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
+document.addEventListener('input', ev => {
+  const t = ev.target; if (!t) return;
+  if (t.id === 'coachName') { G.store.coachName = t.value.trim() || 'Professor Fominha'; saveStore(); }
+  if (t.dataset && t.dataset.act === 'somVol' && window.FFAudio) {
+    const A = FFAudio;
+    A.unlock();
+    const v = Math.max(0, Math.min(1, (+t.value || 0) / 100));
+    A.setVol(v);
+    if (v > 0.001 && !A.settings().on) A.setOn(true);
+    if (v > 0.001) { A.musicStart(); if (G.screen === 'match') A.crowdStart(); }
+    paintSnd();
+  }
+});
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);
   if (!h) return false;

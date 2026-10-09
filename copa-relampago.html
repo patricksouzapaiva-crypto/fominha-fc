@@ -79,7 +79,8 @@ button.chip:active{transform:scale(.96)}
 .panel.hl{border-color:rgba(198,255,61,.35);background:linear-gradient(180deg,rgba(198,255,61,.09),rgba(255,255,255,.02))}
 
 /* ---------- home ---------- */
-.hero{text-align:center;padding:18px 0 4px;position:relative}
+.menuhead{display:flex;justify-content:flex-end;align-items:center;min-height:44px}
+.hero{text-align:center;padding:6px 0 4px;position:relative}
 .logo{display:flex;align-items:center;justify-content:center;gap:10px}
 .ballwrap{position:relative;width:84px;height:94px;flex:0 0 auto}
 .fball.logo{position:absolute;left:0;top:0;width:84px;height:84px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));user-select:none;animation:ballhop 2.4s cubic-bezier(.45,0,.55,1) infinite;transform-origin:50% 50%}
@@ -299,7 +300,15 @@ button.chip:active{transform:scale(.96)}
 .fxbar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .fxbar .chip{min-height:28px;padding:3px 9px;font-size:11.5px}
 .fxbar .chip.c{border-color:rgba(255,200,61,.5);color:var(--gold)}
-.feedhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px}
+.feedhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 6px;gap:8px;flex-wrap:wrap}
+.sndrow{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.row .snddock{flex:0 0 auto}
+.snddock{display:flex;align-items:center;gap:6px}
+.snddock .sndbtn{appearance:none;border:1px solid var(--line);background:rgba(255,255,255,.08);color:var(--tx);border-radius:999px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;padding:0}
+.snddock .sndbtn .svg{width:20px;height:20px}
+.snddock input[type=range]{width:78px;accent-color:var(--lime)}
+.snddock.off .sndbtn{color:var(--mut)}
+.sombox .snddock{margin:8px 0 12px}
 .feed{max-height:290px;overflow-y:auto;border-radius:14px;background:rgba(0,0,0,.22);border:1px solid var(--line);padding:4px}
 .fe{display:grid;grid-template-columns:34px 24px 1fr;gap:6px;align-items:start;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13.5px;animation:fein .35s ease-out}
 @keyframes fein{from{opacity:0;transform:translateY(-6px)}}
@@ -3101,15 +3110,34 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
   else root.FFNet = N;
 })(typeof window !== 'undefined' ? window : this);
 </script>
-<script>/* Fominha FC · amostras livres, com fallback procedural se o arquivo não carregar. */
+<script>/* Fominha FC · só gravações. Sem oscilador e sem ruído gerado. */
 (function (root) {
   const KEY = 'ffsom';
-  let AC = null, master = null, noiseBuf = null, crowd = null, crowdGain = null, unlocked = false;
+  let AC = null, master = null, musicGain = null, crowdGain = null, unlocked = false;
   let settings = { on: true, vol: 0.25 };
   try {
     const s = JSON.parse((typeof localStorage !== 'undefined' && localStorage.getItem(KEY)) || 'null');
     if (s && typeof s.vol === 'number') settings = { on: s.on !== false, vol: Math.max(0, Math.min(1, s.vol)) };
   } catch (e) { /* segue o padrão */ }
+
+  const FILES = {
+    music: 'music.ogg',
+    crowd: 'crowd.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg', chant: 'chant.ogg',
+    whistle: 'whistle.ogg', 'whistle-long': 'whistle-long.ogg',
+    kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
+    click: 'click.ogg', back: 'back.ogg', confirm: 'confirm.ogg', pack: 'pack.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg'
+  };
+  const UI = ['click', 'back', 'confirm', 'pack', 'card', 'fanfare'];
+  const MATCH = ['crowd', 'roar', 'groan', 'boo', 'chant', 'whistle', 'whistle-long', 'kick', 'net', 'post'];
+  const MIX = {
+    music: 0.16, musicDuck: 0.03,
+    crowd: 0.42, crowdDuck: 0.2,
+    click: 0.1, back: 0.08, confirm: 0.12, pack: 0.14, card: 0.11, fanfare: 0.22,
+    whistle: 0.72, kick: 0.64, net: 0.7, post: 0.55, roar: 0.88, groan: 0.5, boo: 0.42, chant: 0.3
+  };
+  const bufs = {};
+  const inflight = {};
+  const loops = {};
 
   function save() {
     try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (e) { /* modo privado */ }
@@ -3122,61 +3150,21 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
     master = AC.createGain();
     master.gain.value = settings.on ? settings.vol : 0;
     master.connect(AC.destination);
-    const len = AC.sampleRate * 2;
-    noiseBuf = AC.createBuffer(1, len, AC.sampleRate);
-    const d = noiseBuf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    musicGain = AC.createGain();
+    musicGain.gain.value = MIX.music;
+    musicGain.connect(master);
+    crowdGain = AC.createGain();
+    crowdGain.gain.value = MIX.crowd;
+    crowdGain.connect(master);
     return AC;
   }
   function live() {
-    if (!settings.on || settings.vol <= 0.001) return null;
+    if (!unlocked || !settings.on || settings.vol <= 0.001) return null;
     const c = ctx();
     if (!c) return null;
     if (c.state === 'suspended') c.resume();
     return c;
   }
-  function envGain(t, a, peak, d) {
-    const g = AC.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + a);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
-    g.connect(master);
-    return g;
-  }
-  function tone(freq, dur, type, peak, delay) {
-    const c = live(); if (!c) return;
-    const t = c.currentTime + (delay || 0);
-    const o = c.createOscillator();
-    o.type = type || 'sine';
-    o.frequency.setValueAtTime(freq, t);
-    o.connect(envGain(t, 0.012, peak == null ? 0.2 : peak, dur));
-    o.start(t); o.stop(t + dur + 0.05);
-  }
-  function noise(dur, peak, bp, delay) {
-    const c = live(); if (!c) return;
-    const t = c.currentTime + (delay || 0);
-    const s = c.createBufferSource();
-    s.buffer = noiseBuf;
-    s.loop = true;
-    let node = s;
-    if (bp) {
-      const f = c.createBiquadFilter();
-      f.type = 'bandpass'; f.frequency.value = bp.f; f.Q.value = bp.q || 0.7;
-      s.connect(f); node = f;
-    }
-    node.connect(envGain(t, 0.01, peak == null ? 0.15 : peak, dur));
-    s.start(t); s.stop(t + dur + 0.02);
-  }
-  function chord(freqs, dur, peak) {
-    freqs.forEach((f, i) => tone(f, dur, 'triangle', (peak || 0.12) * (1 - i * 0.15), i * 0.045));
-  }
-  const FILES = {
-    click: 'click.ogg', card: 'card.ogg', fanfare: 'fanfare.ogg', whistle: 'whistle.ogg',
-    'whistle-long': 'whistle-long.ogg', kick: 'kick.ogg', net: 'net.ogg', post: 'post.ogg',
-    crowd: 'crowd.ogg', chant: 'chant.ogg', roar: 'roar.ogg', groan: 'groan.ogg', boo: 'boo.ogg'
-  };
-  const bufs = {};
-  let loading = false;
   function sampleBase() {
     try {
       if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
@@ -3184,117 +3172,173 @@ if (typeof module !== 'undefined' && module.exports) module.exports = M; else ro
       return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/snd/';
     } catch (e) { return ''; }
   }
-  function loadSamples() {
+  function loadOne(name) {
+    if (bufs[name]) return Promise.resolve(bufs[name]);
+    if (inflight[name]) return inflight[name];
     const base = sampleBase();
-    if (!base || !AC || loading || typeof fetch !== 'function') return;
-    loading = true;
-    Object.keys(FILES).forEach(name => {
-      fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
-        if (!ab) return null;
-        return AC.decodeAudioData(ab);
-      }).then(buf => { if (buf) bufs[name] = buf; }).catch(() => {});
-    });
+    const c = ctx();
+    if (!base || !c || !FILES[name] || typeof fetch !== 'function') return Promise.resolve(null);
+    inflight[name] = fetch(base + FILES[name]).then(r => r.ok ? r.arrayBuffer() : null).then(ab => {
+      if (!ab) return null;
+      return c.decodeAudioData(ab);
+    }).then(buf => {
+      if (buf) bufs[name] = buf;
+      delete inflight[name];
+      return buf || null;
+    }).catch(() => { delete inflight[name]; return null; });
+    return inflight[name];
   }
-  function playBuf(name, gain, loop) {
+  function playBuf(name, gain) {
     const buf = bufs[name];
     const c = live();
-    if (!c || !buf) return null;
+    if (!c) return null;
+    if (!buf) { loadOne(name).then(b => { if (b && settings.on) playBuf(name, gain); }); return null; }
     const s = c.createBufferSource();
     s.buffer = buf;
-    s.loop = !!loop;
     const g = c.createGain();
-    g.gain.value = gain == null ? 0.8 : gain;
+    g.gain.value = gain == null ? 0.5 : gain;
     s.connect(g); g.connect(master);
     s.start();
-    return { src: s, gain: g };
+    return s;
   }
-  function duckCrowd(to, back, sec) {
-    if (!crowdGain || !AC) return;
+  function placeLoop(st, buf, dest, when, fade) {
+    const dur = buf.duration;
+    const xf = Math.min(fade, dur * 0.35);
+    const s = AC.createBufferSource();
+    s.buffer = buf;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.0001, when);
+    g.gain.linearRampToValueAtTime(1, when + xf);
+    g.gain.setValueAtTime(1, Math.max(when + xf + 0.01, when + dur - xf));
+    g.gain.linearRampToValueAtTime(0.0001, when + dur);
+    s.connect(g); g.connect(dest);
+    s.start(when);
+    s.stop(when + dur + 0.03);
+    st.srcs.push(s);
+    s.onended = () => { const i = st.srcs.indexOf(s); if (i >= 0) st.srcs.splice(i, 1); };
+    return dur - xf;
+  }
+  function armLoop(key, buf, dest, fade) {
+    if (!buf || !AC || loops[key]) return;
+    const st = { alive: true, srcs: [], timer: 0 };
+    loops[key] = st;
+    const kick = when => {
+      if (!st.alive) return;
+      const hop = placeLoop(st, buf, dest, when, fade);
+      const wait = (when + hop - AC.currentTime) * 1000;
+      st.timer = setTimeout(() => kick(when + hop), Math.max(40, wait));
+    };
+    kick(AC.currentTime + 0.04);
+  }
+  function disarm(key) {
+    const st = loops[key];
+    if (!st) return;
+    st.alive = false;
+    clearTimeout(st.timer);
+    st.srcs.forEach(s => { try { s.stop(); } catch (e) { /* já parou */ } });
+    delete loops[key];
+  }
+  function duck(node, floor, back, sec) {
+    if (!node || !AC) return;
     const t = AC.currentTime;
-    const now = crowdGain.gain.value;
-    crowdGain.gain.cancelScheduledValues(t);
-    crowdGain.gain.setValueAtTime(now, t);
-    crowdGain.gain.linearRampToValueAtTime(to, t + 0.06);
-    crowdGain.gain.linearRampToValueAtTime(back, t + sec);
+    const now = node.gain.value;
+    node.gain.cancelScheduledValues(t);
+    node.gain.setValueAtTime(now, t);
+    node.gain.linearRampToValueAtTime(floor, t + 0.07);
+    node.gain.linearRampToValueAtTime(back, t + sec);
   }
 
   const FFAudio = {
     settings() { return { on: settings.on, vol: settings.vol }; },
-    setOn(v) { settings.on = !!v; if (master) master.gain.value = settings.on ? settings.vol : 0; if (!settings.on) FFAudio.crowdStop(); save(); },
-    setVol(v) { settings.vol = Math.max(0, Math.min(1, +v || 0)); if (master) master.gain.value = settings.on ? settings.vol : 0; save(); },
+    setOn(v) {
+      settings.on = !!v;
+      const c = ctx();
+      if (master && c) {
+        const t = c.currentTime;
+        master.gain.cancelScheduledValues(t);
+        master.gain.setValueAtTime(master.gain.value, t);
+        master.gain.linearRampToValueAtTime(settings.on ? settings.vol : 0, t + 0.05);
+      }
+      if (!settings.on) { disarm('music'); disarm('crowd'); }
+      save();
+    },
+    setVol(v) {
+      settings.vol = Math.max(0, Math.min(1, +v || 0));
+      if (master && settings.on) master.gain.value = settings.vol;
+      save();
+    },
     unlock() {
       const c = ctx(); if (!c) return;
       if (c.state === 'suspended') c.resume();
       unlocked = true;
-      loadSamples();
+      UI.forEach(loadOne);
+      if (settings.on) loadOne('music').then(buf => { if (buf && settings.on && unlocked) FFAudio.musicStart(); });
     },
-    click() { if (!playBuf('click', 0.55)) tone(640, 0.04, 'sine', 0.045); },
-    flip() { noise(0.07, 0.12, { f: 1800, q: 0.6 }); tone(420, 0.05, 'square', 0.04); },
-    pack() { noise(0.25, 0.14, { f: 900, q: 0.5 }); tone(520, 0.12, 'sawtooth', 0.05); tone(780, 0.16, 'triangle', 0.07, 0.08); },
-    playCard() { if (!playBuf('card', 0.6)) { tone(330, 0.07, 'triangle', 0.1); tone(494, 0.09, 'sine', 0.08, 0.05); } },
-    energy() { tone(880, 0.04, 'sine', 0.06); },
-    counter() { tone(196, 0.12, 'sawtooth', 0.1); tone(392, 0.14, 'square', 0.05, 0.04); },
-    combo() { chord([523, 659, 784], 0.16, 0.1); },
-    level() { chord([523, 659, 784, 1046], 0.22, 0.11); },
-    record() { chord([392, 494, 587, 784], 0.38, 0.12); },
+    musicStart() {
+      const c = live(); if (!c || loops.music) return;
+      loadOne('music').then(buf => {
+        if (!buf || !settings.on || loops.music) return;
+        musicGain.gain.cancelScheduledValues(c.currentTime);
+        musicGain.gain.setValueAtTime(MIX.music, c.currentTime);
+        armLoop('music', buf, musicGain, 0.22);
+      });
+    },
+    musicStop() { disarm('music'); },
+    ready(name) { return !!bufs[name]; },
+    click() { playBuf('click', MIX.click); },
+    back() { playBuf('back', MIX.back); },
+    confirm() { playBuf('confirm', MIX.confirm); },
+    flip() { playBuf('card', MIX.card); },
+    pack() { playBuf('pack', MIX.pack); },
+    playCard() { playBuf('card', MIX.card); },
+    energy() { playBuf('click', MIX.click * 0.7); },
+    counter() { playBuf('confirm', MIX.confirm); },
+    combo() { playBuf('fanfare', MIX.fanfare * 0.7); },
+    level() { playBuf('fanfare', MIX.fanfare); },
+    record() { playBuf('fanfare', MIX.fanfare); },
+    stinger() { playBuf('confirm', MIX.confirm); },
+    fanfare() { playBuf('fanfare', MIX.fanfare); },
     whistle(kind) {
-      const file = kind === 'full' ? 'whistle-long' : 'whistle';
-      if (playBuf(file, 0.7)) return;
-      const hi = kind === 'full' ? 2100 : kind === 'card' ? 1700 : 1900;
-      tone(hi, kind === 'full' ? 0.28 : 0.16, 'sine', 0.09);
-      tone(hi * 1.01, kind === 'full' ? 0.28 : 0.12, 'triangle', 0.04, 0.02);
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.7);
+      playBuf(kind === 'full' ? 'whistle-long' : 'whistle', MIX.whistle);
     },
-    net() { if (!playBuf('net', 0.75)) noise(0.12, 0.16, { f: 600, q: 0.8 }); },
+    kick() {
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.45);
+      playBuf('kick', MIX.kick);
+    },
+    net() { playBuf('net', MIX.net); },
     post() {
-      if (playBuf('post', 0.7)) { FFAudio.uuh(); return; }
-      tone(240, 0.18, 'square', 0.08);
-      tone(180, 0.22, 'sawtooth', 0.06, 0.02);
-      noise(0.15, 0.1, { f: 1400, q: 2 });
+      duck(musicGain, MIX.musicDuck, MIX.music, 0.8);
+      playBuf('post', MIX.post);
       FFAudio.uuh();
     },
-    uuh() { if (!playBuf('groan', 0.55)) noise(0.45, 0.1, { f: 500, q: 0.6 }); },
+    uuh() { playBuf('groan', MIX.groan); },
     goal() {
-      duckCrowd(0.05, 0.12, 1.6);
-      if (playBuf('roar', 0.85)) { playBuf('net', 0.7); return; }
-      FFAudio.crowdSwell(0.22); chord([262, 330, 392, 523], 0.32, 0.13); noise(0.2, 0.12, { f: 800, q: 0.5 });
+      duck(musicGain, MIX.musicDuck, MIX.music, 2.3);
+      duck(crowdGain, MIX.crowdDuck, MIX.crowd, 1.7);
+      playBuf('roar', MIX.roar);
+      playBuf('net', MIX.net);
     },
     concede() {
-      if (playBuf('boo', 0.7)) return;
-      FFAudio.crowdSwell(0.08); noise(0.35, 0.12, { f: 280, q: 0.5 }); tone(140, 0.25, 'sawtooth', 0.05);
+      duck(musicGain, MIX.musicDuck, MIX.music, 1.6);
+      playBuf('boo', MIX.boo);
     },
-    stinger() { chord([349, 440, 523], 0.28, 0.1); },
-    fanfare() { if (!playBuf('fanfare', 0.65)) chord([523, 659, 784, 1046], 0.42, 0.12); },
     crowdStart() {
-      const c = live(); if (!c || crowd) return;
-      if (bufs.crowd) {
-        const played = playBuf('crowd', 0.22, true);
-        if (played) { crowd = played.src; crowdGain = played.gain; return; }
-      }
-      const s = c.createBufferSource();
-      s.buffer = noiseBuf; s.loop = true;
-      const bp = c.createBiquadFilter();
-      bp.type = 'bandpass'; bp.frequency.value = 480; bp.Q.value = 0.55;
-      crowdGain = c.createGain();
-      crowdGain.gain.value = 0.022;
-      s.connect(bp); bp.connect(crowdGain); crowdGain.connect(master);
-      s.start();
-      crowd = s;
+      const c = live(); if (!c || loops.crowd) return;
+      MATCH.forEach(loadOne);
+      loadOne('crowd').then(buf => {
+        if (!buf || !settings.on || loops.crowd) return;
+        crowdGain.gain.cancelScheduledValues(AC.currentTime);
+        crowdGain.gain.setValueAtTime(MIX.crowd, AC.currentTime);
+        armLoop('crowd', buf, crowdGain, 1.05);
+      });
     },
     crowdSwell(level) {
-      if (!crowdGain || !AC) { FFAudio.crowdStart(); }
-      if (!crowdGain || !AC) return;
-      const t = AC.currentTime;
-      const peak = Math.max(0.04, Math.min(0.2, level || 0.1));
-      crowdGain.gain.cancelScheduledValues(t);
-      crowdGain.gain.setValueAtTime(Math.max(0.02, crowdGain.gain.value), t);
-      crowdGain.gain.linearRampToValueAtTime(peak, t + 0.12);
-      crowdGain.gain.linearRampToValueAtTime(bufs.crowd ? 0.22 : 0.022, t + 1.1);
-      if (bufs.chant && peak > 0.12) playBuf('chant', 0.35);
+      if (!loops.crowd) FFAudio.crowdStart();
+      duck(crowdGain, Math.min(0.7, MIX.crowd + (level || 0.08)), MIX.crowd, 1.15);
+      if ((level || 0) > 0.05) playBuf('chant', MIX.chant);
     },
-    crowdStop() {
-      if (crowd) { try { crowd.stop(); } catch (e) { /* já parou */ } }
-      crowd = null; crowdGain = null;
-    },
+    crowdStop() { disarm('crowd'); },
     unlocked: () => unlocked
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = FFAudio;
@@ -5339,7 +5383,9 @@ const ICON = {
   pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>',
   arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
   swap: '<path d="M4 8h14l-4-4M20 16H6l4 4"/>',
-  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5 6.5-5s5.7 1.5 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 15c2 .6 3.2 2.2 3.6 5"/>'
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.3-5 6.5-5s5.7 1.5 6.5 5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 15c2 .6 3.2 2.2 3.6 5"/>',
+  vol: '<path d="M4 10v4h3l4 4V6L7 10zM15.5 9.2a3.6 3.6 0 0 1 0 5.6M18 7a6.5 6.5 0 0 1 0 10"/>',
+  mute: '<path d="M4 10v4h3l4 4V6L7 10zM16 10l5 5M21 10l-5 5"/>'
 };
 const FILLED = { play: 1, fast: 1, pause: 1 };
 function ic(n, cls) { return `<svg class="svg ${FILLED[n] ? 'f' : ''} ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true">${ICON[n] || ''}</svg>`; }
@@ -5551,6 +5597,7 @@ function rankHtml(list, hlTs) {
 function renderHome() {
   const st = G.store, lv = Math.min(st.level || 1, st.unlocked), di = dailyInfo(), ds = dailySeed(), now = new Date();
   app.innerHTML = `
+  <div class="menuhead">${sndDockHtml()}</div>
   <div class="hero"><div class="logo">${logoSvg()}<div class="wm">Fominha<span>FUTEBOL CLUBE</span></div></div>
     <div class="modetag">${ic('bolt')} COPA RELÂMPAGO</div>
     <p class="tagline">7 jogos. Perdeu, acabou. Monte combos absurdos com cartas, relíquias e um técnico lendário.</p></div>
@@ -5576,7 +5623,7 @@ function renderHome() {
     <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button>
     <button class="btn sec" style="margin-top:8px" data-act="carOpen">Modo Carreira <small>20 temporadas, da Série D à elite</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
-  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button><button class="btn ghost" data-act="som">Som</button></div>`;
+  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button></div>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
   if (!ligaAnimModal()) showTip('nav');
 }
@@ -5798,7 +5845,7 @@ function renderMatch() {
   <div class="stadium"><div class="stands" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="floods" aria-hidden="true"><b></b><b></b><b></b><b></b></div>
   <div class="pitch wx-${wx.id}" id="pitch"><div class="pz" id="pz">${pitchLines()}${toks}${trail}<div class="ball" id="ball">${ballSvg('pitch')}</div></div><div class="wx" aria-hidden="true"></div></div></div>
   <div class="fxbar" id="fxbar"></div>
-  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span>${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div>
+  <div class="feedhead"><span class="eyebrow l">${ic('radio')} Narração ao vivo</span><div class="sndrow">${sndDockHtml()}${m.pvp ? '<span class="chip">mesma final</span>' : `<button class="chip" data-act="speed" id="spd" aria-label="Mudar velocidade">${ic('fast')} ${G.speed}x</button>`}</div></div>
   <div class="feed" id="feed" aria-live="polite"></div>`;
   G.queue = []; G.shownScore = m.score.slice();
   G.mom = Array.from({ length: 30 }, () => [0, 0]); G.goalMarks = []; G.mst = { poss: [1, 1], shots: [0, 0], saves: [0, 0] };
@@ -6036,7 +6083,8 @@ function tick() {
     if (e.kind === 'counter' || e.kind === 'combo') { flashBanner(e); if (window.FFAudio) { if (e.kind === 'combo') FFAudio.combo(); else FFAudio.counter(); } }
     if (window.FFAudio) {
       if (e.kind === 'goal') { if (e.side === 0) FFAudio.goal(); else FFAudio.concede(); }
-      else if (e.kind === 'lance' && /TRAVE|travessão/.test(e.text || '')) FFAudio.post();
+      else if (e.kind === 'lance' && /TRAVE|travessão/i.test(e.text || '')) FFAudio.post();
+      else if (e.kind === 'lance') { FFAudio.kick(); if (/fora|cima|bloqueia|Fraquinho|Defesa|espelma|milagre/i.test(e.text || '')) FFAudio.uuh(); }
       else if (e.kind === 'card') FFAudio.playCard();
       else if (e.kind === 'half') FFAudio.whistle('half');
       else if (e.kind === 'end') FFAudio.whistle('full');
@@ -7455,6 +7503,10 @@ function renderCareer() {
   const C = window.FFCareer; if (!C) return;
   const extra = G.screen === 'carCriar' ? G.carDraft : G.screen === 'carMuseu' ? (G.carExtra || C.loadStore()) : G.screen === 'carHome' ? C.loadStore() : G.carExtra;
   app.innerHTML = C.view(G.screen, G.career, extra);
+  if (G.screen === 'carHome') {
+    const bar = app.querySelector('.topbar');
+    if (bar && !bar.querySelector('.snddock')) bar.insertAdjacentHTML('beforeend', sndDockHtml());
+  }
   app.classList.toggle('hasdock', !!app.querySelector('.mctrl'));
   if (G.screen === 'carFim' && G.career && G.career.summary && G.career.summary.fire && !RM()) {
     setTimeout(() => confettiBurst(['#ffc83d', '#c6ff3d', '#fff', '#ff5a5f'], 42), 180);
@@ -7478,19 +7530,36 @@ function renderCareer() {
     }
   }
 }
+function sndDockHtml() {
+  const s = window.FFAudio ? FFAudio.settings() : { on: true, vol: 0.25 };
+  const on = s.on && s.vol > 0.001;
+  return `<div class="snddock ${on ? '' : 'off'}"><button type="button" class="sndbtn" data-act="somToggle" aria-pressed="${on ? 'true' : 'false'}" aria-label="${on ? 'Silenciar' : 'Ligar o som'}">${ic(on ? 'vol' : 'mute')}</button><input data-act="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></div>`;
+}
+function paintSnd() {
+  const s = window.FFAudio ? FFAudio.settings() : { on: true, vol: 0.25 };
+  const on = s.on && s.vol > 0.001;
+  document.querySelectorAll('.snddock').forEach(dock => {
+    dock.classList.toggle('off', !on);
+    const btn = dock.querySelector('[data-act=somToggle]');
+    if (btn) {
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('aria-label', on ? 'Silenciar' : 'Ligar o som');
+      btn.innerHTML = ic(on ? 'vol' : 'mute');
+    }
+    const range = dock.querySelector('[data-act=somVol]');
+    if (range && range !== document.activeElement) range.value = String(Math.round(s.vol * 100));
+  });
+}
 function somSheet() {
   const A = window.FFAudio; if (!A) return;
   document.querySelectorAll('.modal.somm').forEach(x => x.remove());
   const s = A.settings();
   const m = document.createElement('div'); m.className = 'modal somm';
   m.innerHTML = `<div class="box sombox"><div class="eyebrow g">Som do estádio</div><h3 class="ttl" style="margin-top:4px">Arquibancada</h3>
-    <p class="sub">Apito, torcida e chute usam gravações livres. Se o áudio não carregar, o jogo volta ao som do navegador.</p>
-    <button class="btn ${s.on ? '' : 'sec'}" data-act="somOn">${s.on ? 'Som ligado' : 'Som desligado'}</button>
-    <label class="somlab">Volume<input id="somVol" type="range" min="0" max="100" value="${Math.round(s.vol * 100)}" aria-label="Volume"></label>
+    <p class="sub">Música, torcida, apito, chute e rede são gravações. O volume fica neste aparelho e a música só entra depois do primeiro toque.</p>
+    ${sndDockHtml()}
     <button class="btn sec" data-x="1">Fechar</button></div>`;
   m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
-  const range = m.querySelector('#somVol');
-  range.addEventListener('input', ev => { A.unlock(); A.setVol(ev.target.value / 100); A.click(); });
   document.body.appendChild(m);
 }
 function syncCarName() {
@@ -7551,8 +7620,13 @@ function onClick(ev) {
   const a = el.dataset.act;
   if (window.FFAudio) {
     FFAudio.unlock();
-    const ownSound = { speed: 1, somVol: 1, carStart: 1, carMentorOk: 1, somOn: 1 };
-    if (a === 'usecard' || a === 'carOpt' || a === 'carLive') FFAudio.playCard();
+    const ownSound = { speed: 1, somVol: 1, somToggle: 1, somOn: 1, carMentorOk: 1 };
+    const backActs = { home: 1, carHome: 1, carBackHub: 1, leaveShop: 1 };
+    const confirmActs = { start: 1, daily: 1, play: 1, carStart: 1, carAccept: 1, afterResult: 1, cdone: 1, bgo: 1 };
+    if (a === 'usecard' || a === 'carOpt' || a === 'carLive' || a === 'takeReward') FFAudio.playCard();
+    else if (a === 'openPack') FFAudio.pack();
+    else if (backActs[a]) FFAudio.back();
+    else if (confirmActs[a]) FFAudio.confirm();
     else if (!ownSound[a]) FFAudio.click();
   }
   if (navigator.vibrate && !RM()) try { navigator.vibrate(8); } catch (er) { /* sem vibração */ }
@@ -7619,7 +7693,22 @@ function onClick(ev) {
     case 'tipok': G.store.tips[el.dataset.k] = 1; saveStore(); el.closest('.tip').remove(); break;
     case 'tipskip': G.store.tipsOff = true; saveStore(); document.querySelectorAll('.tip').forEach(x => x.remove()); break;
     case 'som': somSheet(); break;
-    case 'somOn': { const A = window.FFAudio; if (!A) break; A.setOn(!A.settings().on); if (A.settings().on) { A.unlock(); A.whistle('kick'); } somSheet(); break; }
+    case 'somToggle': {
+      const A = window.FFAudio; if (!A) break;
+      const s = A.settings();
+      const sounding = s.on && s.vol > 0.001;
+      if (sounding) A.setOn(false);
+      else {
+        if (s.vol <= 0.001) A.setVol(0.25);
+        A.setOn(true);
+        A.musicStart();
+        if (G.screen === 'match') A.crowdStart();
+        A.confirm();
+      }
+      paintSnd();
+      break;
+    }
+    case 'somOn': { const A = window.FFAudio; if (!A) break; A.setOn(!A.settings().on); if (A.settings().on) { A.unlock(); A.musicStart(); A.confirm(); } somSheet(); break; }
     case 'carOpen': G.screen = 'carHome'; render(); break;
     case 'carNew': G.carSlot = +el.dataset.i || 0; G.carDraft = FFCareer.draftNew(G.pendingSeed || 'FOMINHA'); go('carCriar'); break;
     case 'carCont': { const st = FFCareer.loadStore(); G.career = st.slots[+el.dataset.i]; if (G.career) { G.career.slot = +el.dataset.i; go(FFCareer.screenFor(G.career)); } break; }
@@ -7630,7 +7719,7 @@ function onClick(ev) {
     case 'carStart': {
       syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
       G.career = FFCareer.create({ seed: d.seed, nome: d.nome || 'Professor', nums: d.nums, clubId: d.clubId, slot: G.carSlot || 0, policy: 'play' });
-      FFCareer.persist(G.career); if (window.FFAudio) FFAudio.whistle('kick'); go('carHub'); break;
+      FFCareer.persist(G.career); go('carHub'); break;
     }
     case 'carJump': carGo(FFCareer.pump(G.career, 'jump')); break;
     case 'carOne': carGo(FFCareer.pump(G.career, 'one')); break;
@@ -7774,7 +7863,19 @@ function previewCareer(which) {
   G.screen = d.screen; render();
 }
 window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet };
-document.addEventListener('input', ev => { if (ev.target && ev.target.id === 'coachName') { G.store.coachName = ev.target.value.trim() || 'Professor Fominha'; saveStore(); } });
+document.addEventListener('input', ev => {
+  const t = ev.target; if (!t) return;
+  if (t.id === 'coachName') { G.store.coachName = t.value.trim() || 'Professor Fominha'; saveStore(); }
+  if (t.dataset && t.dataset.act === 'somVol' && window.FFAudio) {
+    const A = FFAudio;
+    A.unlock();
+    const v = Math.max(0, Math.min(1, (+t.value || 0) / 100));
+    A.setVol(v);
+    if (v > 0.001 && !A.settings().on) A.setOn(true);
+    if (v > 0.001) { A.musicStart(); if (G.screen === 'match') A.crowdStart(); }
+    paintSnd();
+  }
+});
 function readDuelHash() {
   const h = location.hash.match(/duelo=([A-Za-z0-9_-]+)/);
   if (!h) return false;

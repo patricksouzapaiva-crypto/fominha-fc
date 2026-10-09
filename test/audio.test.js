@@ -1,0 +1,43 @@
+// O áudio não pode gerar ruído nem oscilador, e os arquivos citados precisam existir.
+const fs = require('fs');
+const path = require('path');
+const src = fs.readFileSync(path.join(__dirname, '..', 'src', 'audio.js'), 'utf8');
+const banned = ['createOscillator', 'noiseBuf', 'Math.random', 'createBuffer('];
+banned.forEach(token => {
+  if (src.indexOf(token) >= 0) throw new Error('áudio ainda gera som no código: ' + token);
+});
+const FFAudio = require('../src/audio.js');
+FFAudio.click();
+FFAudio.back();
+FFAudio.confirm();
+FFAudio.pack();
+FFAudio.playCard();
+FFAudio.whistle('kick');
+FFAudio.whistle('full');
+FFAudio.kick();
+FFAudio.net();
+FFAudio.post();
+FFAudio.uuh();
+FFAudio.goal();
+FFAudio.concede();
+FFAudio.crowdStart();
+FFAudio.crowdSwell(0.1);
+FFAudio.crowdStop();
+FFAudio.musicStart();
+FFAudio.musicStop();
+FFAudio.setVol(0.4);
+FFAudio.setOn(false);
+const off = FFAudio.settings();
+if (off.on !== false || Math.abs(off.vol - 0.4) > 0.001) throw new Error('mudo/volume ' + JSON.stringify(off));
+FFAudio.setOn(true);
+if (!FFAudio.settings().on) throw new Error('não religou');
+const files = ['music', 'crowd', 'roar', 'groan', 'boo', 'chant', 'whistle', 'whistle-long', 'kick', 'net', 'post', 'click', 'back', 'confirm', 'pack', 'card', 'fanfare'];
+files.forEach(name => {
+  const fp = path.join(__dirname, '..', 'assets', 'snd', name + '.ogg');
+  const st = fs.statSync(fp);
+  if (st.size < 400) throw new Error(name + ' curto demais');
+});
+const built = fs.readFileSync(path.join(__dirname, '..', 'copa-relampago.html'), 'utf8');
+if (built.indexOf('createOscillator') >= 0 || built.indexOf('noiseBuf') >= 0) throw new Error('o html publicado ainda tem ruído procedural');
+if (built.indexOf('data-act="somToggle"') < 0) throw new Error('o controle de som não entrou no html');
+console.log('audio ok', files.length, 'arquivos');
