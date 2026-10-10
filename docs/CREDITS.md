@@ -25,3 +25,7 @@ A mixagem deixa a música abaixo da torcida ambiente, e a torcida ambiente abaix
 | `fanfare.ogg` | título e mentor | Kenney, Interface Sounds, `confirmation_002.ogg` | CC0 |
 
 Os arquivos da Freesound usados aqui são o preview em alta do próprio som publicado em CC0. A trave não é uma gravação separada de travessão: é outro chute do mesmo take CC0, filtrado para ficar mais seco. Os sons de interface da Kenney foram desenhados no GameSynth e publicados por ele em CC0; entram só como clique de botão, bem abaixo da torcida.
+
+## Ícones das cartas
+
+Os ícones das cartas, dos quatro tipos (ataque, defesa, tática, especial) e das relíquias são desenhos originais em SVG, feitos para este jogo. Não vêm de biblioteca nem de fonte de ícones. A cor da moldura segue o tipo da carta ou a raridade da relíquia.

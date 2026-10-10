@@ -411,6 +411,7 @@ button.chip:active{transform:scale(.96)}
 .shopsign{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:linear-gradient(90deg,rgba(255,200,61,.16),rgba(255,200,61,.03));border:1px solid rgba(255,200,61,.35);margin:6px 0 12px}
 .shopsign .svg{font-size:30px;color:var(--gold)}
 .sellrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-top:6px;cursor:pointer;min-height:48px}
+.sellrow .med,.opt .med{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:0 0 40px}
 .sellrow .p{margin-left:auto}
 
 /* ---------- veredito ---------- */
@@ -718,22 +719,40 @@ body:has(.tabbar) #app{padding-bottom:96px}
 .pips{display:inline-flex;gap:4px;align-items:center}
 .pips i{width:12px;height:12px;border-radius:99px;background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
 .pips i.on{background:var(--gold);box-shadow:0 0 8px var(--gold)}
-.cface{--tc:#ff4d57;position:relative;width:100%;min-height:118px;border-radius:16px;padding:28px 10px 8px;text-align:left;color:#fff;background:linear-gradient(180deg,#1a2740,#0c1424);border:2px solid var(--tc);box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 10px 24px rgba(0,0,0,.35);font-family:var(--ui)}
-.cface.rar-rara{box-shadow:0 0 16px color-mix(in srgb,var(--tc) 55%,transparent)}
+.cface{--tc:#ff4d57;position:relative;width:100%;min-height:132px;border-radius:16px;padding:28px 10px 8px;text-align:left;color:#fff;background:linear-gradient(165deg,#243656 0%,#121a2c 42%,#0c1424 100%);border:2px solid var(--tc);box-shadow:0 0 0 1px rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.12);font-family:var(--ui)}
+.cface.rar-rara{box-shadow:0 0 16px color-mix(in srgb,var(--tc) 55%,transparent), inset 0 1px 0 rgba(255,255,255,.12)}
+.cface.lv2{box-shadow:0 0 0 2px rgba(255,200,61,.9), 0 10px 24px rgba(0,0,0,.35)}
 .cface.lv3{box-shadow:0 0 0 2px #ffc83d, 0 0 22px rgba(255,200,61,.7)}
-.dcards .cface{min-height:108px;padding-top:24px}
-.dcards .cface .art,.dcards .cface .art svg{height:34px;width:34px}
+.dcards .cface{min-height:124px;padding-top:26px}
+.dcards .cface .art{width:46px;height:46px}
 .offer.cardoffer{align-items:stretch}
-.offer .cslot{width:128px}
-.offer .cslot .cface{min-height:132px}
-.cface .cost,.cface .dur{position:absolute;top:8px;font-size:11px;font-weight:900;letter-spacing:.3px}
+.offer .cslot{width:132px;flex:0 0 132px}
+.offer .cslot .cface{min-height:168px}
+.cface .cost,.cface .dur{position:absolute;top:8px;font-size:11px;font-weight:900;letter-spacing:.3px;display:inline-flex;align-items:center;gap:2px}
 .cface .cost{left:8px;background:#111;color:var(--gold);border-radius:8px;padding:2px 6px}
 .cface .dur{right:8px;color:#d5e4da}
-.cface .art{display:block;height:42px}
-.cface .art svg{height:42px;width:42px}
+.cface .art{display:grid;place-items:center;width:54px;height:54px;margin:2px 0 4px;border-radius:14px;color:#fff;
+  background:radial-gradient(circle at 32% 24%, color-mix(in srgb,var(--tc) 72%,#fff), color-mix(in srgb,var(--tc) 42%,#061018) 68%);
+  box-shadow:inset 0 0 0 2px color-mix(in srgb,#fff 62%,var(--tc)), 0 0 14px color-mix(in srgb,var(--tc) 55%,transparent)}
+.cface .art svg{width:36px;height:36px;filter:drop-shadow(0 1px 0 rgba(0,0,0,.35))}
 .cface b{display:block;font-size:13px;line-height:1.15;margin-top:2px}
-.cface small{display:block;color:#c9d7ce;font-size:10px;font-weight:800}
-.cface em{font-style:normal;color:var(--gold);font-size:11px;letter-spacing:1px}
+.cface small{display:flex;align-items:center;gap:4px;color:#c9d7ce;font-size:10px;font-weight:800}
+.cface em{font-style:normal;color:var(--gold);font-size:13px;letter-spacing:2px;text-shadow:0 0 8px rgba(255,200,61,.55)}
+.tmark{width:13px;height:13px;flex:0 0 auto}
+.bolt{width:11px;height:11px}
+.small b,.d b,.ot{display:inline-flex;align-items:center;gap:4px}
+.chip .mk,.fxbar .mk{width:15px;height:15px;vertical-align:-3px}
+.plate{color:#fff;background:radial-gradient(circle at 32% 24%, color-mix(in srgb,var(--tc,var(--rc)) 78%,#fff), color-mix(in srgb,var(--tc,var(--rc)) 40%,#061018) 70%);box-shadow:inset 0 0 0 2px color-mix(in srgb,#fff 50%,var(--tc,var(--rc))), 0 0 10px color-mix(in srgb,var(--tc,var(--rc)) 45%,transparent)}
+.item .med.plate svg,.offer .med.plate svg,.ii.plate svg,.sellrow .med svg,.opt .med svg{width:68%;height:68%}
+.relicline{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:4px;font-size:13px;font-weight:800}
+.relicline .ri{display:inline-flex;align-items:center;gap:4px}
+.relicline .mk{width:18px;height:18px;color:var(--gold)}
+.info .cface{min-height:210px;padding-top:34px}
+.info .cface .art{width:92px;height:92px;border-radius:20px;margin:6px auto 8px}
+.info .cface .art svg{width:62px;height:62px}
+.info .cface b{font-size:18px;text-align:center}
+.info .cface small,.info .cface em{justify-content:center}
+.info .cface em{display:block;text-align:center;font-size:16px}
 .cface.on{outline:2px solid var(--lime)}
 .cface.dim{opacity:.38;filter:grayscale(.6)}
 .prev{display:grid;gap:6px;margin:8px 0}
@@ -1104,26 +1123,26 @@ const RARITIES = {
 };
 
 const RELICS = {
-  cabeca_ouro: { id: 'cabeca_ouro', nome: 'Cabeça de Ouro', rar: 'rara', icon: '👑', desc: 'Gol de cabeça vale 2.' },
-  luva_ofensiva: { id: 'luva_ofensiva', nome: 'Luva Ofensiva', rar: 'rara', icon: '🧤', desc: 'O goleiro pode marcar: sobe nos escanteios e bate faltas e chutes de longe.' },
-  escanteio_nunca: { id: 'escanteio_nunca', nome: 'Escanteio Curto Nunca', rar: 'incomum', icon: '🚩', desc: '+50% de escanteios e todo escanteio vira cabeçada na área.' },
-  paredao_fala: { id: 'paredao_fala', nome: 'Paredão que Fala', rar: 'incomum', icon: '🧱', desc: 'Cada defesa difícil do seu goleiro dá +5% de força ao time até o fim do jogo.' },
-  retranca: { id: 'retranca', nome: 'Retranca Rentável', rar: 'comum', icon: '💰', desc: 'Vitória por 1 a 0 dá +3 Fichas.' },
-  promessa: { id: 'promessa', nome: 'Promessa Eterna', rar: 'lendaria', icon: '🌟', desc: 'O jogador mais fraco do time vira a Promessa: dobra a força no mata-mata.' },
-  cofrinho: { id: 'cofrinho', nome: 'Cofrinho do Roupeiro', rar: 'comum', icon: '🐷', desc: 'Juros máximos +2 (de +3 para +5).' },
-  pe_coelho: { id: 'pe_coelho', nome: 'Pé de Coelho', rar: 'comum', icon: '🐰', desc: 'A primeira bola na trave do seu time em cada jogo entra.' },
-  bola_quadrada: { id: 'bola_quadrada', nome: 'Bola Quadrada', rar: 'amaldicoada', icon: '🟧', desc: 'Passes erram mais (menos lances) e sai mais chute de longe, mas gol de fora da área vale 2 pros DOIS times.' },
-  juiz_ladrao: { id: 'juiz_ladrao', nome: 'Juiz Ladrão', rar: 'amaldicoada', icon: '🃏', desc: '1 vez por jogo o juiz marca um pênalti do nada: 60% pra você, 40% pro rival.' }
+  cabeca_ouro: { id: 'cabeca_ouro', nome: 'Cabeça de Ouro', rar: 'rara', icon: '', desc: 'Gol de cabeça vale 2.' },
+  luva_ofensiva: { id: 'luva_ofensiva', nome: 'Luva Ofensiva', rar: 'rara', icon: '', desc: 'O goleiro pode marcar: sobe nos escanteios e bate faltas e chutes de longe.' },
+  escanteio_nunca: { id: 'escanteio_nunca', nome: 'Escanteio Curto Nunca', rar: 'incomum', icon: '', desc: '+50% de escanteios e todo escanteio vira cabeçada na área.' },
+  paredao_fala: { id: 'paredao_fala', nome: 'Paredão que Fala', rar: 'incomum', icon: '', desc: 'Cada defesa difícil do seu goleiro dá +5% de força ao time até o fim do jogo.' },
+  retranca: { id: 'retranca', nome: 'Retranca Rentável', rar: 'comum', icon: '', desc: 'Vitória por 1 a 0 dá +3 Fichas.' },
+  promessa: { id: 'promessa', nome: 'Promessa Eterna', rar: 'lendaria', icon: '', desc: 'O jogador mais fraco do time vira a Promessa: dobra a força no mata-mata.' },
+  cofrinho: { id: 'cofrinho', nome: 'Cofrinho do Roupeiro', rar: 'comum', icon: '', desc: 'Juros máximos +2 (de +3 para +5).' },
+  pe_coelho: { id: 'pe_coelho', nome: 'Pé de Coelho', rar: 'comum', icon: '', desc: 'A primeira bola na trave do seu time em cada jogo entra.' },
+  bola_quadrada: { id: 'bola_quadrada', nome: 'Bola Quadrada', rar: 'amaldicoada', icon: '', desc: 'Passes erram mais (menos lances) e sai mais chute de longe, mas gol de fora da área vale 2 pros DOIS times.' },
+  juiz_ladrao: { id: 'juiz_ladrao', nome: 'Juiz Ladrão', rar: 'amaldicoada', icon: '', desc: '1 vez por jogo o juiz marca um pênalti do nada: 60% pra você, 40% pro rival.' }
 };
 const RELIC_IDS = Object.keys(RELICS);
 const RELIC_PRICE = { comum: 4, incomum: 5, rara: 7, lendaria: 9, amaldicoada: 4 };
 const RELIC_WEIGHT = { comum: 40, incomum: 30, rara: 18, lendaria: 7, amaldicoada: 14 };
 
 const CARD_TYPES = {
-  ataque: { id: 'ataque', nome: 'Ataque', emoji: '🟥', cor: '#ff4d57', papel: 'mais chance de gol' },
-  defesa: { id: 'defesa', nome: 'Defesa', emoji: '🟦', cor: '#3d8bff', papel: 'menos gols sofridos' },
-  tatica: { id: 'tatica', nome: 'Tática', emoji: '🟨', cor: '#ffc83d', papel: 'muda o estilo de jogo' },
-  especial: { id: 'especial', nome: 'Especial', emoji: '🟪', cor: '#c084fc', papel: 'rara e forte' }
+  ataque: { id: 'ataque', nome: 'Ataque', cor: '#ff4d57', papel: 'mais chance de gol' },
+  defesa: { id: 'defesa', nome: 'Defesa', cor: '#3d8bff', papel: 'menos gols sofridos' },
+  tatica: { id: 'tatica', nome: 'Tática', cor: '#ffc83d', papel: 'muda o estilo de jogo' },
+  especial: { id: 'especial', nome: 'Especial', cor: '#c084fc', papel: 'rara e forte' }
 };
 const STYLE_NAME = { pressao: 'Pressão', posse: 'Posse', contra: 'Contra-ataque' };
 // Pedra-papel-tesoura: Pressão ganha de Posse, Posse ganha de Contra-ataque, Contra-ataque ganha de Pressão.
@@ -1134,46 +1153,46 @@ function cardSpec(o) {
   return o;
 }
 const CARDS = {
-  pressao: cardSpec({ id: 'pressao', nome: 'Pressão Alta', tipo: 'ataque', rar: 'comum', icon: '⚡', cost: 2, dur: '15 min', style: 'pressao', tip: 'Precisa do gol e o rival toca a bola.',
+  pressao: cardSpec({ id: 'pressao', nome: 'Pressão Alta', tipo: 'ataque', rar: 'comum', icon: '', cost: 2, dur: '15 min', style: 'pressao', tip: 'Precisa do gol e o rival toca a bola.',
     lv: [{ roubo: 0.30, fadiga: 0.06, mins: 15 }, { roubo: 0.36, fadiga: 0.05, mins: 15 }, { roubo: 0.42, fadiga: 0.04, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `+${pct(n.roubo)} de roubadas no campo rival por ${n.mins} min. Depois −${pct(n.fadiga)} de força por 10 min.`; } }),
-  casinha: cardSpec({ id: 'casinha', nome: 'Fechar a Casinha', tipo: 'defesa', rar: 'comum', icon: '🔒', cost: 1, dur: 'até o fim', style: null, tip: 'Ganhando por 1 depois dos 70 minutos.',
+  casinha: cardSpec({ id: 'casinha', nome: 'Fechar a Casinha', tipo: 'defesa', rar: 'comum', icon: '', cost: 1, dur: 'até o fim', style: null, tip: 'Ganhando por 1 depois dos 70 minutos.',
     lv: [{ them: 0.35, you: 0.05 }, { them: 0.40, you: 0.04 }, { them: 0.44, you: 0.03 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Até o fim: rival −${pct(n.them)} de chance de gol, você −${pct(n.you)}.`; } }),
-  contra: cardSpec({ id: 'contra', nome: 'Contra-Ataque Mortal', tipo: 'tatica', rar: 'incomum', icon: '⚡', cost: 2, dur: '20 min', style: 'contra', tip: 'O rival usou Pressão Alta.',
+  contra: cardSpec({ id: 'contra', nome: 'Contra-Ataque Mortal', tipo: 'tatica', rar: 'incomum', icon: '', cost: 2, dur: '20 min', style: 'contra', tip: 'O rival usou Pressão Alta.',
     lv: [{ q: 0.34, mins: 20 }, { q: 0.40, mins: 20 }, { q: 0.46, mins: 22 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: −20% de posse. Roubada vira contra-ataque com +${pct(n.q)} de chance de gol.`; } }),
-  chuveirinho: cardSpec({ id: 'chuveirinho', nome: 'Chuveirinho', tipo: 'ataque', rar: 'incomum', icon: '🌧️', cost: 1, dur: '15 min', style: null, tip: 'Tem cabeceador e a relíquia Cabeça de Ouro.',
+  chuveirinho: cardSpec({ id: 'chuveirinho', nome: 'Chuveirinho', tipo: 'ataque', rar: 'incomum', icon: '', cost: 1, dur: '15 min', style: null, tip: 'Tem cabeceador e a relíquia Cabeça de Ouro.',
     lv: [{ head: 0.20, mins: 15 }, { head: 0.24, mins: 15 }, { head: 0.28, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `+2 cruzamentos no período e cabeçada +${pct(n.head)} por ${n.mins} min.`; } }),
-  craque: cardSpec({ id: 'craque', nome: 'Craque Decide', tipo: 'especial', rar: 'rara', icon: '⭐', cost: 3, dur: 'uso único', style: null, tip: 'O jogo está empatado e o seu melhor jogador está em campo.',
+  craque: cardSpec({ id: 'craque', nome: 'Craque Decide', tipo: 'especial', rar: 'rara', icon: '', cost: 3, dur: 'uso único', style: null, tip: 'O jogo está empatado e o seu melhor jogador está em campo.',
     lv: [{ q: 0.55 }, { q: 0.60 }, { q: 0.65 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: jogada do melhor jogador com ${pct(n.q)} de chance de gol.`; } }),
-  paredao: cardSpec({ id: 'paredao', nome: 'Paredão', tipo: 'defesa', rar: 'incomum', icon: '🛡️', cost: 2, dur: '10 min', style: null, tip: 'O rival finaliza muito ou tem pênalti à vista.',
+  paredao: cardSpec({ id: 'paredao', nome: 'Paredão', tipo: 'defesa', rar: 'incomum', icon: '', cost: 2, dur: '10 min', style: null, tip: 'O rival finaliza muito ou tem pênalti à vista.',
     lv: [{ save: 0.30, pen: 0.50, mins: 10 }, { save: 0.36, pen: 0.55, mins: 10 }, { save: 0.42, pen: 0.60, mins: 12 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: goleiro +${pct(n.save)} nas defesas. Pênalti: ${pct(n.pen)} de defesa.`; } }),
-  submagica: cardSpec({ id: 'submagica', nome: 'Substituição Mágica', tipo: 'tatica', rar: 'comum', icon: '🔄', cost: 1, dur: 'uso único', style: null, tip: 'O time cansou depois da Pressão Alta.',
+  submagica: cardSpec({ id: 'submagica', nome: 'Substituição Mágica', tipo: 'tatica', rar: 'comum', icon: '', cost: 1, dur: 'uso único', style: null, tip: 'O time cansou depois da Pressão Alta.',
     lv: [{ add: 4 }, { add: 5 }, { add: 6 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: zera o cansaço e entra um reserva com +${n.add} de força até o fim.`; } }),
-  catimba: cardSpec({ id: 'catimba', nome: 'Catimba', tipo: 'especial', rar: 'rara', icon: '🎭', cost: 2, dur: 'uso único', style: null, tip: 'O rival ainda tem carta forte na mão.',
+  catimba: cardSpec({ id: 'catimba', nome: 'Catimba', tipo: 'especial', rar: 'rara', icon: '', cost: 2, dur: 'uso único', style: null, tip: 'O rival ainda tem carta forte na mão.',
     lv: [{ }, { }, { }],
     fx() { return 'Uso único: cancela a próxima carta do adversário.'; } }),
-  longe: cardSpec({ id: 'longe', nome: 'Chute de Longe', tipo: 'ataque', rar: 'incomum', icon: '🚀', cost: 1, dur: '15 min', style: null, tip: 'A defesa rival está fechada e sobra espaço fora da área.',
+  longe: cardSpec({ id: 'longe', nome: 'Chute de Longe', tipo: 'ataque', rar: 'incomum', icon: '', cost: 1, dur: '15 min', style: null, tip: 'A defesa rival está fechada e sobra espaço fora da área.',
     lv: [{ q: 0.22, mins: 15 }, { q: 0.28, mins: 15 }, { q: 0.34, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: chute de fora da área +${pct(n.q)} de chance de gol.`; } }),
-  peixinho: cardSpec({ id: 'peixinho', nome: 'Peixinho', tipo: 'ataque', rar: 'rara', icon: '🐟', cost: 2, dur: 'uso único', style: null, tip: 'Acabou de armar a Bola Parada Ensaiada.',
+  peixinho: cardSpec({ id: 'peixinho', nome: 'Peixinho', tipo: 'ataque', rar: 'rara', icon: '', cost: 2, dur: 'uso único', style: null, tip: 'Acabou de armar a Bola Parada Ensaiada.',
     lv: [{ q: 0.28 }, { q: 0.34 }, { q: 0.40 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: o próximo cruzamento vira peixinho com +${pct(n.q)} de chance de gol.`; } }),
-  toque: cardSpec({ id: 'toque', nome: 'Toque de Bola', tipo: 'tatica', rar: 'comum', icon: '🎯', cost: 1, dur: '15 min', style: 'posse', tip: 'O rival abriu a marcação ou está no contra-ataque.',
+  toque: cardSpec({ id: 'toque', nome: 'Toque de Bola', tipo: 'tatica', rar: 'comum', icon: '', cost: 1, dur: '15 min', style: 'posse', tip: 'O rival abriu a marcação ou está no contra-ataque.',
     lv: [{ posse: 0.24, mins: 15 }, { posse: 0.30, mins: 15 }, { posse: 0.36, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Posse paciente: +${pct(n.posse)} de posse por ${n.mins} min. Chance de gol −5%.`; } }),
-  bolaparada: cardSpec({ id: 'bolaparada', nome: 'Bola Parada Ensaiada', tipo: 'ataque', rar: 'incomum', icon: '🚩', cost: 2, dur: '15 min', style: null, tip: 'O técnico tem Bola Parada alta ou você tem o Peixinho.',
+  bolaparada: cardSpec({ id: 'bolaparada', nome: 'Bola Parada Ensaiada', tipo: 'ataque', rar: 'incomum', icon: '', cost: 2, dur: '15 min', style: null, tip: 'O técnico tem Bola Parada alta ou você tem o Peixinho.',
     lv: [{ q: 0.22, mins: 15 }, { q: 0.28, mins: 15 }, { q: 0.34, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: escanteio e falta +${pct(n.q)} de chance de gol.`; } }),
-  linha: cardSpec({ id: 'linha', nome: 'Linha Alta', tipo: 'defesa', rar: 'incomum', icon: '📏', cost: 2, dur: '15 min', style: 'pressao', tip: 'O rival joga direto e pouco pela ponta.',
+  linha: cardSpec({ id: 'linha', nome: 'Linha Alta', tipo: 'defesa', rar: 'incomum', icon: '', cost: 2, dur: '15 min', style: 'pressao', tip: 'O rival joga direto e pouco pela ponta.',
     lv: [{ cut: 0.18, mins: 15 }, { cut: 0.22, mins: 15 }, { cut: 0.26, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: impedimento e linha alta, rival −${pct(n.cut)} de chance de gol.`; } }),
-  grito: cardSpec({ id: 'grito', nome: 'Grito da Torcida', tipo: 'especial', rar: 'incomum', icon: '📣', cost: 2, dur: '10 min', style: null, tip: 'Vai usar o Craque Decide em seguida.',
+  grito: cardSpec({ id: 'grito', nome: 'Grito da Torcida', tipo: 'especial', rar: 'incomum', icon: '', cost: 2, dur: '10 min', style: null, tip: 'Vai usar o Craque Decide em seguida.',
     lv: [{ q: 0.12, mins: 10 }, { q: 0.16, mins: 10 }, { q: 0.20, mins: 12 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: +${pct(n.q)} de chance de gol com a torcida em cima.`; } })
 };
@@ -1871,7 +1890,7 @@ function resolveLance(m, side, forcedType, ev, opts) {
     m.stats.posts[side]++;
     if (side === 0 && has(run, 'pe_coelho') && !m.peCoelhoUsed) {
       m.peCoelhoUsed = true; goal = true;
-      text += ' NA TRAVE... e ENTRA! 🐰 Pé de Coelho!';
+      text += ' NA TRAVE... e ENTRA! Pé de Coelho!';
     } else {
       ev.push({ min, kind: 'lance', side, scorer: scorerName, text: text + ' ' + r.pick(T.post), ball: ballFor(side), hl: true });
       return;
@@ -1882,9 +1901,9 @@ function resolveLance(m, side, forcedType, ev, opts) {
     if (isGK) gtype = gtype === 'cabeca' ? 'goleiro_cabeca' : 'goleiro';
     const header = gtype === 'cabeca' || gtype === 'goleiro_cabeca';
     const longShot = type === 'fora' || type === 'falta';
-    if (side === 0 && header && has(run, 'cabeca_ouro')) { value = 2; notes.push('Vale 2 pela Cabeça de Ouro 👑'); addExtra(m, 'cabeca_ouro', 1); }
-    if (longShot && has(run, 'bola_quadrada')) { value = Math.max(value, 2); notes.push('Gol de fora vale 2 pela Bola Quadrada 🟧'); if (side === 0) addExtra(m, 'bola_quadrada', 1); }
-    if (isGK) notes.unshift('GOL DO GOLEIRO! 🧤 Luva Ofensiva');
+    if (side === 0 && header && has(run, 'cabeca_ouro')) { value = 2; notes.push('Vale 2 pela Cabeça de Ouro'); addExtra(m, 'cabeca_ouro', 1); }
+    if (longShot && has(run, 'bola_quadrada')) { value = Math.max(value, 2); notes.push('Gol de fora vale 2 pela Bola Quadrada'); if (side === 0) addExtra(m, 'bola_quadrada', 1); }
+    if (isGK) notes.unshift('GOL DO GOLEIRO! Luva Ofensiva');
     if (coachAttr && !(post)) { m.stats.coach[coachAttr]++; notes.push(coachAttr === 'atk' ? `⚔️ Ataque treinado no estilo ${csrc(run, 'atk')}` : `🚩 Bola parada ensaiada por ${csrc(run, 'bol')}`); }
     m.score[side] += value;
     const g = { min, side, scorer: scorerName, type: gtype, value, card: side === 0 ? byCard : null };
@@ -2026,8 +2045,8 @@ function castCard(m, side, id) {
   let extra = '';
   if (id === 'craque' && run) { const bi = bestPlayer(run, m.stage, p => p.pos !== 'GOL'); extra = ` A bola vai pro ${run.players[bi].nome}.`; }
   if (id === 'submagica' && run) { const res = SELECOES[run.selecao].reservas; extra = ` Entra ${res[(bag.length + m.stage) % res.length]}.`; }
-  if (id === 'paredao') extra = ' 🛡️ PAREDÃO!';
-  ev.push({ min, kind: 'card', card: id, side: side === 0 ? 0 : 1, text: `${c.icon} ${who}: ${c.nome} (Nv${lv}, ${c.cost} energia). ${cardText(id, lv)}${extra}` });
+  if (id === 'paredao') extra = ' PAREDÃO!';
+  ev.push({ min, kind: 'card', card: id, side: side === 0 ? 0 : 1, text: `${who}: ${c.nome} (Nv${lv}, ${c.cost} energia). ${cardText(id, lv)}${extra}` });
   ev.push(...counterCheck(m, side, c));
   ev.push(...comboCheck(m, side));
   return ev;
@@ -2194,12 +2213,12 @@ function whyLines(run, m, outcome, pens) {
   if (pens) out.push(pens.win ? `Nos pênaltis, seus batedores tiveram sangue frio (${pens.score[0]} x ${pens.score[1]}).` : `Nos pênaltis a sorte foi pro outro lado (${pens.score[0]} x ${pens.score[1]}).`);
   for (const id in m.stats.relicExtra) {
     const n = m.stats.relicExtra[id];
-    if (id === 'paredao_fala') out.push(`🧱 Paredão que Fala ativou ${n}x e deixou o time ${Math.round((m.fx.paredaoMult - 1) * 100)}% mais forte.`);
-    else out.push(`${RELICS[id].icon} ${RELICS[id].nome} rendeu +${n} gol${n > 1 ? 's' : ''} extra${n > 1 ? 's' : ''} no placar.`);
+    if (id === 'paredao_fala') out.push(`Paredão que Fala ativou ${n}x e deixou o time ${Math.round((m.fx.paredaoMult - 1) * 100)}% mais forte.`);
+    else out.push(`${RELICS[id].nome} rendeu +${n} gol${n > 1 ? 's' : ''} extra${n > 1 ? 's' : ''} no placar.`);
   }
   if (m.stats.cardGoals.length) {
     const cg = m.stats.cardGoals[0];
-    out.push(`${CARDS[cg.card].icon} Sua carta ${CARDS[cg.card].nome} virou gol de ${cg.scorer}.`);
+    out.push(`Sua carta ${CARDS[cg.card].nome} virou gol de ${cg.scorer}.`);
   }
   if (outcome === 'W') {
     if (share >= 58) out.push(`Você mandou no meio: ${share}% dos ataques foram seus.`);
@@ -5446,25 +5465,46 @@ function futCard(p, opts) {
   return `<div class="fut ${t} ${opts.size || ''}" title="${esc(p.nome)} · ${p.pos} ${p.rating}"><span class="r">${p.rating}</span><span class="ps">${p.pos}</span>${shirt(k[0], k[1])}
     ${opts.star ? `<span class="star">🌟</span>` : ''}<span class="nm">${esc(p.nome)}</span><span class="tt">${p.traits.split('').filter(Boolean).map(x => `<i>${TRAIT[x]}</i>`).join('')}</span></div>`;
 }
-function cardSvg(id) {
-  const col = E.CARD_TYPES[E.CARDS[id].tipo].cor;
-  const g = {
-    pressao: `<path d="M14 46 L32 6 L27 28 H46 L18 58 L24 34 H8 Z" fill="${col}"/>`,
-    casinha: `<path d="M8 30 L32 10 L56 30 V54 H8 Z" fill="${col}"/><rect x="26" y="36" width="12" height="18" fill="#0c1424"/>`,
-    contra: `<path d="M8 40 H28 L36 18 L44 40 H56 L40 54 Z" fill="${col}"/>`,
-    chuveirinho: `<circle cx="22" cy="18" r="8" fill="${col}"/><path d="M14 34 h8 M30 34 h8 M18 46 h8 M34 46 h6" stroke="${col}" stroke-width="4"/>`,
-    craque: `<polygon points="32,6 38,24 56,24 42,36 48,54 32,42 16,54 22,36 8,24 26,24" fill="${col}"/>`,
-    paredao: `<rect x="10" y="16" width="44" height="36" rx="4" fill="${col}"/><path d="M10 28 H54 M10 40 H54 M24 16 V52 M40 16 V52" stroke="#0c1424" stroke-width="2"/>`,
-    submagica: `<path d="M18 18 A14 14 0 1 1 14 36" fill="none" stroke="${col}" stroke-width="4"/><path d="M44 46 A14 14 0 1 1 50 28" fill="none" stroke="${col}" stroke-width="4"/>`,
-    catimba: `<circle cx="32" cy="28" r="14" fill="${col}"/><path d="M22 48 Q32 58 42 48" stroke="${col}" stroke-width="4" fill="none"/>`,
-    longe: `<circle cx="18" cy="44" r="8" fill="${col}"/><path d="M26 40 L52 14" stroke="${col}" stroke-width="4"/><path d="M40 14 H52 V26" fill="${col}"/>`,
-    peixinho: `<ellipse cx="34" cy="34" rx="18" ry="10" fill="${col}"/><polygon points="14,34 4,24 4,44" fill="${col}"/>`,
-    toque: `<circle cx="18" cy="40" r="7" fill="${col}"/><circle cx="34" cy="24" r="7" fill="${col}"/><circle cx="50" cy="40" r="7" fill="${col}"/>`,
-    bolaparada: `<circle cx="32" cy="36" r="14" fill="none" stroke="${col}" stroke-width="4"/><path d="M32 8 V18 M32 54 V48" stroke="${col}" stroke-width="4"/>`,
-    linha: `<path d="M8 44 H56 M16 44 L28 16 H40 L52 44" fill="none" stroke="${col}" stroke-width="4"/>`,
-    grito: `<path d="M12 24 H28 L46 12 V52 L28 40 H12 Z" fill="${col}"/><path d="M50 24 Q58 32 50 40" fill="none" stroke="${col}" stroke-width="3"/>`
-  };
-  return `<svg viewBox="0 0 64 64" aria-hidden="true">${g[id] || ''}</svg>`;
+const GLYPH = {
+  ataque: '<path d="M8 36c2-14 16-18 24-8l14-4c8-2 16 6 12 14l2 10H16z"/><path d="M14 48h44v8H14z"/>',
+  defesa: '<path d="M32 4l24 10v18c0 16-10 26-24 30C18 58 8 48 8 32V14z"/>',
+  tatica: '<path d="M16 16h10V8h12v8h10v42H16z"/><path d="M24 6h16v12H24z"/>',
+  especial: '<path d="M32 4l6 22 22 6-22 6-6 22-6-22-22-6 22-6z"/>',
+  pressao: '<path d="M38 4L14 34h16L22 60l32-38H36z"/>',
+  casinha: '<path fill-rule="evenodd" d="M6 32L32 8l26 24v28H6zM26 40h12v20H26z"/>',
+  contra: '<path d="M4 26h28V12l26 20-26 20V38H4z"/>',
+  chuveirinho: '<path d="M16 30a10 10 0 0 1 8-16 12 12 0 0 1 22 8 8 8 0 0 1 2 16z"/><circle cx="20" cy="48" r="4"/><circle cx="34" cy="52" r="4"/><circle cx="48" cy="46" r="4"/>',
+  craque: '<polygon points="32,4 39,24 60,24 43,36 50,56 32,44 14,56 21,36 4,24 25,24"/>',
+  paredao: '<path d="M8 10h48v14H8zm0 18h22v14H8zm26 0h22v14H34zM8 46h48v12H8z"/>',
+  submagica: '<path d="M6 20h28v-8l18 14-18 14v-8H6z"/><path d="M58 36H30v8L12 30l18-14v8h28z"/>',
+  catimba: '<path fill-rule="evenodd" d="M10 24c0-12 10-16 22-16s22 4 22 16v12c0 16-10 24-22 24S10 52 10 36zM22 30a5 5 0 1 0 .1 0zM42 30a5 5 0 1 0 .1 0zM22 44h20v6H22z"/>',
+  longe: '<circle cx="14" cy="48" r="9"/><path d="M24 42L46 18l8 7L32 50z"/><path d="M42 8l18 6-14 16z"/>',
+  peixinho: '<circle cx="50" cy="24" r="8"/><path d="M42 30L12 40l6 12 22-8-2 12 12-4 2-14z"/><circle cx="14" cy="18" r="7"/>',
+  toque: '<circle cx="14" cy="46" r="8"/><circle cx="32" cy="16" r="8"/><circle cx="50" cy="46" r="8"/><path d="M20 40L26 24M38 22L44 40" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>',
+  bolaparada: '<path d="M16 6v52" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M16 10h34L36 26l14 16H16z"/>',
+  linha: '<path d="M4 46h56v8H4z"/><circle cx="20" cy="26" r="7"/><path d="M16 34h8v12h-8z"/><circle cx="46" cy="26" r="7"/><path d="M42 34h8v12h-8z"/>',
+  grito: '<path d="M8 24h16l24-14v44L24 40H8z"/><path d="M52 22c8 6 8 14 0 20" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>',
+  cabeca_ouro: '<path d="M14 24l6-14 8 10 6-12 6 12 8-10 6 14z"/><circle cx="32" cy="42" r="16"/>',
+  luva_ofensiva: '<path d="M18 36c0-12 12-18 16-8 3-10 16-8 18 4 8-2 14 8 10 16v8c0 10-8 14-20 14h-6c-12 0-18-6-18-16z"/>',
+  escanteio_nunca: '<path d="M14 6v52" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M14 10h32L34 24l12 14H14z"/><circle cx="46" cy="48" r="8"/>',
+  paredao_fala: '<path d="M6 8h52v14H6zm0 18h24v14H6zm28 0h24v14H34zM6 44h52v14H6z"/>',
+  retranca: '<path fill-rule="evenodd" d="M32 6a20 20 0 1 0 .1 0zM18 28h28v10H18z"/>',
+  promessa: '<path d="M32 2l4 12 12 2-10 7 4 12-10-7-10 7 4-12-10-7 12-2z"/><circle cx="32" cy="46" r="8"/><path d="M22 56h20l-4-8H26z"/>',
+  cofrinho: '<ellipse cx="30" cy="38" rx="20" ry="14"/><circle cx="14" cy="30" r="7"/><ellipse cx="48" cy="40" rx="7" ry="5"/><path d="M22 22h14v6H22z"/>',
+  pe_coelho: '<circle cx="32" cy="42" r="16"/><path d="M18 30L12 6l16 20z"/><path d="M46 30L52 6 36 26z"/>',
+  bola_quadrada: '<path fill-rule="evenodd" d="M10 16a8 8 0 0 1 8-8h28a8 8 0 0 1 8 8v32a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8zM32 32m-11 0a11 11 0 1 0 22 0a11 11 0 1 0-22 0"/>',
+  juiz_ladrao: '<path fill-rule="evenodd" d="M8 34h24s6-14 18-12c8 2 8 16 0 18-8 2-14-4-18-2H8zM46 34a5 5 0 1 0 .1 0z"/>',
+  energia: '<path d="M38 4L14 34h16L22 60l32-38H36z"/>'
+};
+function markSvg(id) {
+  return `<svg class="mk" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${GLYPH[id] || ''}</svg>`;
+}
+function typeMark(tipo) {
+  const t = E.CARD_TYPES[tipo];
+  return `<svg class="tmark" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true" style="color:${t.cor}">${GLYPH[tipo] || ''}</svg>`;
+}
+function boltSvg() {
+  return `<svg class="bolt" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${GLYPH.energia}</svg>`;
 }
 function nrgPips(left, max) {
   let s = '';
@@ -5477,9 +5517,10 @@ function cardFace(id, run, opts) {
   const lv = opts.lv || E.cardLevel(run || G.run, id);
   const hints = run ? E.comboHints(run, id) : [];
   const tag = opts.btn === false ? 'div' : 'button';
-  return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
-    <i class="cost">⚡${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${cardSvg(id)}</span>
-    <b>${esc(c.nome)}</b><small>${t.emoji} ${t.nome}${lv > 1 ? ' · Nv' + lv : ''}</small><em>${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
+  const label = `${c.nome}, ${t.nome}, nível ${lv}, custa ${c.cost} de energia`;
+  return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${tag === 'button' ? 'type="button"' : 'role="img"'} aria-label="${esc(label)}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
+    <i class="cost">${boltSvg()}${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${markSvg(id)}</span>
+    <b>${esc(c.nome)}</b><small>${typeMark(c.tipo)} <span>${esc(t.nome)}${lv > 1 ? ' · Nv' + lv : ''}</span></small><em aria-hidden="true">${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
     ${hints.length ? `<div class="hintline">Combo: ${esc(hints.join(', '))}</div>` : ''}</${tag}>`;
 }
 function chanceBars(id) {
@@ -5493,7 +5534,7 @@ function itemHtml(kind, id, opts) {
   if (kind === 'card') return cardFace(id, G.run, { act: 'info', btn: true });
   const d = E.RELICS[id];
   return `<button class="item ${kind} ${d.rar} ${opts.cls || ''}" style="--rc:${rc(d.rar)}" data-act="info" data-k="${kind}" data-id="${id}" aria-label="${esc(d.nome)}: ver detalhes">
-    <span class="med">${d.icon}</span><div class="in">${esc(d.nome)}</div><div class="rr">Relíquia · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
+    <span class="med plate" style="--tc:${rc(d.rar)}">${markSvg(id)}</span><div class="in">${esc(d.nome)}</div><div class="rr">Relíquia · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
 }
 function invPanels(run, desc) {
   const cards = run.cards.map(c => itemHtml('card', c, { desc })).join('') + (run.cards.length < E.MAX_CARDS ? `<div class="item empty">vaga de carta</div>` : '');
@@ -5975,20 +6016,21 @@ function updateFx() {
   const c = [];
   c.push(nrgPips(m.nrgLeft == null ? 3 : m.nrgLeft, m.nrgMax || 3));
   if (m.fxOpp && m.fxOpp.style && min <= m.fxOpp.styleUntil) c.push(`Rival: ${E.STYLE_NAME[m.fxOpp.style]}`);
-  if (min <= f.pressaoUntil) c.push(`⚡ Pressão até ${f.pressaoUntil}'`);
-  if (min <= f.casinhaUntil) c.push(f.casinhaUntil > 120 ? '🔒 Casinha até o fim' : `🔒 Casinha até ${f.casinhaUntil}'`);
-  if (min <= f.chuvaUntil) c.push(`🌧️ Chuveirinho até ${f.chuvaUntil}'`);
-  if (min <= f.longeUntil) c.push(`🚀 Longe até ${f.longeUntil}'`);
-  if (min <= f.contraUntil) c.push(`⚡ Contra-ataque até ${f.contraUntil}'`);
-  if (min <= f.toqueUntil) c.push(`🎯 Posse até ${f.toqueUntil}'`);
-  if (min <= f.paredaoUntil) c.push(`🛡️ Paredão até ${f.paredaoUntil}'`);
-  if (f.craque) c.push('⭐ Craque armado');
-  if (f.peixinho) c.push('🐟 Peixinho armado');
-  if (f.sub) c.push(`🔄 Reserva +${Math.round(f.sub * 10) / 10}`);
-  if (f.paredaoMult > 1) c.push(`🧱 +${Math.round((f.paredaoMult - 1) * 100)}% força`);
+  const fxChip = (id, text) => `<span class="chip c">${markSvg(id)} ${text}</span>`;
+  if (min <= f.pressaoUntil) c.push(fxChip('pressao', `Pressão até ${f.pressaoUntil}'`));
+  if (min <= f.casinhaUntil) c.push(fxChip('casinha', f.casinhaUntil > 120 ? 'Casinha até o fim' : `Casinha até ${f.casinhaUntil}'`));
+  if (min <= f.chuvaUntil) c.push(fxChip('chuveirinho', `Chuveirinho até ${f.chuvaUntil}'`));
+  if (min <= f.longeUntil) c.push(fxChip('longe', `Longe até ${f.longeUntil}'`));
+  if (min <= f.contraUntil) c.push(fxChip('contra', `Contra-ataque até ${f.contraUntil}'`));
+  if (min <= f.toqueUntil) c.push(fxChip('toque', `Posse até ${f.toqueUntil}'`));
+  if (min <= f.paredaoUntil) c.push(fxChip('paredao', `Paredão até ${f.paredaoUntil}'`));
+  if (f.craque) c.push(fxChip('craque', 'Craque armado'));
+  if (f.peixinho) c.push(fxChip('peixinho', 'Peixinho armado'));
+  if (f.sub) c.push(fxChip('submagica', `Reserva +${Math.round(f.sub * 10) / 10}`));
+  if (f.paredaoMult > 1) c.push(fxChip('paredao_fala', `+${Math.round((f.paredaoMult - 1) * 100)}% força`));
   if (f.fadigaUntil >= min && !f.blitz) c.push(`😮‍💨 Cansaço −${Math.round((f.fadigaPct || 0) * 100)}%`);
   if (m.weather !== 'sol') c.push(`${E.WEATHER[m.weather].icon} ${E.WEATHER[m.weather].nome}`);
-  bar.innerHTML = c.map(x => `<span class="chip c">${x}</span>`).join('') + run.relics.map(r => `<button class="chip" style="min-height:30px;padding:3px 8px" data-act="info" data-k="relic" data-id="${r}" title="${esc(E.RELICS[r].nome)}">${E.RELICS[r].icon}</button>`).join('');
+  bar.innerHTML = c.map(x => x.indexOf('class="chip c"') >= 0 ? x : `<span class="chip c">${x}</span>`).join('') + run.relics.map(r => `<button class="chip plate" style="--tc:${rc(E.RELICS[r].rar)};min-height:30px;padding:3px 8px" data-act="info" data-k="relic" data-id="${r}" title="${esc(E.RELICS[r].nome)}" aria-label="${esc(E.RELICS[r].nome)}">${markSvg(r)}</button>`).join('');
 }
 const RELIC_RX = new RegExp(Object.values(E.RELICS).map(r => r.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'));
 function feedClass(e) {
@@ -6164,7 +6206,7 @@ function paintDecision() {
       const on = G.hand.indexOf(c) >= 0, used = m.used.indexOf(c) >= 0, afford = !used && (on || E.CARDS[c].cost <= left);
       return cardFace(c, run, { act: afford ? 'queue' : '', on, dim: !afford, btn: true });
     }).join('')}</div>
-    ${d ? `<p class="small"><b>${t.emoji} ${esc(d.nome)}</b> · ${esc(E.cardText(focus, E.cardLevel(run, focus)))}</p><p class="xs" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>${chanceBars(focus)}` : ''}
+    ${d ? `<p class="small"><b>${typeMark(d.tipo)} ${esc(d.nome)}</b> · ${esc(E.cardText(focus, E.cardLevel(run, focus)))}</p><p class="xs" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>${chanceBars(focus)}` : ''}
     <button class="btn shine" style="margin-top:8px" data-act="usecard" data-c="go">${G.hand.length ? 'Jogar ' + G.hand.length + ' carta' + (G.hand.length > 1 ? 's' : '') : 'Escolha uma carta'}</button>
     <button class="btn sec" style="margin-top:8px" data-act="usecard" data-c="">${ic('arrow')} Guardar e seguir</button>`;
 }
@@ -6360,14 +6402,14 @@ function offerHtml(it, i, act, price, flip) {
     const showLv = owned ? Math.min(3, lv + 1) : 1;
     return `<div class="offer cardoffer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${t.cor}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
       <div class="cslot">${cardFace(it.id, G.run, { btn: false, lv: showLv })}</div>
-      <div><div class="ot">${t.emoji} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ⚡${d.cost}</div>
+      <div><div class="ot">${typeMark(d.tipo)} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ${boltSvg()}${d.cost}</div>
       <div class="on">${esc(d.nome)}</div>
       <div class="od">${esc(E.cardText(it.id, showLv))}</div>
       <div class="xs" style="color:var(--gold);margin-top:4px">Melhor quando: ${esc(d.tip)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
   }
   const d = E.RELICS[it.id];
   return `<div class="offer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${rc(d.rar)}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
-    <span class="med">${d.icon}</span><div><div class="ot">Relíquia · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
+    <span class="med plate" style="--tc:${rc(d.rar)}" aria-hidden="true">${markSvg(it.id)}</span><div><div class="ot">Relíquia · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
 }
 function renderReward() {
   const run = G.run;
@@ -6395,7 +6437,7 @@ function askTarget(it, done) {
   let title, list;
   if (it.type === 'player') { title = `Quem sai pra entrar ${esc(it.player.nome)} (${it.player.rating})?`; list = opts.map(i => { const p = run.players[i]; return `<div class="opt" data-t="${i}">${futCard(p, { size: 'sm', kit: selOf(run).kit })}<div><b>${esc(p.nome)}</b><div class="xs mut">${p.pos} · nota ${p.rating}</div></div><span style="margin-left:auto;color:var(--lime);font-weight:900">+${it.player.rating - p.rating}</span></div>`; }); }
   else if (it.type === 'card') { title = `Mão cheia (${E.MAX_CARDS}). Qual carta sai?`; list = opts.map(c => `<div class="opt" data-t="${c}">${cardFace(c, run, { btn: false })}<div class="xs mut" style="margin-top:4px">${esc(E.cardText(c, E.cardLevel(run, c)))}</div></div>`); }
-  else { title = `Relíquias cheias (${E.MAX_RELICS}). Qual sai?`; list = opts.map(r => `<div class="opt" data-t="${r}"><span style="font-size:24px">${E.RELICS[r].icon}</span><div><b>${esc(E.RELICS[r].nome)}</b><div class="xs mut">${esc(E.RELICS[r].desc)}</div></div></div>`); }
+  else { title = `Relíquias cheias (${E.MAX_RELICS}). Qual sai?`; list = opts.map(r => `<div class="opt" data-t="${r}"><span class="med plate" style="--tc:${rc(E.RELICS[r].rar)}">${markSvg(r)}</span><div><b>${esc(E.RELICS[r].nome)}</b><div class="xs mut">${esc(E.RELICS[r].desc)}</div></div></div>`); }
   m.innerHTML = `<div class="box"><h3>${title}</h3>${list.join('')}<button class="btn sec" style="margin-top:8px" data-x="1">Cancelar</button></div>`;
   m.addEventListener('click', ev => {
     const o = ev.target.closest('[data-t]'); const x = ev.target.closest('[data-x]') || ev.target === m;
@@ -6424,7 +6466,7 @@ function renderShop() {
   <div class="shopsign">${ic('hanger')}<div><div class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase">Vestiário</div><div class="xs mut">Guardar Fichas rende juros: +1 a cada 5 (máx +${E.maxInterest(run)})</div></div></div>
   <div class="offers">${G.shop.map((it, i) => offerHtml(it, i, 'buy', it.price)).join('')}</div>
   <button class="btn sec" style="margin-top:12px" data-act="rerollShop" ${run.fichas < cost ? 'disabled' : ''}>${ic('dice')} Re-sortear vitrine <small>${cost} fichas</small></button>
-  ${run.relics.length ? `<div class="panel"><div class="ph">${ic('coin')} Vender relíquia <span class="r">metade do preço</span></div>${run.relics.map(r => `<div class="sellrow" data-act="sell" data-id="${r}" role="button" tabindex="0"><span style="font-size:22px">${E.RELICS[r].icon}</span><b style="font-size:13.5px">${esc(E.RELICS[r].nome)}</b><span class="p chip coin">+${Math.floor(E.RELIC_PRICE[E.RELICS[r].rar] / 2)} ${ic('coin')}</span></div>`).join('')}</div>` : ''}
+  ${run.relics.length ? `<div class="panel"><div class="ph">${ic('coin')} Vender relíquia <span class="r">metade do preço</span></div>${run.relics.map(r => `<div class="sellrow" data-act="sell" data-id="${r}" role="button" tabindex="0" aria-label="Vender ${esc(E.RELICS[r].nome)}"><span class="med plate" style="--tc:${rc(E.RELICS[r].rar)}">${markSvg(r)}</span><b style="font-size:13.5px">${esc(E.RELICS[r].nome)}</b><span class="p chip coin">+${Math.floor(E.RELIC_PRICE[E.RELICS[r].rar] / 2)} ${ic('coin')}</span></div>`).join('')}</div>` : ''}
   ${invPanels(run)}
   <div class="mctrl"><button class="btn" data-act="leaveShop">${ic('play')} Sair do Vestiário</button></div>`;
 }
@@ -6506,7 +6548,7 @@ function renderVerdict() {
       <div><div class="k">Campanha</div><div class="v">${w}V ${d}E ${l}D</div></div>
       <div><div class="k">Gols</div><div class="v">${v.gf} pró · ${v.ga} contra</div></div>
     </div>
-    <div style="margin-top:10px"><div class="k eyebrow" style="font-size:9.5px">Relíquias</div><div style="font-size:13.5px;font-weight:800;margin-top:2px">${v.relics.length ? v.relics.map(r => E.RELICS[r].icon + ' ' + esc(E.RELICS[r].nome)).join(' · ') : 'Nenhuma: na raça!'}</div></div>
+    <div style="margin-top:10px"><div class="k eyebrow" style="font-size:9.5px">Relíquias</div><div class="relicline">${v.relics.length ? v.relics.map(r => `<span class="ri">${markSvg(r)} ${esc(E.RELICS[r].nome)}</span>`).join('') : 'Nenhuma: na raça!'}</div></div>
     <div class="vpath">${v.history.map(h => `<span class="${h.outcome}">${E.STAGES[h.stage].curto} ${h.flag} ${h.gf}-${h.ga}${h.pens ? ` (p ${h.pens[0]}-${h.pens[1]})` : ''}</span>`).join('')}</div>
     ${run.bolao && G.metaRes && G.metaRes.bolao ? `<div class="vbolao">🎯 Bolão: palpite <b>${esc(M.BOLAO[run.bolao.guess].nome)}</b> · chegou <b>${esc(M.BOLAO[G.metaRes.bolao.reach].nome)}</b> ${bolaoMark(G.metaRes.bolao)}</div>` : ''}
     <div class="vbottom"><div><small>SEMENTE PRO DESAFIO</small><b>${esc(v.seed)}</b></div><div class="sc"><small>PONTOS</small><b class="num">${fmtN(P.total)}</b></div></div>
@@ -6567,7 +6609,7 @@ function drawCard(v) {
   y += 400;
   x.fillStyle = '#9db5a6'; x.font = `900 28px ${F}`; x.fillText('RELÍQUIAS', W / 2, y);
   x.fillStyle = '#fff'; x.font = `700 36px ${FE}`;
-  y = wrapText(x, v.relics.length ? v.relics.map(r => E.RELICS[r].icon + ' ' + E.RELICS[r].nome).join(' · ') : 'Nenhuma: na raça!', W / 2, y + 50, W - 160, 48);
+  y = wrapText(x, v.relics.length ? v.relics.map(r => E.RELICS[r].nome).join(' · ') : 'Nenhuma: na raça!', W / 2, y + 50, W - 160, 48);
   x.font = `800 32px ${F}`; x.fillStyle = '#d6efd9';
   y = wrapText(x, v.history.map(h => `${E.STAGES[h.stage].curto} ${h.gf}-${h.ga}`).join('  ·  '), W / 2, Math.min(y + 16, H - 380), W - 160, 42);
   const extra = [];
@@ -6602,7 +6644,7 @@ function showInfo(k, id) {
     const m = document.createElement('div'); m.className = 'modal';
     const hints = G.run ? E.comboHints(G.run, id) : [];
     m.innerHTML = `<div class="box info" style="--rc:${t.cor}"><div style="max-width:220px;margin:0 auto 10px">${cardFace(id, G.run, { btn: false })}</div>
-      <p class="d"><b>${t.emoji} ${t.nome}</b> · custa ${d.cost} · ${esc(d.dur)} · Nv${lv}</p>
+      <p class="d"><b>${typeMark(d.tipo)} ${t.nome}</b> · custa ${d.cost} · ${esc(d.dur)} · Nv${lv}</p>
       <p class="d">${esc(E.cardText(id, lv))}</p>
       <p class="d" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>
       ${d.style ? `<p class="xs">Estilo ${E.STYLE_NAME[d.style]}. ${E.BEATS[d.style] ? 'Ganha de ' + E.STYLE_NAME[E.BEATS[d.style]] + '.' : ''}</p>` : ''}
@@ -6612,10 +6654,10 @@ function showInfo(k, id) {
     document.body.appendChild(m);
     return;
   }
-  else if (k === 'relic') { const d = E.RELICS[id]; rar = d.rar; icon = d.icon; nome = d.nome; tipo = 'Relíquia · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Relíquias funcionam sozinhas, o tempo todo.'; }
+  else if (k === 'relic') { const d = E.RELICS[id]; rar = d.rar; icon = markSvg(id); nome = d.nome; tipo = 'Relíquia · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Relíquias funcionam sozinhas, o tempo todo.'; }
   else return;
   const m = document.createElement('div'); m.className = 'modal';
-  m.innerHTML = `<div class="box info" style="--rc:${rc(rar)}"><div class="big"><div class="ii">${icon}</div><div><div class="eyebrow" style="color:var(--rc)">${esc(tipo)}</div><h3 class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase;margin:2px 0 0">${esc(nome)}</h3></div></div>
+  m.innerHTML = `<div class="box info" style="--rc:${rc(rar)}"><div class="big"><div class="ii plate" style="--tc:${rc(rar)}" role="img" aria-label="${esc(nome)}">${icon}</div><div><div class="eyebrow" style="color:var(--rc)">${esc(tipo)}</div><h3 class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase;margin:2px 0 0">${esc(nome)}</h3></div></div>
     <p class="d">${esc(desc)}</p><button class="btn sec" data-x="1">Fechar</button></div>`;
   m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
   document.body.appendChild(m);
@@ -7862,7 +7904,7 @@ function previewCareer(which) {
   }
   G.screen = d.screen; render();
 }
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet };
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet, paintDecision };
 document.addEventListener('input', ev => {
   const t = ev.target; if (!t) return;
   if (t.id === 'coachName') { G.store.coachName = t.value.trim() || 'Professor Fominha'; saveStore(); }
