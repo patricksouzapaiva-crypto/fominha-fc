@@ -188,26 +188,26 @@ const RARITIES = {
 };
 
 const RELICS = {
-  cabeca_ouro: { id: 'cabeca_ouro', nome: 'Cabeça de Ouro', rar: 'rara', icon: '👑', desc: 'Gol de cabeça vale 2.' },
-  luva_ofensiva: { id: 'luva_ofensiva', nome: 'Luva Ofensiva', rar: 'rara', icon: '🧤', desc: 'O goleiro pode marcar: sobe nos escanteios e bate faltas e chutes de longe.' },
-  escanteio_nunca: { id: 'escanteio_nunca', nome: 'Escanteio Curto Nunca', rar: 'incomum', icon: '🚩', desc: '+50% de escanteios e todo escanteio vira cabeçada na área.' },
-  paredao_fala: { id: 'paredao_fala', nome: 'Paredão que Fala', rar: 'incomum', icon: '🧱', desc: 'Cada defesa difícil do seu goleiro dá +5% de força ao time até o fim do jogo.' },
-  retranca: { id: 'retranca', nome: 'Retranca Rentável', rar: 'comum', icon: '💰', desc: 'Vitória por 1 a 0 dá +3 Fichas.' },
-  promessa: { id: 'promessa', nome: 'Promessa Eterna', rar: 'lendaria', icon: '🌟', desc: 'O jogador mais fraco do time vira a Promessa: dobra a força no mata-mata.' },
-  cofrinho: { id: 'cofrinho', nome: 'Cofrinho do Roupeiro', rar: 'comum', icon: '🐷', desc: 'Juros máximos +2 (de +3 para +5).' },
-  pe_coelho: { id: 'pe_coelho', nome: 'Pé de Coelho', rar: 'comum', icon: '🐰', desc: 'A primeira bola na trave do seu time em cada jogo entra.' },
-  bola_quadrada: { id: 'bola_quadrada', nome: 'Bola Quadrada', rar: 'amaldicoada', icon: '🟧', desc: 'Passes erram mais (menos lances) e sai mais chute de longe, mas gol de fora da área vale 2 pros DOIS times.' },
-  juiz_ladrao: { id: 'juiz_ladrao', nome: 'Juiz Ladrão', rar: 'amaldicoada', icon: '🃏', desc: '1 vez por jogo o juiz marca um pênalti do nada: 60% pra você, 40% pro rival.' }
+  cabeca_ouro: { id: 'cabeca_ouro', nome: 'Cabeça de Ouro', rar: 'rara', icon: '', desc: 'Gol de cabeça vale 2.' },
+  luva_ofensiva: { id: 'luva_ofensiva', nome: 'Luva Ofensiva', rar: 'rara', icon: '', desc: 'O goleiro pode marcar: sobe nos escanteios e bate faltas e chutes de longe.' },
+  escanteio_nunca: { id: 'escanteio_nunca', nome: 'Escanteio Curto Nunca', rar: 'incomum', icon: '', desc: '+50% de escanteios e todo escanteio vira cabeçada na área.' },
+  paredao_fala: { id: 'paredao_fala', nome: 'Paredão que Fala', rar: 'incomum', icon: '', desc: 'Cada defesa difícil do seu goleiro dá +5% de força ao time até o fim do jogo.' },
+  retranca: { id: 'retranca', nome: 'Retranca Rentável', rar: 'comum', icon: '', desc: 'Vitória por 1 a 0 dá +3 Fichas.' },
+  promessa: { id: 'promessa', nome: 'Promessa Eterna', rar: 'lendaria', icon: '', desc: 'O jogador mais fraco do time vira a Promessa: dobra a força no mata-mata.' },
+  cofrinho: { id: 'cofrinho', nome: 'Cofrinho do Roupeiro', rar: 'comum', icon: '', desc: 'Juros máximos +2 (de +3 para +5).' },
+  pe_coelho: { id: 'pe_coelho', nome: 'Pé de Coelho', rar: 'comum', icon: '', desc: 'A primeira bola na trave do seu time em cada jogo entra.' },
+  bola_quadrada: { id: 'bola_quadrada', nome: 'Bola Quadrada', rar: 'amaldicoada', icon: '', desc: 'Passes erram mais (menos lances) e sai mais chute de longe, mas gol de fora da área vale 2 pros DOIS times.' },
+  juiz_ladrao: { id: 'juiz_ladrao', nome: 'Juiz Ladrão', rar: 'amaldicoada', icon: '', desc: '1 vez por jogo o juiz marca um pênalti do nada: 60% pra você, 40% pro rival.' }
 };
 const RELIC_IDS = Object.keys(RELICS);
 const RELIC_PRICE = { comum: 4, incomum: 5, rara: 7, lendaria: 9, amaldicoada: 4 };
 const RELIC_WEIGHT = { comum: 40, incomum: 30, rara: 18, lendaria: 7, amaldicoada: 14 };
 
 const CARD_TYPES = {
-  ataque: { id: 'ataque', nome: 'Ataque', emoji: '🟥', cor: '#ff4d57', papel: 'mais chance de gol' },
-  defesa: { id: 'defesa', nome: 'Defesa', emoji: '🟦', cor: '#3d8bff', papel: 'menos gols sofridos' },
-  tatica: { id: 'tatica', nome: 'Tática', emoji: '🟨', cor: '#ffc83d', papel: 'muda o estilo de jogo' },
-  especial: { id: 'especial', nome: 'Especial', emoji: '🟪', cor: '#c084fc', papel: 'rara e forte' }
+  ataque: { id: 'ataque', nome: 'Ataque', cor: '#ff4d57', papel: 'mais chance de gol' },
+  defesa: { id: 'defesa', nome: 'Defesa', cor: '#3d8bff', papel: 'menos gols sofridos' },
+  tatica: { id: 'tatica', nome: 'Tática', cor: '#ffc83d', papel: 'muda o estilo de jogo' },
+  especial: { id: 'especial', nome: 'Especial', cor: '#c084fc', papel: 'rara e forte' }
 };
 const STYLE_NAME = { pressao: 'Pressão', posse: 'Posse', contra: 'Contra-ataque' };
 // Pedra-papel-tesoura: Pressão ganha de Posse, Posse ganha de Contra-ataque, Contra-ataque ganha de Pressão.
@@ -218,46 +218,46 @@ function cardSpec(o) {
   return o;
 }
 const CARDS = {
-  pressao: cardSpec({ id: 'pressao', nome: 'Pressão Alta', tipo: 'ataque', rar: 'comum', icon: '⚡', cost: 2, dur: '15 min', style: 'pressao', tip: 'Precisa do gol e o rival toca a bola.',
+  pressao: cardSpec({ id: 'pressao', nome: 'Pressão Alta', tipo: 'ataque', rar: 'comum', icon: '', cost: 2, dur: '15 min', style: 'pressao', tip: 'Precisa do gol e o rival toca a bola.',
     lv: [{ roubo: 0.30, fadiga: 0.06, mins: 15 }, { roubo: 0.36, fadiga: 0.05, mins: 15 }, { roubo: 0.42, fadiga: 0.04, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `+${pct(n.roubo)} de roubadas no campo rival por ${n.mins} min. Depois −${pct(n.fadiga)} de força por 10 min.`; } }),
-  casinha: cardSpec({ id: 'casinha', nome: 'Fechar a Casinha', tipo: 'defesa', rar: 'comum', icon: '🔒', cost: 1, dur: 'até o fim', style: null, tip: 'Ganhando por 1 depois dos 70 minutos.',
+  casinha: cardSpec({ id: 'casinha', nome: 'Fechar a Casinha', tipo: 'defesa', rar: 'comum', icon: '', cost: 1, dur: 'até o fim', style: null, tip: 'Ganhando por 1 depois dos 70 minutos.',
     lv: [{ them: 0.35, you: 0.05 }, { them: 0.40, you: 0.04 }, { them: 0.44, you: 0.03 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Até o fim: rival −${pct(n.them)} de chance de gol, você −${pct(n.you)}.`; } }),
-  contra: cardSpec({ id: 'contra', nome: 'Contra-Ataque Mortal', tipo: 'tatica', rar: 'incomum', icon: '⚡', cost: 2, dur: '20 min', style: 'contra', tip: 'O rival usou Pressão Alta.',
+  contra: cardSpec({ id: 'contra', nome: 'Contra-Ataque Mortal', tipo: 'tatica', rar: 'incomum', icon: '', cost: 2, dur: '20 min', style: 'contra', tip: 'O rival usou Pressão Alta.',
     lv: [{ q: 0.34, mins: 20 }, { q: 0.40, mins: 20 }, { q: 0.46, mins: 22 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: −20% de posse. Roubada vira contra-ataque com +${pct(n.q)} de chance de gol.`; } }),
-  chuveirinho: cardSpec({ id: 'chuveirinho', nome: 'Chuveirinho', tipo: 'ataque', rar: 'incomum', icon: '🌧️', cost: 1, dur: '15 min', style: null, tip: 'Tem cabeceador e a relíquia Cabeça de Ouro.',
+  chuveirinho: cardSpec({ id: 'chuveirinho', nome: 'Chuveirinho', tipo: 'ataque', rar: 'incomum', icon: '', cost: 1, dur: '15 min', style: null, tip: 'Tem cabeceador e a relíquia Cabeça de Ouro.',
     lv: [{ head: 0.20, mins: 15 }, { head: 0.24, mins: 15 }, { head: 0.28, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `+2 cruzamentos no período e cabeçada +${pct(n.head)} por ${n.mins} min.`; } }),
-  craque: cardSpec({ id: 'craque', nome: 'Craque Decide', tipo: 'especial', rar: 'rara', icon: '⭐', cost: 3, dur: 'uso único', style: null, tip: 'O jogo está empatado e o seu melhor jogador está em campo.',
+  craque: cardSpec({ id: 'craque', nome: 'Craque Decide', tipo: 'especial', rar: 'rara', icon: '', cost: 3, dur: 'uso único', style: null, tip: 'O jogo está empatado e o seu melhor jogador está em campo.',
     lv: [{ q: 0.55 }, { q: 0.60 }, { q: 0.65 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: jogada do melhor jogador com ${pct(n.q)} de chance de gol.`; } }),
-  paredao: cardSpec({ id: 'paredao', nome: 'Paredão', tipo: 'defesa', rar: 'incomum', icon: '🛡️', cost: 2, dur: '10 min', style: null, tip: 'O rival finaliza muito ou tem pênalti à vista.',
+  paredao: cardSpec({ id: 'paredao', nome: 'Paredão', tipo: 'defesa', rar: 'incomum', icon: '', cost: 2, dur: '10 min', style: null, tip: 'O rival finaliza muito ou tem pênalti à vista.',
     lv: [{ save: 0.30, pen: 0.50, mins: 10 }, { save: 0.36, pen: 0.55, mins: 10 }, { save: 0.42, pen: 0.60, mins: 12 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: goleiro +${pct(n.save)} nas defesas. Pênalti: ${pct(n.pen)} de defesa.`; } }),
-  submagica: cardSpec({ id: 'submagica', nome: 'Substituição Mágica', tipo: 'tatica', rar: 'comum', icon: '🔄', cost: 1, dur: 'uso único', style: null, tip: 'O time cansou depois da Pressão Alta.',
+  submagica: cardSpec({ id: 'submagica', nome: 'Substituição Mágica', tipo: 'tatica', rar: 'comum', icon: '', cost: 1, dur: 'uso único', style: null, tip: 'O time cansou depois da Pressão Alta.',
     lv: [{ add: 4 }, { add: 5 }, { add: 6 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: zera o cansaço e entra um reserva com +${n.add} de força até o fim.`; } }),
-  catimba: cardSpec({ id: 'catimba', nome: 'Catimba', tipo: 'especial', rar: 'rara', icon: '🎭', cost: 2, dur: 'uso único', style: null, tip: 'O rival ainda tem carta forte na mão.',
+  catimba: cardSpec({ id: 'catimba', nome: 'Catimba', tipo: 'especial', rar: 'rara', icon: '', cost: 2, dur: 'uso único', style: null, tip: 'O rival ainda tem carta forte na mão.',
     lv: [{ }, { }, { }],
     fx() { return 'Uso único: cancela a próxima carta do adversário.'; } }),
-  longe: cardSpec({ id: 'longe', nome: 'Chute de Longe', tipo: 'ataque', rar: 'incomum', icon: '🚀', cost: 1, dur: '15 min', style: null, tip: 'A defesa rival está fechada e sobra espaço fora da área.',
+  longe: cardSpec({ id: 'longe', nome: 'Chute de Longe', tipo: 'ataque', rar: 'incomum', icon: '', cost: 1, dur: '15 min', style: null, tip: 'A defesa rival está fechada e sobra espaço fora da área.',
     lv: [{ q: 0.22, mins: 15 }, { q: 0.28, mins: 15 }, { q: 0.34, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: chute de fora da área +${pct(n.q)} de chance de gol.`; } }),
-  peixinho: cardSpec({ id: 'peixinho', nome: 'Peixinho', tipo: 'ataque', rar: 'rara', icon: '🐟', cost: 2, dur: 'uso único', style: null, tip: 'Acabou de armar a Bola Parada Ensaiada.',
+  peixinho: cardSpec({ id: 'peixinho', nome: 'Peixinho', tipo: 'ataque', rar: 'rara', icon: '', cost: 2, dur: 'uso único', style: null, tip: 'Acabou de armar a Bola Parada Ensaiada.',
     lv: [{ q: 0.28 }, { q: 0.34 }, { q: 0.40 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Uso único: o próximo cruzamento vira peixinho com +${pct(n.q)} de chance de gol.`; } }),
-  toque: cardSpec({ id: 'toque', nome: 'Toque de Bola', tipo: 'tatica', rar: 'comum', icon: '🎯', cost: 1, dur: '15 min', style: 'posse', tip: 'O rival abriu a marcação ou está no contra-ataque.',
+  toque: cardSpec({ id: 'toque', nome: 'Toque de Bola', tipo: 'tatica', rar: 'comum', icon: '', cost: 1, dur: '15 min', style: 'posse', tip: 'O rival abriu a marcação ou está no contra-ataque.',
     lv: [{ posse: 0.24, mins: 15 }, { posse: 0.30, mins: 15 }, { posse: 0.36, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Posse paciente: +${pct(n.posse)} de posse por ${n.mins} min. Chance de gol −5%.`; } }),
-  bolaparada: cardSpec({ id: 'bolaparada', nome: 'Bola Parada Ensaiada', tipo: 'ataque', rar: 'incomum', icon: '🚩', cost: 2, dur: '15 min', style: null, tip: 'O técnico tem Bola Parada alta ou você tem o Peixinho.',
+  bolaparada: cardSpec({ id: 'bolaparada', nome: 'Bola Parada Ensaiada', tipo: 'ataque', rar: 'incomum', icon: '', cost: 2, dur: '15 min', style: null, tip: 'O técnico tem Bola Parada alta ou você tem o Peixinho.',
     lv: [{ q: 0.22, mins: 15 }, { q: 0.28, mins: 15 }, { q: 0.34, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: escanteio e falta +${pct(n.q)} de chance de gol.`; } }),
-  linha: cardSpec({ id: 'linha', nome: 'Linha Alta', tipo: 'defesa', rar: 'incomum', icon: '📏', cost: 2, dur: '15 min', style: 'pressao', tip: 'O rival joga direto e pouco pela ponta.',
+  linha: cardSpec({ id: 'linha', nome: 'Linha Alta', tipo: 'defesa', rar: 'incomum', icon: '', cost: 2, dur: '15 min', style: 'pressao', tip: 'O rival joga direto e pouco pela ponta.',
     lv: [{ cut: 0.18, mins: 15 }, { cut: 0.22, mins: 15 }, { cut: 0.26, mins: 18 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: impedimento e linha alta, rival −${pct(n.cut)} de chance de gol.`; } }),
-  grito: cardSpec({ id: 'grito', nome: 'Grito da Torcida', tipo: 'especial', rar: 'incomum', icon: '📣', cost: 2, dur: '10 min', style: null, tip: 'Vai usar o Craque Decide em seguida.',
+  grito: cardSpec({ id: 'grito', nome: 'Grito da Torcida', tipo: 'especial', rar: 'incomum', icon: '', cost: 2, dur: '10 min', style: null, tip: 'Vai usar o Craque Decide em seguida.',
     lv: [{ q: 0.12, mins: 10 }, { q: 0.16, mins: 10 }, { q: 0.20, mins: 12 }],
     fx(lv) { const n = this.lv[lv - 1]; return `Por ${n.mins} min: +${pct(n.q)} de chance de gol com a torcida em cima.`; } })
 };
@@ -955,7 +955,7 @@ function resolveLance(m, side, forcedType, ev, opts) {
     m.stats.posts[side]++;
     if (side === 0 && has(run, 'pe_coelho') && !m.peCoelhoUsed) {
       m.peCoelhoUsed = true; goal = true;
-      text += ' NA TRAVE... e ENTRA! 🐰 Pé de Coelho!';
+      text += ' NA TRAVE... e ENTRA! Pé de Coelho!';
     } else {
       ev.push({ min, kind: 'lance', side, scorer: scorerName, text: text + ' ' + r.pick(T.post), ball: ballFor(side), hl: true });
       return;
@@ -966,9 +966,9 @@ function resolveLance(m, side, forcedType, ev, opts) {
     if (isGK) gtype = gtype === 'cabeca' ? 'goleiro_cabeca' : 'goleiro';
     const header = gtype === 'cabeca' || gtype === 'goleiro_cabeca';
     const longShot = type === 'fora' || type === 'falta';
-    if (side === 0 && header && has(run, 'cabeca_ouro')) { value = 2; notes.push('Vale 2 pela Cabeça de Ouro 👑'); addExtra(m, 'cabeca_ouro', 1); }
-    if (longShot && has(run, 'bola_quadrada')) { value = Math.max(value, 2); notes.push('Gol de fora vale 2 pela Bola Quadrada 🟧'); if (side === 0) addExtra(m, 'bola_quadrada', 1); }
-    if (isGK) notes.unshift('GOL DO GOLEIRO! 🧤 Luva Ofensiva');
+    if (side === 0 && header && has(run, 'cabeca_ouro')) { value = 2; notes.push('Vale 2 pela Cabeça de Ouro'); addExtra(m, 'cabeca_ouro', 1); }
+    if (longShot && has(run, 'bola_quadrada')) { value = Math.max(value, 2); notes.push('Gol de fora vale 2 pela Bola Quadrada'); if (side === 0) addExtra(m, 'bola_quadrada', 1); }
+    if (isGK) notes.unshift('GOL DO GOLEIRO! Luva Ofensiva');
     if (coachAttr && !(post)) { m.stats.coach[coachAttr]++; notes.push(coachAttr === 'atk' ? `⚔️ Ataque treinado no estilo ${csrc(run, 'atk')}` : `🚩 Bola parada ensaiada por ${csrc(run, 'bol')}`); }
     m.score[side] += value;
     const g = { min, side, scorer: scorerName, type: gtype, value, card: side === 0 ? byCard : null };
@@ -1110,8 +1110,8 @@ function castCard(m, side, id) {
   let extra = '';
   if (id === 'craque' && run) { const bi = bestPlayer(run, m.stage, p => p.pos !== 'GOL'); extra = ` A bola vai pro ${run.players[bi].nome}.`; }
   if (id === 'submagica' && run) { const res = SELECOES[run.selecao].reservas; extra = ` Entra ${res[(bag.length + m.stage) % res.length]}.`; }
-  if (id === 'paredao') extra = ' 🛡️ PAREDÃO!';
-  ev.push({ min, kind: 'card', card: id, side: side === 0 ? 0 : 1, text: `${c.icon} ${who}: ${c.nome} (Nv${lv}, ${c.cost} energia). ${cardText(id, lv)}${extra}` });
+  if (id === 'paredao') extra = ' PAREDÃO!';
+  ev.push({ min, kind: 'card', card: id, side: side === 0 ? 0 : 1, text: `${who}: ${c.nome} (Nv${lv}, ${c.cost} energia). ${cardText(id, lv)}${extra}` });
   ev.push(...counterCheck(m, side, c));
   ev.push(...comboCheck(m, side));
   return ev;
@@ -1278,12 +1278,12 @@ function whyLines(run, m, outcome, pens) {
   if (pens) out.push(pens.win ? `Nos pênaltis, seus batedores tiveram sangue frio (${pens.score[0]} x ${pens.score[1]}).` : `Nos pênaltis a sorte foi pro outro lado (${pens.score[0]} x ${pens.score[1]}).`);
   for (const id in m.stats.relicExtra) {
     const n = m.stats.relicExtra[id];
-    if (id === 'paredao_fala') out.push(`🧱 Paredão que Fala ativou ${n}x e deixou o time ${Math.round((m.fx.paredaoMult - 1) * 100)}% mais forte.`);
-    else out.push(`${RELICS[id].icon} ${RELICS[id].nome} rendeu +${n} gol${n > 1 ? 's' : ''} extra${n > 1 ? 's' : ''} no placar.`);
+    if (id === 'paredao_fala') out.push(`Paredão que Fala ativou ${n}x e deixou o time ${Math.round((m.fx.paredaoMult - 1) * 100)}% mais forte.`);
+    else out.push(`${RELICS[id].nome} rendeu +${n} gol${n > 1 ? 's' : ''} extra${n > 1 ? 's' : ''} no placar.`);
   }
   if (m.stats.cardGoals.length) {
     const cg = m.stats.cardGoals[0];
-    out.push(`${CARDS[cg.card].icon} Sua carta ${CARDS[cg.card].nome} virou gol de ${cg.scorer}.`);
+    out.push(`Sua carta ${CARDS[cg.card].nome} virou gol de ${cg.scorer}.`);
   }
   if (outcome === 'W') {
     if (share >= 58) out.push(`Você mandou no meio: ${share}% dos ataques foram seus.`);

@@ -113,25 +113,46 @@ function futCard(p, opts) {
   return `<div class="fut ${t} ${opts.size || ''}" title="${esc(p.nome)} · ${p.pos} ${p.rating}"><span class="r">${p.rating}</span><span class="ps">${p.pos}</span>${shirt(k[0], k[1])}
     ${opts.star ? `<span class="star">🌟</span>` : ''}<span class="nm">${esc(p.nome)}</span><span class="tt">${p.traits.split('').filter(Boolean).map(x => `<i>${TRAIT[x]}</i>`).join('')}</span></div>`;
 }
-function cardSvg(id) {
-  const col = E.CARD_TYPES[E.CARDS[id].tipo].cor;
-  const g = {
-    pressao: `<path d="M14 46 L32 6 L27 28 H46 L18 58 L24 34 H8 Z" fill="${col}"/>`,
-    casinha: `<path d="M8 30 L32 10 L56 30 V54 H8 Z" fill="${col}"/><rect x="26" y="36" width="12" height="18" fill="#0c1424"/>`,
-    contra: `<path d="M8 40 H28 L36 18 L44 40 H56 L40 54 Z" fill="${col}"/>`,
-    chuveirinho: `<circle cx="22" cy="18" r="8" fill="${col}"/><path d="M14 34 h8 M30 34 h8 M18 46 h8 M34 46 h6" stroke="${col}" stroke-width="4"/>`,
-    craque: `<polygon points="32,6 38,24 56,24 42,36 48,54 32,42 16,54 22,36 8,24 26,24" fill="${col}"/>`,
-    paredao: `<rect x="10" y="16" width="44" height="36" rx="4" fill="${col}"/><path d="M10 28 H54 M10 40 H54 M24 16 V52 M40 16 V52" stroke="#0c1424" stroke-width="2"/>`,
-    submagica: `<path d="M18 18 A14 14 0 1 1 14 36" fill="none" stroke="${col}" stroke-width="4"/><path d="M44 46 A14 14 0 1 1 50 28" fill="none" stroke="${col}" stroke-width="4"/>`,
-    catimba: `<circle cx="32" cy="28" r="14" fill="${col}"/><path d="M22 48 Q32 58 42 48" stroke="${col}" stroke-width="4" fill="none"/>`,
-    longe: `<circle cx="18" cy="44" r="8" fill="${col}"/><path d="M26 40 L52 14" stroke="${col}" stroke-width="4"/><path d="M40 14 H52 V26" fill="${col}"/>`,
-    peixinho: `<ellipse cx="34" cy="34" rx="18" ry="10" fill="${col}"/><polygon points="14,34 4,24 4,44" fill="${col}"/>`,
-    toque: `<circle cx="18" cy="40" r="7" fill="${col}"/><circle cx="34" cy="24" r="7" fill="${col}"/><circle cx="50" cy="40" r="7" fill="${col}"/>`,
-    bolaparada: `<circle cx="32" cy="36" r="14" fill="none" stroke="${col}" stroke-width="4"/><path d="M32 8 V18 M32 54 V48" stroke="${col}" stroke-width="4"/>`,
-    linha: `<path d="M8 44 H56 M16 44 L28 16 H40 L52 44" fill="none" stroke="${col}" stroke-width="4"/>`,
-    grito: `<path d="M12 24 H28 L46 12 V52 L28 40 H12 Z" fill="${col}"/><path d="M50 24 Q58 32 50 40" fill="none" stroke="${col}" stroke-width="3"/>`
-  };
-  return `<svg viewBox="0 0 64 64" aria-hidden="true">${g[id] || ''}</svg>`;
+const GLYPH = {
+  ataque: '<path d="M8 36c2-14 16-18 24-8l14-4c8-2 16 6 12 14l2 10H16z"/><path d="M14 48h44v8H14z"/>',
+  defesa: '<path d="M32 4l24 10v18c0 16-10 26-24 30C18 58 8 48 8 32V14z"/>',
+  tatica: '<path d="M16 16h10V8h12v8h10v42H16z"/><path d="M24 6h16v12H24z"/>',
+  especial: '<path d="M32 4l6 22 22 6-22 6-6 22-6-22-22-6 22-6z"/>',
+  pressao: '<path d="M38 4L14 34h16L22 60l32-38H36z"/>',
+  casinha: '<path fill-rule="evenodd" d="M6 32L32 8l26 24v28H6zM26 40h12v20H26z"/>',
+  contra: '<path d="M4 26h28V12l26 20-26 20V38H4z"/>',
+  chuveirinho: '<path d="M16 30a10 10 0 0 1 8-16 12 12 0 0 1 22 8 8 8 0 0 1 2 16z"/><circle cx="20" cy="48" r="4"/><circle cx="34" cy="52" r="4"/><circle cx="48" cy="46" r="4"/>',
+  craque: '<polygon points="32,4 39,24 60,24 43,36 50,56 32,44 14,56 21,36 4,24 25,24"/>',
+  paredao: '<path d="M8 10h48v14H8zm0 18h22v14H8zm26 0h22v14H34zM8 46h48v12H8z"/>',
+  submagica: '<path d="M6 20h28v-8l18 14-18 14v-8H6z"/><path d="M58 36H30v8L12 30l18-14v8h28z"/>',
+  catimba: '<path fill-rule="evenodd" d="M10 24c0-12 10-16 22-16s22 4 22 16v12c0 16-10 24-22 24S10 52 10 36zM22 30a5 5 0 1 0 .1 0zM42 30a5 5 0 1 0 .1 0zM22 44h20v6H22z"/>',
+  longe: '<circle cx="14" cy="48" r="9"/><path d="M24 42L46 18l8 7L32 50z"/><path d="M42 8l18 6-14 16z"/>',
+  peixinho: '<circle cx="50" cy="24" r="8"/><path d="M42 30L12 40l6 12 22-8-2 12 12-4 2-14z"/><circle cx="14" cy="18" r="7"/>',
+  toque: '<circle cx="14" cy="46" r="8"/><circle cx="32" cy="16" r="8"/><circle cx="50" cy="46" r="8"/><path d="M20 40L26 24M38 22L44 40" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>',
+  bolaparada: '<path d="M16 6v52" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M16 10h34L36 26l14 16H16z"/>',
+  linha: '<path d="M4 46h56v8H4z"/><circle cx="20" cy="26" r="7"/><path d="M16 34h8v12h-8z"/><circle cx="46" cy="26" r="7"/><path d="M42 34h8v12h-8z"/>',
+  grito: '<path d="M8 24h16l24-14v44L24 40H8z"/><path d="M52 22c8 6 8 14 0 20" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>',
+  cabeca_ouro: '<path d="M14 24l6-14 8 10 6-12 6 12 8-10 6 14z"/><circle cx="32" cy="42" r="16"/>',
+  luva_ofensiva: '<path d="M18 36c0-12 12-18 16-8 3-10 16-8 18 4 8-2 14 8 10 16v8c0 10-8 14-20 14h-6c-12 0-18-6-18-16z"/>',
+  escanteio_nunca: '<path d="M14 6v52" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M14 10h32L34 24l12 14H14z"/><circle cx="46" cy="48" r="8"/>',
+  paredao_fala: '<path d="M6 8h52v14H6zm0 18h24v14H6zm28 0h24v14H34zM6 44h52v14H6z"/>',
+  retranca: '<path fill-rule="evenodd" d="M32 6a20 20 0 1 0 .1 0zM18 28h28v10H18z"/>',
+  promessa: '<path d="M32 2l4 12 12 2-10 7 4 12-10-7-10 7 4-12-10-7 12-2z"/><circle cx="32" cy="46" r="8"/><path d="M22 56h20l-4-8H26z"/>',
+  cofrinho: '<ellipse cx="30" cy="38" rx="20" ry="14"/><circle cx="14" cy="30" r="7"/><ellipse cx="48" cy="40" rx="7" ry="5"/><path d="M22 22h14v6H22z"/>',
+  pe_coelho: '<circle cx="32" cy="42" r="16"/><path d="M18 30L12 6l16 20z"/><path d="M46 30L52 6 36 26z"/>',
+  bola_quadrada: '<path fill-rule="evenodd" d="M10 16a8 8 0 0 1 8-8h28a8 8 0 0 1 8 8v32a8 8 0 0 1-8 8H18a8 8 0 0 1-8-8zM32 32m-11 0a11 11 0 1 0 22 0a11 11 0 1 0-22 0"/>',
+  juiz_ladrao: '<path fill-rule="evenodd" d="M8 34h24s6-14 18-12c8 2 8 16 0 18-8 2-14-4-18-2H8zM46 34a5 5 0 1 0 .1 0z"/>',
+  energia: '<path d="M38 4L14 34h16L22 60l32-38H36z"/>'
+};
+function markSvg(id) {
+  return `<svg class="mk" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${GLYPH[id] || ''}</svg>`;
+}
+function typeMark(tipo) {
+  const t = E.CARD_TYPES[tipo];
+  return `<svg class="tmark" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true" style="color:${t.cor}">${GLYPH[tipo] || ''}</svg>`;
+}
+function boltSvg() {
+  return `<svg class="bolt" viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${GLYPH.energia}</svg>`;
 }
 function nrgPips(left, max) {
   let s = '';
@@ -144,9 +165,10 @@ function cardFace(id, run, opts) {
   const lv = opts.lv || E.cardLevel(run || G.run, id);
   const hints = run ? E.comboHints(run, id) : [];
   const tag = opts.btn === false ? 'div' : 'button';
-  return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
-    <i class="cost">⚡${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${cardSvg(id)}</span>
-    <b>${esc(c.nome)}</b><small>${t.emoji} ${t.nome}${lv > 1 ? ' · Nv' + lv : ''}</small><em>${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
+  const label = `${c.nome}, ${t.nome}, nível ${lv}, custa ${c.cost} de energia`;
+  return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${tag === 'button' ? 'type="button"' : 'role="img"'} aria-label="${esc(label)}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
+    <i class="cost">${boltSvg()}${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${markSvg(id)}</span>
+    <b>${esc(c.nome)}</b><small>${typeMark(c.tipo)} <span>${esc(t.nome)}${lv > 1 ? ' · Nv' + lv : ''}</span></small><em aria-hidden="true">${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
     ${hints.length ? `<div class="hintline">Combo: ${esc(hints.join(', '))}</div>` : ''}</${tag}>`;
 }
 function chanceBars(id) {
@@ -160,7 +182,7 @@ function itemHtml(kind, id, opts) {
   if (kind === 'card') return cardFace(id, G.run, { act: 'info', btn: true });
   const d = E.RELICS[id];
   return `<button class="item ${kind} ${d.rar} ${opts.cls || ''}" style="--rc:${rc(d.rar)}" data-act="info" data-k="${kind}" data-id="${id}" aria-label="${esc(d.nome)}: ver detalhes">
-    <span class="med">${d.icon}</span><div class="in">${esc(d.nome)}</div><div class="rr">Relíquia · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
+    <span class="med plate" style="--tc:${rc(d.rar)}">${markSvg(id)}</span><div class="in">${esc(d.nome)}</div><div class="rr">Relíquia · ${E.RARITIES[d.rar].nome}</div>${opts.desc ? `<div class="id">${esc(d.desc)}</div>` : ''}</button>`;
 }
 function invPanels(run, desc) {
   const cards = run.cards.map(c => itemHtml('card', c, { desc })).join('') + (run.cards.length < E.MAX_CARDS ? `<div class="item empty">vaga de carta</div>` : '');
@@ -642,20 +664,21 @@ function updateFx() {
   const c = [];
   c.push(nrgPips(m.nrgLeft == null ? 3 : m.nrgLeft, m.nrgMax || 3));
   if (m.fxOpp && m.fxOpp.style && min <= m.fxOpp.styleUntil) c.push(`Rival: ${E.STYLE_NAME[m.fxOpp.style]}`);
-  if (min <= f.pressaoUntil) c.push(`⚡ Pressão até ${f.pressaoUntil}'`);
-  if (min <= f.casinhaUntil) c.push(f.casinhaUntil > 120 ? '🔒 Casinha até o fim' : `🔒 Casinha até ${f.casinhaUntil}'`);
-  if (min <= f.chuvaUntil) c.push(`🌧️ Chuveirinho até ${f.chuvaUntil}'`);
-  if (min <= f.longeUntil) c.push(`🚀 Longe até ${f.longeUntil}'`);
-  if (min <= f.contraUntil) c.push(`⚡ Contra-ataque até ${f.contraUntil}'`);
-  if (min <= f.toqueUntil) c.push(`🎯 Posse até ${f.toqueUntil}'`);
-  if (min <= f.paredaoUntil) c.push(`🛡️ Paredão até ${f.paredaoUntil}'`);
-  if (f.craque) c.push('⭐ Craque armado');
-  if (f.peixinho) c.push('🐟 Peixinho armado');
-  if (f.sub) c.push(`🔄 Reserva +${Math.round(f.sub * 10) / 10}`);
-  if (f.paredaoMult > 1) c.push(`🧱 +${Math.round((f.paredaoMult - 1) * 100)}% força`);
+  const fxChip = (id, text) => `<span class="chip c">${markSvg(id)} ${text}</span>`;
+  if (min <= f.pressaoUntil) c.push(fxChip('pressao', `Pressão até ${f.pressaoUntil}'`));
+  if (min <= f.casinhaUntil) c.push(fxChip('casinha', f.casinhaUntil > 120 ? 'Casinha até o fim' : `Casinha até ${f.casinhaUntil}'`));
+  if (min <= f.chuvaUntil) c.push(fxChip('chuveirinho', `Chuveirinho até ${f.chuvaUntil}'`));
+  if (min <= f.longeUntil) c.push(fxChip('longe', `Longe até ${f.longeUntil}'`));
+  if (min <= f.contraUntil) c.push(fxChip('contra', `Contra-ataque até ${f.contraUntil}'`));
+  if (min <= f.toqueUntil) c.push(fxChip('toque', `Posse até ${f.toqueUntil}'`));
+  if (min <= f.paredaoUntil) c.push(fxChip('paredao', `Paredão até ${f.paredaoUntil}'`));
+  if (f.craque) c.push(fxChip('craque', 'Craque armado'));
+  if (f.peixinho) c.push(fxChip('peixinho', 'Peixinho armado'));
+  if (f.sub) c.push(fxChip('submagica', `Reserva +${Math.round(f.sub * 10) / 10}`));
+  if (f.paredaoMult > 1) c.push(fxChip('paredao_fala', `+${Math.round((f.paredaoMult - 1) * 100)}% força`));
   if (f.fadigaUntil >= min && !f.blitz) c.push(`😮‍💨 Cansaço −${Math.round((f.fadigaPct || 0) * 100)}%`);
   if (m.weather !== 'sol') c.push(`${E.WEATHER[m.weather].icon} ${E.WEATHER[m.weather].nome}`);
-  bar.innerHTML = c.map(x => `<span class="chip c">${x}</span>`).join('') + run.relics.map(r => `<button class="chip" style="min-height:30px;padding:3px 8px" data-act="info" data-k="relic" data-id="${r}" title="${esc(E.RELICS[r].nome)}">${E.RELICS[r].icon}</button>`).join('');
+  bar.innerHTML = c.map(x => x.indexOf('class="chip c"') >= 0 ? x : `<span class="chip c">${x}</span>`).join('') + run.relics.map(r => `<button class="chip plate" style="--tc:${rc(E.RELICS[r].rar)};min-height:30px;padding:3px 8px" data-act="info" data-k="relic" data-id="${r}" title="${esc(E.RELICS[r].nome)}" aria-label="${esc(E.RELICS[r].nome)}">${markSvg(r)}</button>`).join('');
 }
 const RELIC_RX = new RegExp(Object.values(E.RELICS).map(r => r.nome.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'));
 function feedClass(e) {
@@ -831,7 +854,7 @@ function paintDecision() {
       const on = G.hand.indexOf(c) >= 0, used = m.used.indexOf(c) >= 0, afford = !used && (on || E.CARDS[c].cost <= left);
       return cardFace(c, run, { act: afford ? 'queue' : '', on, dim: !afford, btn: true });
     }).join('')}</div>
-    ${d ? `<p class="small"><b>${t.emoji} ${esc(d.nome)}</b> · ${esc(E.cardText(focus, E.cardLevel(run, focus)))}</p><p class="xs" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>${chanceBars(focus)}` : ''}
+    ${d ? `<p class="small"><b>${typeMark(d.tipo)} ${esc(d.nome)}</b> · ${esc(E.cardText(focus, E.cardLevel(run, focus)))}</p><p class="xs" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>${chanceBars(focus)}` : ''}
     <button class="btn shine" style="margin-top:8px" data-act="usecard" data-c="go">${G.hand.length ? 'Jogar ' + G.hand.length + ' carta' + (G.hand.length > 1 ? 's' : '') : 'Escolha uma carta'}</button>
     <button class="btn sec" style="margin-top:8px" data-act="usecard" data-c="">${ic('arrow')} Guardar e seguir</button>`;
 }
@@ -1027,14 +1050,14 @@ function offerHtml(it, i, act, price, flip) {
     const showLv = owned ? Math.min(3, lv + 1) : 1;
     return `<div class="offer cardoffer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${t.cor}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
       <div class="cslot">${cardFace(it.id, G.run, { btn: false, lv: showLv })}</div>
-      <div><div class="ot">${t.emoji} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ⚡${d.cost}</div>
+      <div><div class="ot">${typeMark(d.tipo)} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ${boltSvg()}${d.cost}</div>
       <div class="on">${esc(d.nome)}</div>
       <div class="od">${esc(E.cardText(it.id, showLv))}</div>
       <div class="xs" style="color:var(--gold);margin-top:4px">Melhor quando: ${esc(d.tip)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
   }
   const d = E.RELICS[it.id];
   return `<div class="offer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${rc(d.rar)}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
-    <span class="med">${d.icon}</span><div><div class="ot">Relíquia · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
+    <span class="med plate" style="--tc:${rc(d.rar)}" aria-hidden="true">${markSvg(it.id)}</span><div><div class="ot">Relíquia · ${E.RARITIES[d.rar].nome}</div><div class="on">${esc(d.nome)}</div><div class="od">${esc(d.desc)}</div></div>${priceHtml}${it.sold ? '<span class="soldtag">VENDIDO</span>' : ''}</div>`;
 }
 function renderReward() {
   const run = G.run;
@@ -1062,7 +1085,7 @@ function askTarget(it, done) {
   let title, list;
   if (it.type === 'player') { title = `Quem sai pra entrar ${esc(it.player.nome)} (${it.player.rating})?`; list = opts.map(i => { const p = run.players[i]; return `<div class="opt" data-t="${i}">${futCard(p, { size: 'sm', kit: selOf(run).kit })}<div><b>${esc(p.nome)}</b><div class="xs mut">${p.pos} · nota ${p.rating}</div></div><span style="margin-left:auto;color:var(--lime);font-weight:900">+${it.player.rating - p.rating}</span></div>`; }); }
   else if (it.type === 'card') { title = `Mão cheia (${E.MAX_CARDS}). Qual carta sai?`; list = opts.map(c => `<div class="opt" data-t="${c}">${cardFace(c, run, { btn: false })}<div class="xs mut" style="margin-top:4px">${esc(E.cardText(c, E.cardLevel(run, c)))}</div></div>`); }
-  else { title = `Relíquias cheias (${E.MAX_RELICS}). Qual sai?`; list = opts.map(r => `<div class="opt" data-t="${r}"><span style="font-size:24px">${E.RELICS[r].icon}</span><div><b>${esc(E.RELICS[r].nome)}</b><div class="xs mut">${esc(E.RELICS[r].desc)}</div></div></div>`); }
+  else { title = `Relíquias cheias (${E.MAX_RELICS}). Qual sai?`; list = opts.map(r => `<div class="opt" data-t="${r}"><span class="med plate" style="--tc:${rc(E.RELICS[r].rar)}">${markSvg(r)}</span><div><b>${esc(E.RELICS[r].nome)}</b><div class="xs mut">${esc(E.RELICS[r].desc)}</div></div></div>`); }
   m.innerHTML = `<div class="box"><h3>${title}</h3>${list.join('')}<button class="btn sec" style="margin-top:8px" data-x="1">Cancelar</button></div>`;
   m.addEventListener('click', ev => {
     const o = ev.target.closest('[data-t]'); const x = ev.target.closest('[data-x]') || ev.target === m;
@@ -1091,7 +1114,7 @@ function renderShop() {
   <div class="shopsign">${ic('hanger')}<div><div class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase">Vestiário</div><div class="xs mut">Guardar Fichas rende juros: +1 a cada 5 (máx +${E.maxInterest(run)})</div></div></div>
   <div class="offers">${G.shop.map((it, i) => offerHtml(it, i, 'buy', it.price)).join('')}</div>
   <button class="btn sec" style="margin-top:12px" data-act="rerollShop" ${run.fichas < cost ? 'disabled' : ''}>${ic('dice')} Re-sortear vitrine <small>${cost} fichas</small></button>
-  ${run.relics.length ? `<div class="panel"><div class="ph">${ic('coin')} Vender relíquia <span class="r">metade do preço</span></div>${run.relics.map(r => `<div class="sellrow" data-act="sell" data-id="${r}" role="button" tabindex="0"><span style="font-size:22px">${E.RELICS[r].icon}</span><b style="font-size:13.5px">${esc(E.RELICS[r].nome)}</b><span class="p chip coin">+${Math.floor(E.RELIC_PRICE[E.RELICS[r].rar] / 2)} ${ic('coin')}</span></div>`).join('')}</div>` : ''}
+  ${run.relics.length ? `<div class="panel"><div class="ph">${ic('coin')} Vender relíquia <span class="r">metade do preço</span></div>${run.relics.map(r => `<div class="sellrow" data-act="sell" data-id="${r}" role="button" tabindex="0" aria-label="Vender ${esc(E.RELICS[r].nome)}"><span class="med plate" style="--tc:${rc(E.RELICS[r].rar)}">${markSvg(r)}</span><b style="font-size:13.5px">${esc(E.RELICS[r].nome)}</b><span class="p chip coin">+${Math.floor(E.RELIC_PRICE[E.RELICS[r].rar] / 2)} ${ic('coin')}</span></div>`).join('')}</div>` : ''}
   ${invPanels(run)}
   <div class="mctrl"><button class="btn" data-act="leaveShop">${ic('play')} Sair do Vestiário</button></div>`;
 }
@@ -1173,7 +1196,7 @@ function renderVerdict() {
       <div><div class="k">Campanha</div><div class="v">${w}V ${d}E ${l}D</div></div>
       <div><div class="k">Gols</div><div class="v">${v.gf} pró · ${v.ga} contra</div></div>
     </div>
-    <div style="margin-top:10px"><div class="k eyebrow" style="font-size:9.5px">Relíquias</div><div style="font-size:13.5px;font-weight:800;margin-top:2px">${v.relics.length ? v.relics.map(r => E.RELICS[r].icon + ' ' + esc(E.RELICS[r].nome)).join(' · ') : 'Nenhuma: na raça!'}</div></div>
+    <div style="margin-top:10px"><div class="k eyebrow" style="font-size:9.5px">Relíquias</div><div class="relicline">${v.relics.length ? v.relics.map(r => `<span class="ri">${markSvg(r)} ${esc(E.RELICS[r].nome)}</span>`).join('') : 'Nenhuma: na raça!'}</div></div>
     <div class="vpath">${v.history.map(h => `<span class="${h.outcome}">${E.STAGES[h.stage].curto} ${h.flag} ${h.gf}-${h.ga}${h.pens ? ` (p ${h.pens[0]}-${h.pens[1]})` : ''}</span>`).join('')}</div>
     ${run.bolao && G.metaRes && G.metaRes.bolao ? `<div class="vbolao">🎯 Bolão: palpite <b>${esc(M.BOLAO[run.bolao.guess].nome)}</b> · chegou <b>${esc(M.BOLAO[G.metaRes.bolao.reach].nome)}</b> ${bolaoMark(G.metaRes.bolao)}</div>` : ''}
     <div class="vbottom"><div><small>SEMENTE PRO DESAFIO</small><b>${esc(v.seed)}</b></div><div class="sc"><small>PONTOS</small><b class="num">${fmtN(P.total)}</b></div></div>
@@ -1234,7 +1257,7 @@ function drawCard(v) {
   y += 400;
   x.fillStyle = '#9db5a6'; x.font = `900 28px ${F}`; x.fillText('RELÍQUIAS', W / 2, y);
   x.fillStyle = '#fff'; x.font = `700 36px ${FE}`;
-  y = wrapText(x, v.relics.length ? v.relics.map(r => E.RELICS[r].icon + ' ' + E.RELICS[r].nome).join(' · ') : 'Nenhuma: na raça!', W / 2, y + 50, W - 160, 48);
+  y = wrapText(x, v.relics.length ? v.relics.map(r => E.RELICS[r].nome).join(' · ') : 'Nenhuma: na raça!', W / 2, y + 50, W - 160, 48);
   x.font = `800 32px ${F}`; x.fillStyle = '#d6efd9';
   y = wrapText(x, v.history.map(h => `${E.STAGES[h.stage].curto} ${h.gf}-${h.ga}`).join('  ·  '), W / 2, Math.min(y + 16, H - 380), W - 160, 42);
   const extra = [];
@@ -1269,7 +1292,7 @@ function showInfo(k, id) {
     const m = document.createElement('div'); m.className = 'modal';
     const hints = G.run ? E.comboHints(G.run, id) : [];
     m.innerHTML = `<div class="box info" style="--rc:${t.cor}"><div style="max-width:220px;margin:0 auto 10px">${cardFace(id, G.run, { btn: false })}</div>
-      <p class="d"><b>${t.emoji} ${t.nome}</b> · custa ${d.cost} · ${esc(d.dur)} · Nv${lv}</p>
+      <p class="d"><b>${typeMark(d.tipo)} ${t.nome}</b> · custa ${d.cost} · ${esc(d.dur)} · Nv${lv}</p>
       <p class="d">${esc(E.cardText(id, lv))}</p>
       <p class="d" style="color:var(--gold)">Melhor quando: ${esc(d.tip)}</p>
       ${d.style ? `<p class="xs">Estilo ${E.STYLE_NAME[d.style]}. ${E.BEATS[d.style] ? 'Ganha de ' + E.STYLE_NAME[E.BEATS[d.style]] + '.' : ''}</p>` : ''}
@@ -1279,10 +1302,10 @@ function showInfo(k, id) {
     document.body.appendChild(m);
     return;
   }
-  else if (k === 'relic') { const d = E.RELICS[id]; rar = d.rar; icon = d.icon; nome = d.nome; tipo = 'Relíquia · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Relíquias funcionam sozinhas, o tempo todo.'; }
+  else if (k === 'relic') { const d = E.RELICS[id]; rar = d.rar; icon = markSvg(id); nome = d.nome; tipo = 'Relíquia · ' + E.RARITIES[d.rar].nome; desc = d.desc + ' Relíquias funcionam sozinhas, o tempo todo.'; }
   else return;
   const m = document.createElement('div'); m.className = 'modal';
-  m.innerHTML = `<div class="box info" style="--rc:${rc(rar)}"><div class="big"><div class="ii">${icon}</div><div><div class="eyebrow" style="color:var(--rc)">${esc(tipo)}</div><h3 class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase;margin:2px 0 0">${esc(nome)}</h3></div></div>
+  m.innerHTML = `<div class="box info" style="--rc:${rc(rar)}"><div class="big"><div class="ii plate" style="--tc:${rc(rar)}" role="img" aria-label="${esc(nome)}">${icon}</div><div><div class="eyebrow" style="color:var(--rc)">${esc(tipo)}</div><h3 class="disp" style="font-size:22px;font-style:italic;text-transform:uppercase;margin:2px 0 0">${esc(nome)}</h3></div></div>
     <p class="d">${esc(desc)}</p><button class="btn sec" data-x="1">Fechar</button></div>`;
   m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
   document.body.appendChild(m);
@@ -2529,7 +2552,7 @@ function previewCareer(which) {
   }
   G.screen = d.screen; render();
 }
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet };
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet, paintDecision };
 document.addEventListener('input', ev => {
   const t = ev.target; if (!t) return;
   if (t.id === 'coachName') { G.store.coachName = t.value.trim() || 'Professor Fominha'; saveStore(); }

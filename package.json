@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "node build.js",
-    "test": "node test/sim.test.js && node test/coach.test.js && node test/relics.test.js && node test/epic.test.js && node test/meta.test.js && node test/bracket.test.js && node test/live.test.js && node test/cards.test.js && node test/career.test.js && node test/audio.test.js"
+    "test": "node test/sim.test.js && node test/coach.test.js && node test/relics.test.js && node test/epic.test.js && node test/meta.test.js && node test/bracket.test.js && node test/live.test.js && node test/cards.test.js && node test/career.test.js && node test/audio.test.js && node test/icons.test.js"
   },
   "keywords": [],
   "author": "",
