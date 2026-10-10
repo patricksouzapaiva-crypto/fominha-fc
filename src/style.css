@@ -917,3 +917,4 @@ button.cface{appearance:none;cursor:pointer}
 .penwho{text-align:center;min-height:48px;margin-top:8px}
 .penwho b{display:block;font-size:18px}
 .penwho small{color:var(--mut);font-weight:700}
+.gcnote{margin:16px 8px 0;text-align:center;line-height:1.45}

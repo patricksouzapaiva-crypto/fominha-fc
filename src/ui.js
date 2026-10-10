@@ -72,6 +72,15 @@ function loadStore() {
 function saveStore() { try { localStorage.setItem(STORE_KEY, JSON.stringify(G.store)); } catch (e) { /* modo privado */ } }
 
 const G = { albumPage: 'inicio', cosTab: 'kit', store: loadStore(), screen: 'home', run: null, match: null, offers: null, shop: null, result: null, speed: 1, pendingSeed: '', pendingDaily: null, timer: null, verdict: null, newRecord: false };
+function gc(path, title) {
+  try { if (window.ffGc && window.ffGc.event) window.ffGc.event(path, title); } catch (e) { /* sem analytics */ }
+}
+function noteSeasons(before) {
+  const after = (G.career && G.career.seasons) || 0;
+  if (before < 5 && after >= 5) gc('carreira-temporada-5', 'Temporada 5');
+  if (before < 10 && after >= 10) gc('carreira-temporada-10', 'Temporada 10');
+  if (before < 20 && after >= 20) gc('carreira-temporada-20', 'Temporada 20');
+}
 
 M.cosStore(G.store); M.ligaSync(G.store); M.missionState(G.store);
 function toast(msg) {
@@ -312,7 +321,8 @@ function renderHome() {
     <button class="btn sec" style="margin-top:8px" data-act="liveDuel">${ic('users')} Duelo ao vivo <small>mesma Copa, só se encontram na final</small></button>
     <button class="btn sec" style="margin-top:8px" data-act="carOpen">Modo Carreira <small>20 temporadas, da Série D à elite</small></button></div>
   <div class="panel"><div class="ph">${ic('rank')} Ranking local <span class="r">melhores campanhas</span></div>${rankHtml(st.ranking || [])}</div>
-  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button></div>`;
+  <div class="row"><button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button></div>
+  <p class="xs mut gcnote">Contamos visitas de forma anônima, sem cookies.</p>`;
   if (DEBUG.week) { const d = G.store.liga.div; G.store.liga.anim = { from: DEBUG.week === 'down' ? Math.min(4, d + 1) : Math.max(0, d), to: DEBUG.week === 'down' ? d : Math.min(4, d + 1), week: M.isoWeek(new Date(Date.now() - 7 * 864e5)), score: DEBUG.week === 'down' ? 240 : 1720 }; DEBUG.week = null; }
   if (!ligaAnimModal()) showTip('nav');
 }
@@ -325,6 +335,7 @@ function howtoModal() {
     <li><div><b>Na partida</b> o jogo pausa em 3 momentos. Cada carta custa energia (3 por jogo, 4 com Estrategista 90+). Dá pra gastar mais de uma no mesmo momento.</div></li>
     <li><div><b>Depois de vencer</b> você abre um pacote: 1 de 3 entre jogador, carta ou relíquia. No Vestiário (jogos 2, 4 e 6) dá pra comprar com Fichas.</div></li>
     <li><div><b>Pontos:</b> 100 por vitória, 40 por empate, 15 por gol, 10 por saldo e +250 pelo título, tudo vezes o multiplicador do nível.</div></li></ol>
+    <p class="xs mut gcnote">Contamos visitas de forma anônima, sem cookies.</p>
     <button class="btn" data-x="1">Bora!</button></div>`;
   m.addEventListener('click', ev => { if (ev.target === m || ev.target.closest('[data-x]')) m.remove(); });
   document.body.appendChild(m);
@@ -1015,7 +1026,9 @@ function renderResult() {
 function afterResult() {
   const r = G.result; G.epicIdx = 0;
   if (r && r.career && G.career && G.careerPending) {
+    const before = G.career.seasons || 0;
     const back = FFCareer.applyLive(G.career, G.careerPending.gf, G.careerPending.ga);
+    noteSeasons(before);
     FFCareer.persist(G.career);
     G.careerPending = null;
     if (back.msg) toast(back.msg);
@@ -1132,6 +1145,8 @@ function finalizeRun() {
   const pts = runPoints(run);
   const label = E.stageReachedLabel(run);
   const chegou = label === 'CAMPEÃO' ? 'Campeão' : label;
+  if (run.status === 'champion') gc('copa-campeao', 'Campeão');
+  else if (run.status === 'eliminated') gc('copa-eliminado', label);
   G.points = pts;
   G.prevRecord = st.record || 0;
   G.newRecord = pts.total > (st.record || 0);
@@ -1289,10 +1304,11 @@ async function shareCard() {
   const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
   const file = blob && typeof File !== 'undefined' ? new File([blob], `fominha-fc-${v.seed}.png`, { type: 'image/png' }) : null;
   try {
-    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text, title: 'Fominha FC' }); return; }
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text, title: 'Fominha FC' }); gc('compartilhou-card', 'Compartilhou o card'); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
   if (blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `fominha-fc-${v.seed}.png`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
   await copyText(text);
+  gc('compartilhou-card', 'Compartilhou o card');
   toast('Card baixado e texto copiado! 📋');
 }
 
@@ -1438,7 +1454,8 @@ function renderPerfil() {
       const how = own ? (on ? '<span class="eq">EQUIPADO</span>' : `<button class="mini" data-act="equip" data-id="${id}">Equipar</button>`) : c.preco ? `<button class="mini buy" data-act="buycos" data-id="${id}" ${st.fominhas < c.preco ? 'disabled' : ''}>🪙 ${c.preco}</button>` : `<span class="lockm">${ic('lock')} ${c.album ? 'Álbum' : 'Missão'}</span>`;
       return `<div class="cos ${own ? '' : 'locked'} ${on ? 'on' : ''}"><div class="cprev">${cosSwatch(id)}</div><b>${esc(c.nome)}</b><small>${esc(c.desc)}</small>${how}</div>`; }).join('')}</div></div>
   <div class="panel"><div class="ph">${ic('star')} Conquistas</div><div class="badges">${M.STREAK_BADGES.map(b => `<div class="bdg ${sk.badges[b.n] ? 'on' : ''}"><span>${b.icon}</span><b>${b.n} dias</b><small>${esc(b.nome)}</small></div>`).join('')}</div></div>
-  <button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button>`;
+  <button class="btn ghost" data-act="howto">${ic('info')} Como jogar</button>
+  <p class="xs mut gcnote">Contamos visitas de forma anônima, sem cookies.</p>`;
 }
 // ---------- divisões: animação de virada da semana ----------
 function ligaAnimModal() {
@@ -1758,6 +1775,7 @@ function onCupEvent(p) {
 }
 function beginFinal(home, away, startAt) {
   if (!G.cup || (G.match && G.match.pvp && !G.match.done)) return;
+  gc('duelo-final-ao-vivo', 'Final ao vivo');
   const h = FFLive.unpackSquad(home, G.cup.seed), a = FFLive.unpackSquad(away, G.cup.seed);
   G.speed = 1;
   G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
@@ -1770,6 +1788,7 @@ function beginFinal(home, away, startAt) {
 function resumeFinal(final) {
   if (!final || !final.home || !final.away || !G.cup) return;
   if (G.match && G.match.pvp && !G.match.done) return;
+  gc('duelo-final-ao-vivo', 'Final ao vivo');
   const h = FFLive.unpackSquad(final.home, G.cup.seed), a = FFLive.unpackSquad(final.away, G.cup.seed);
   G.speed = 1;
   G.match = E.createPvpMatch(h, a, G.cup.seed + 'F');
@@ -2045,6 +2064,7 @@ function openLiveDuel(seed) {
   const url = duelLink(d); G.lastDuelLink = url;
   copyText(`⚔️ Duelo ao vivo no Fominha FC! Mesma Copa, grupos opostos, a gente só se encontra na final: ${url}`);
   history.replaceState(null, '', publicPath() + '#duelo=' + M.duelEncode(d));
+  gc('duelo-criado', 'Duelo criado');
   go('chave'); cupConnect();
 }
 function previewDuel(which) {
@@ -2371,7 +2391,7 @@ function onClick(ev) {
     case 'pick': newRunFromPending(el.dataset.id); G.draft = E.coachDraftNew(G.run.seed); toast(`${selOf(G.run).flag} ${selOf(G.run).nome} na Copa!`); G.screen = 'coach'; render(); spinCoach(); break;
     case 'cpick': if (E.draftPick(G.draft, el.dataset.a)) { if (G.draft.done) { renderCoach(); toast('Técnico montado!'); } else spinCoach(); } break;
     case 'creroll': if (E.draftReroll(G.draft)) spinCoach(); break;
-    case 'cdone': { const nm = ($('#coachName') && $('#coachName').value.trim()) || G.store.coachName || 'Professor Fominha'; G.store.coachName = nm; saveStore(); G.run.coach = E.makeCoach(nm, G.draft.slots); go('hub'); break; }
+    case 'cdone': { const nm = ($('#coachName') && $('#coachName').value.trim()) || G.store.coachName || 'Professor Fominha'; G.store.coachName = nm; saveStore(); G.run.coach = E.makeCoach(nm, G.draft.slots); gc('tecnico-criado', 'Técnico criado'); gc('copa-iniciada', 'Copa iniciada'); if (G.run.daily) gc('desafio-do-dia', 'Desafio do dia'); go('hub'); break; }
     case 'play': G.match = E.createMatch(G.run); applyDebug(G.match); go('match'); break;
     case 'speed': G.speed = G.speed === 1 ? 2 : G.speed === 2 ? 3 : 1; el.innerHTML = `${ic('fast')} ${G.speed}x`; break;
     case 'usecard': useCard(el.dataset.c); break;
@@ -2421,12 +2441,13 @@ function onClick(ev) {
     case 'carStart': {
       syncCarName(); const d = G.carDraft; if (!d || d.left !== 0) return toast('Distribua os 18 pontos.');
       G.career = FFCareer.create({ seed: d.seed, nome: d.nome || 'Professor', nums: d.nums, clubId: d.clubId, slot: G.carSlot || 0, policy: 'play' });
+      gc('carreira-iniciada', 'Carreira iniciada');
       FFCareer.persist(G.career); go('carHub'); break;
     }
-    case 'carJump': carGo(FFCareer.pump(G.career, 'jump')); break;
-    case 'carOne': carGo(FFCareer.pump(G.career, 'one')); break;
+    case 'carJump': { const before = G.career ? G.career.seasons : 0; carGo(FFCareer.pump(G.career, 'jump')); noteSeasons(before); break; }
+    case 'carOne': { const before = G.career ? G.career.seasons : 0; carGo(FFCareer.pump(G.career, 'one')); noteSeasons(before); break; }
     case 'carLive': startCareerLive(); break;
-    case 'carSkip': carGo(FFCareer.skipLive(G.career)); break;
+    case 'carSkip': { const before = G.career ? G.career.seasons : 0; carGo(FFCareer.skipLive(G.career)); noteSeasons(before); break; }
     case 'carTabela': go('carTabela'); break;
     case 'carInboxBtn': go('carInbox'); break;
     case 'carBackHub': go(G.career ? FFCareer.screenFor(G.career) : 'carHome'); break;
@@ -2587,13 +2608,16 @@ function readDuelHash() {
     let role = 1;
     try { if (sessionStorage.getItem('ffcup') === d.id) role = 0; } catch (e) { /* ignora */ }
     G.cup = { id: d.id, seed: d.s, level: d.l, host: d.host, role, mode: 'start', koSeen: false, status: 'connecting', friend: null };
+    if (role !== 0) gc('duelo-entrou-pelo-link', 'Entrou pelo link');
     restoreSnap();
     G.screen = 'chave';
     if (G.cup.final && G.cup.final.home && G.cup.final.locks && G.cup.final.locks.length && G.run && G.run.stage >= 6 && G.run.status === 'playing') setTimeout(() => resumeFinal(G.cup.final), 20);
     setTimeout(cupConnect, 40);
     return true;
   }
-  G.duelIn = d; G.screen = 'duelo'; return true;
+  G.duelIn = d; G.screen = 'duelo';
+  gc('duelo-entrou-pelo-link', 'Entrou pelo link');
+  return true;
 }
 window.addEventListener('hashchange', () => { if (readDuelHash()) render(); });
 readDuelHash();
