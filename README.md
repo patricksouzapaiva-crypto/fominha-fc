@@ -61,7 +61,9 @@ Os scripts `test/*.e2e.js`, `test/screens*.js`, `test/pace.js` e `test/share.js`
 
 ## Onde está publicado
 
-https://patricksouzapaiva-crypto.github.io/fominha-fc/
+https://fominha-fc.github.io/
+
+O site fica na raiz do domínio, sem a subpasta `/fominha-fc/`. O `index.html` é servido em `/`, os sons em `/assets/snd/` e as imagens em `/assets/`. Links de duelo e de compartilhamento abertos nesse domínio apontam para `https://fominha-fc.github.io/`.
 
 Cada push na `main` dispara `.github/workflows/pages.yml`: instala as dependências, roda `node build.js`, publica a pasta `_site/` com `index.html` via GitHub Actions (`actions/configure-pages` com `enablement: true`, `actions/upload-pages-artifact` e `actions/deploy-pages`).
 

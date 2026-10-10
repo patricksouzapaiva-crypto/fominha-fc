@@ -1212,8 +1212,20 @@ function renderVerdict() {
   countUp($('#pts'), P.total);
   if (G.metaRes && G.metaRes.duel && !RM()) setTimeout(() => confettiBurst(['#ffc83d', '#c6ff3d', '#fff'], G.metaRes.duel.w === 0 ? 30 : 0), 400);
 }
+const SITE = 'https://fominha-fc.github.io/';
+function onPublishedSite() {
+  try { return new URL(location.href).hostname === 'fominha-fc.github.io'; } catch (e) { return false; }
+}
+function pageUrl() {
+  if (onPublishedSite()) return SITE;
+  try { return location.href.split('#')[0]; } catch (e) { return SITE; }
+}
+function publicPath() {
+  if (onPublishedSite()) return '/' + (location.search || '');
+  return location.pathname + location.search;
+}
 function shareText(v) {
-  return `⚡ Fominha FC · Copa Relâmpago${v.daily ? ' · Desafio do dia ' + v.daily.slice(8, 10) + '/' + v.daily.slice(5, 7) : ''}\n${v.selecao.flag} ${v.selecao.nome}: ${v.chegou === 'CAMPEÃO' ? '🏆 CAMPEÃO' : v.chegou} · ${fmtN(v.points || 0)} pts\n“${v.titulo}”: ${v.frase}\n${v.artilheiro ? `Artilheiro: ${v.artilheiro.nome} (${v.artilheiro.gols})\n` : ''}${v.coach ? `Técnico: ${v.coach.nome} (“${v.coach.titulo}”, OVR ${slotsOVR(v.coach.slots)})\n` : ''}Duvido você fazer mais pontos! Semente: ${v.seed} (nível ${v.level})`;
+  return `⚡ Fominha FC · Copa Relâmpago${v.daily ? ' · Desafio do dia ' + v.daily.slice(8, 10) + '/' + v.daily.slice(5, 7) : ''}\n${v.selecao.flag} ${v.selecao.nome}: ${v.chegou === 'CAMPEÃO' ? '🏆 CAMPEÃO' : v.chegou} · ${fmtN(v.points || 0)} pts\n“${v.titulo}”: ${v.frase}\n${v.artilheiro ? `Artilheiro: ${v.artilheiro.nome} (${v.artilheiro.gols})\n` : ''}${v.coach ? `Técnico: ${v.coach.nome} (“${v.coach.titulo}”, OVR ${slotsOVR(v.coach.slots)})\n` : ''}Duvido você fazer mais pontos! Semente: ${v.seed} (nível ${v.level})\n${SITE}`;
 }
 async function copyText(t) {
   try { await navigator.clipboard.writeText(t); return true; } catch (e) {
@@ -2032,7 +2044,7 @@ function openLiveDuel(seed) {
   try { sessionStorage.setItem('ffcup', d.id); } catch (e) { /* ignora */ }
   const url = duelLink(d); G.lastDuelLink = url;
   copyText(`⚔️ Duelo ao vivo no Fominha FC! Mesma Copa, grupos opostos, a gente só se encontra na final: ${url}`);
-  history.replaceState(null, '', location.pathname + location.search + '#duelo=' + M.duelEncode(d));
+  history.replaceState(null, '', publicPath() + '#duelo=' + M.duelEncode(d));
   go('chave'); cupConnect();
 }
 function previewDuel(which) {
@@ -2075,7 +2087,7 @@ function previewDuel(which) {
 }
 
 // ---------- duelo ----------
-function duelLink(d) { return location.href.split('#')[0] + '#duelo=' + M.duelEncode(d); }
+function duelLink(d) { return pageUrl() + '#duelo=' + M.duelEncode(d); }
 function duelSideHtml(s, win, lbl) {
   const sel = E.SELECOES[s.sel];
   return `<div class="dside ${win ? 'win' : ''}">${win ? '<div class="crown">👑</div>' : ''}<div class="eyebrow">${esc(lbl)}</div><div class="dn">${esc(s.n)}</div><div class="df">${sel.flag} ${esc(sel.curto)}</div><div class="dp num">${fmtN(s.p)}</div><div class="xs mut">${M.REACH[s.r]} · ${s.gf}-${s.ga}</div></div>`;
@@ -2345,7 +2357,7 @@ function onClick(ev) {
     case 'epicCard': epicModal(G.run.epics[+el.dataset.i]); break;
     case 'liveDuel': openLiveDuel($('#seedIn') ? $('#seedIn').value : ''); break;
     case 'cupTeam': G.pendingSeed = G.cup.seed; G.pendingLevel = G.cup.level; G.pendingDaily = null; G.pendingLegend = null; G.pendingDuel = null; go('selecao'); break;
-    case 'cupCopy': { const url = G.lastDuelLink || (location.href.split('#')[0] + location.hash); copyText(url).then(ok => toast(ok ? 'Link do duelo copiado!' : url)); break; }
+    case 'cupCopy': { const url = G.lastDuelLink || (pageUrl() + location.hash); copyText(url).then(ok => toast(ok ? 'Link do duelo copiado!' : url)); break; }
     case 'cupBack': go(G.run && G.run.stage >= 3 && !G.cup.koSeen ? 'chave' : 'hub'); break;
     case 'cupBoard': if (G.cup) { G.cup.mode = G.run && G.run.stage >= 3 ? 'ko' : 'start'; G.screen = 'chave'; render(); } break;
     case 'cupRetry': cupRetry(); break;
@@ -2353,7 +2365,7 @@ function onClick(ev) {
     case 'pvpcard': pvpChoose(el.dataset.c || ''); break;
     case 'duelLink': { const d = { v: 1, s: G.run.seed, l: G.run.level, a: M.duelSide(G.run, G.store.coachName || 'Fominha', G.verdict.points) }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Duelo no Fominha FC! Fiz ${fmtN(G.verdict.points)} pts na Copa ${G.run.seed}. Duvido você me passar: ${url}`).then(ok => toast(ok ? 'Link do duelo copiado! Manda no grupo ⚔️' : 'Não deu pra copiar o link')); break; }
     case 'duelReturn': { const R = G.metaRes.duel; const d = { v: 1, s: G.run.seed, l: G.run.level, a: R.me, b: R.them }; const url = duelLink(d); G.lastDuelLink = url; copyText(`⚔️ Respondi teu duelo no Fominha FC: ${fmtN(R.me.p)} x ${fmtN(R.them.p)}. Confere: ${url}`).then(ok => toast(ok ? 'Resposta copiada! Devolve pro amigo ⚔️' : 'Não deu pra copiar')); break; }
-    case 'duelAccept': { const d = G.duelIn; const duel = d.b ? { v: 1, s: d.s, l: d.l, a: d.a } : d; startRun(d.s, null); G.pendingLevel = d.l; G.pendingDuel = duel; history.replaceState(null, '', location.pathname + location.search); render(); break; }
+    case 'duelAccept': { const d = G.duelIn; const duel = d.b ? { v: 1, s: d.s, l: d.l, a: d.a } : d; startRun(d.s, null); G.pendingLevel = d.l; G.pendingDuel = duel; history.replaceState(null, '', publicPath()); render(); break; }
     case 'howto': howtoModal(); break;
     case 'home': G.pendingSeed = ''; go('home'); break;
     case 'pick': newRunFromPending(el.dataset.id); G.draft = E.coachDraftNew(G.run.seed); toast(`${selOf(G.run).flag} ${selOf(G.run).nome} na Copa!`); G.screen = 'coach'; render(); spinCoach(); break;

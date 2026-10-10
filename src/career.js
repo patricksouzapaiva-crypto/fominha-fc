@@ -1670,7 +1670,7 @@
   }
   function shareText(d) {
     const t = d.titles || emptyTitles();
-    return `Fominha FC · ${d.titulo}\n${d.nome} · ${d.seasons} temporadas\nLigas ${t.D + t.C + t.B + t.A} · Copa ${t.copa} · Liberta ${t.lib}\n${(d.mentors || []).slice(0, 2).join(' | ')}`;
+    return `Fominha FC · ${d.titulo}\n${d.nome} · ${d.seasons} temporadas\nLigas ${t.D + t.C + t.B + t.A} · Copa ${t.copa} · Liberta ${t.lib}\n${(d.mentors || []).slice(0, 2).join(' | ')}\nhttps://fominha-fc.github.io/`;
   }
 
   function afterSingle(c, msg) {

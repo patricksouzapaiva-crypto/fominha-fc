@@ -40,4 +40,9 @@ files.forEach(name => {
 const built = fs.readFileSync(path.join(__dirname, '..', 'copa-relampago.html'), 'utf8');
 if (built.indexOf('createOscillator') >= 0 || built.indexOf('noiseBuf') >= 0) throw new Error('o html publicado ainda tem ruído procedural');
 if (built.indexOf('data-act="somToggle"') < 0) throw new Error('o controle de som não entrou no html');
+if (built.indexOf('patricksouzapaiva-crypto') >= 0) throw new Error('html ainda aponta pro repo antigo');
+if (built.indexOf('/fominha-fc/') >= 0) throw new Error('html ainda usa a subpasta /fominha-fc/');
+if (built.indexOf('rel="canonical" href="https://fominha-fc.github.io/"') < 0) throw new Error('canonical ausente');
+if (built.indexOf('property="og:url" content="https://fominha-fc.github.io/"') < 0) throw new Error('og:url ausente');
+if (built.indexOf('https://fominha-fc.github.io/assets/snd/') < 0) throw new Error('sons não apontam pra raiz do site');
 console.log('audio ok', files.length, 'arquivos');

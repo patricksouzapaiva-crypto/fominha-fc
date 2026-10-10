@@ -56,8 +56,14 @@
   function sampleBase() {
     try {
       if (typeof location === 'undefined' || !location.href || location.protocol === 'about:') return '';
-      const u = location.href.split('#')[0].split('?')[0];
-      return u.slice(0, u.lastIndexOf('/') + 1) + 'assets/snd/';
+      const u = new URL(location.href);
+      if (u.hostname === 'fominha-fc.github.io') return 'https://fominha-fc.github.io/assets/snd/';
+      u.hash = '';
+      u.search = '';
+      let path = u.pathname || '/';
+      if (!path.endsWith('/')) path = path.slice(0, path.lastIndexOf('/') + 1) || '/';
+      u.pathname = path + 'assets/snd/';
+      return u.href;
     } catch (e) { return ''; }
   }
   function loadOne(name) {
