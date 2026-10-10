@@ -163,11 +163,11 @@ function cardFace(id, run, opts) {
   opts = opts || {};
   const c = E.CARDS[id], t = E.CARD_TYPES[c.tipo];
   const lv = opts.lv || E.cardLevel(run || G.run, id);
-  const hints = run ? E.comboHints(run, id) : [];
+  const hints = opts.compact || !run ? [] : E.comboHints(run, id);
   const tag = opts.btn === false ? 'div' : 'button';
   const label = `${c.nome}, ${t.nome}, nível ${lv}, custa ${c.cost} de energia`;
   return `<${tag} class="cface tipo-${c.tipo} rar-${c.rar} lv${lv} ${opts.on ? 'on' : ''} ${opts.dim ? 'dim' : ''}" style="--tc:${t.cor}" ${tag === 'button' ? 'type="button"' : 'role="img"'} aria-label="${esc(label)}" ${opts.act ? `data-act="${opts.act}" data-c="${id}" data-k="card" data-id="${id}"` : ''}>
-    <i class="cost">${boltSvg()}${c.cost}</i><i class="dur">${esc(c.dur)}</i><span class="art">${markSvg(id)}</span>
+    <span class="cmeta"><i class="cost">${boltSvg()}${c.cost}</i><i class="dur">${esc(c.dur)}</i></span><span class="art">${markSvg(id)}</span>
     <b>${esc(c.nome)}</b><small>${typeMark(c.tipo)} <span>${esc(t.nome)}${lv > 1 ? ' · Nv' + lv : ''}</span></small><em aria-hidden="true">${'★'.repeat(lv)}${'☆'.repeat(3 - lv)}</em>
     ${hints.length ? `<div class="hintline">Combo: ${esc(hints.join(', '))}</div>` : ''}</${tag}>`;
 }
@@ -1049,7 +1049,7 @@ function offerHtml(it, i, act, price, flip) {
     const lv = E.cardLevel(G.run, it.id);
     const showLv = owned ? Math.min(3, lv + 1) : 1;
     return `<div class="offer cardoffer ${d.rar} ${it.sold ? 'sold' : ''} ${can ? '' : 'cant'} ${anim}--rc:${t.cor}" data-act="${act}" data-i="${i}" role="button" tabindex="0">
-      <div class="cslot">${cardFace(it.id, G.run, { btn: false, lv: showLv })}</div>
+      <div class="offercard">${cardFace(it.id, G.run, { btn: false, lv: showLv, compact: true })}</div>
       <div><div class="ot">${typeMark(d.tipo)} ${t.nome} · ${owned ? 'sobe para Nv' + showLv : 'Nv1'} · ${boltSvg()}${d.cost}</div>
       <div class="on">${esc(d.nome)}</div>
       <div class="od">${esc(E.cardText(it.id, showLv))}</div>
@@ -1812,10 +1812,10 @@ function paintPvp() {
     <div class="dhead">${ic('pause')}<div><div class="eyebrow g">${m.minute}' · ${m.score[0]} x ${m.score[1]}</div><div class="t">Final · ${nrgPips(Math.max(0, left), max)}</div></div>
     <div class="dtimer"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="4"/><circle id="dring" cx="22" cy="22" r="18" fill="none" stroke="#ffc83d" stroke-width="4" stroke-linecap="round" stroke-dasharray="${2 * Math.PI * 18}"/></svg><b id="dsec">12</b></div></div>
     <div class="dctx" style="border-left:3px solid var(--gold)">Os dois escolhem ao mesmo tempo. Sem escolha, a carta fica guardada. <span id="fpick">Amigo escolhendo...</span></div>
-    ${(mine.cards || []).map(c => {
+    <div class="dcards">${(mine.cards || []).map(c => {
       const on = (G.pvpHand || []).indexOf(c) >= 0, used = bag.indexOf(c) >= 0, afford = !used && (on || E.CARDS[c].cost <= left);
       return cardFace(c, mine, { act: afford && m.awaitingSides[role] ? 'pvpcard' : '', on, dim: !afford, btn: true });
-    }).join('')}
+    }).join('')}</div>
     ${focus ? chanceBars(focus) : ''}
     <button class="btn shine" style="margin-top:8px" data-act="pvpcard" data-c="go">Confirmar</button>
     <button class="btn sec" style="margin-top:8px" data-act="pvpcard" data-c="">Guardar e seguir</button>`;
@@ -2564,7 +2564,7 @@ function previewCareer(which) {
   }
   G.screen = d.screen; render();
 }
-window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet, paintDecision };
+window.FFUI = { G, M, go, render, runPoints, dailySeed, drawCard, autoRun, setupRun, quickMatch, epicPNG, saveStore, applyDebug, previewDuel, previewCards, previewCareer, somSheet, paintDecision, paintPvp };
 document.addEventListener('input', ev => {
   const t = ev.target; if (!t) return;
   if (t.id === 'coachName') { G.store.coachName = t.value.trim() || 'Professor Fominha'; saveStore(); }
